@@ -983,6 +983,39 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
         return _url_plan("remove_pmax_url_exclusions", customer_id,
                          campaign_id=campaign_id, criterion_ids=criterion_ids)
 
+    @server.tool(
+        name="set_asset_group_product_selection",
+        description=_spec(
+            "set_asset_group_product_selection",
+            "Plan irreversible replacement of an existing feed-linked Performance Max "
+            "asset group's complete product tree. item_ids must contain 1 to 998 distinct "
+            "trimmed, case-preserved Item IDs, at most 128 Unicode codepoints each, without "
+            "controls or internal whitespace. Includes these items and excludes everything "
+            "else. Supports empty trees, a single all-products unit, or flat Item-ID trees "
+            "with one catch-all; nested trees and other dimensions are refused. Reads at "
+            "most 1000 existing nodes plus one lookahead and requires complete state. "
+            "Shows every before/after node and rechecks group, campaign feed and tree before "
+            "apply; changed state returns STALE_PLAN. Uses one atomic v25 tree request, "
+            "normal preview and irreversible acknowledgement. Alters inventory eligibility "
+            "and may affect delivery and spend. Provider acceptance is not guaranteed. "
+            "Writes only to the configured account; verify afterwards with get_listing_groups.",
+        ),
+    )
+    def set_asset_group_product_selection(
+        asset_group_id: str,
+        item_ids: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        def impl():
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **pmax.product_selection_plan(
+                ctx, asset_group_id=asset_group_id, item_ids=item_ids,
+            ))
+
+        return _guarded_mutation(ctx, "set_asset_group_product_selection", impl)()
+
     def entity_kind(entity_type: str) -> str:
         kind = str(entity_type or "").strip().lower()
         if kind not in _ENTITY_SERVICES:

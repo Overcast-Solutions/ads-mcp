@@ -54,6 +54,178 @@ CRITERION_FIELDS = (
     "campaign_criterion.negative, campaign_criterion.type, "
     "campaign_criterion.webpage"
 )
+LISTING_FIELDS = ", ".join(
+    "asset_group_listing_group_filter." + field for field in (
+        "id", "resource_name", "asset_group", "type", "listing_source",
+        "parent_listing_group_filter", "case_value.product_item_id.value",
+        "case_value.product_brand.value", "case_value.product_category.category_id",
+        "case_value.product_category.level", "case_value.product_channel.channel",
+        "case_value.product_condition.condition", "case_value.product_custom_attribute.index",
+        "case_value.product_custom_attribute.value", "case_value.product_type.level",
+        "case_value.product_type.value", "case_value.webpage.conditions",
+        "case_value.retail_filter_bundle.shared_set",
+    )
+)
+MAX_LISTING_NODES = 1000
+MAX_ITEM_IDS = MAX_LISTING_NODES - 2
+
+
+def _product_unverified(message="Listing tree is inconsistent or unverifiable"):
+    raise ToolError(
+        "PMAX_PRODUCT_STATE_UNVERIFIED", message + ". Read get_listing_groups and "
+        "review the tree. Only empty, all-products unit, or flat Item-ID trees "
+        "with one catch-all can be replaced; other shapes need separate management.",
+    )
+
+
+def _listing_tree(ctx, customer_id, asset_group_id):
+    group_name = resource(customer_id, "assetGroups", asset_group_id)
+
+    def nodes():
+        rows = ctx.search_iter(
+            f"SELECT {LISTING_FIELDS} FROM asset_group_listing_group_filter "
+            f"WHERE asset_group_listing_group_filter.asset_group = '{group_name}' "
+            "ORDER BY asset_group_listing_group_filter.id LIMIT 1001", customer_id,
+        )
+        for index, row in enumerate(islice(rows, MAX_LISTING_NODES + 1)):
+            if index == MAX_LISTING_NODES:
+                _product_unverified("Complete tree exceeds the local 1000-node ceiling")
+            node = row.asset_group_listing_group_filter
+            identity = numeric_id(node.id, "listing filter ID")
+            if (node.resource_name != resource(customer_id, "assetGroupListingGroupFilters",
+                                               asset_group_id + "~" + identity)
+                    or node.asset_group != group_name
+                    or getattr(node.listing_source, "name", None) != "SHOPPING"):
+                _product_unverified()
+            kind = getattr(node.type_, "name", None)
+            if kind not in {"SUBDIVISION", "UNIT_INCLUDED", "UNIT_EXCLUDED"}:
+                _product_unverified("Unknown listing node type")
+            dimension = node.case_value._pb.WhichOneof("dimension")
+            if node.parent_listing_group_filter:
+                if dimension != "product_item_id":
+                    _product_unverified("Only Item-ID child dimensions are supported")
+                item = node.case_value.product_item_id
+                if item._pb.HasField("value") and not item.value:
+                    _product_unverified("An explicit empty Item ID is ambiguous")
+            elif node._pb.HasField("case_value"):
+                _product_unverified("Root must not carry a dimension")
+            yield json_format.MessageToDict(node._pb, preserving_proto_field_name=True)
+
+    encoded, _, truncated = ctx.retry_account_read(lambda: bounded_rows(nodes()), customer_id)
+    if truncated:
+        _product_unverified("Complete tree exceeds the local 16 MiB state limit")
+    tree = sorted((json.loads(row) for row in encoded), key=lambda node: int(node["id"]))
+    if not tree:
+        return tree
+    names = {node["resource_name"] for node in tree}
+    roots = [node for node in tree if not node.get("parent_listing_group_filter")]
+    if len(names) != len(tree) or len(roots) != 1:
+        _product_unverified("Duplicate nodes or missing/multiple roots")
+    root = roots[0]
+    if root["type_"] != "SUBDIVISION":
+        if len(tree) != 1:
+            _product_unverified("All-products unit cannot have children")
+        return tree
+    catchalls, items = 0, set()
+    for node in tree:
+        if node is root:
+            continue
+        if (node.get("parent_listing_group_filter") != root["resource_name"]
+                or node["type_"] not in {"UNIT_INCLUDED", "UNIT_EXCLUDED"}):
+            _product_unverified("Nested, cyclic or disconnected trees are unsupported")
+        item = node["case_value"]["product_item_id"].get("value")
+        if item is None:
+            catchalls += 1
+        elif item in items:
+            _product_unverified("Duplicate Item-ID siblings")
+        else:
+            items.add(item)
+    if catchalls != 1:
+        _product_unverified("A subdivision needs exactly one Item-ID catch-all")
+    return tree
+
+
+def _product_state(ctx, customer_id, asset_group_id):
+    return {
+        "group": group_state(ctx, asset_group_id, customer_id, shopping=True),
+        "tree": _listing_tree(ctx, customer_id, asset_group_id),
+    }
+
+
+def product_selection_plan(ctx, *, asset_group_id, item_ids):
+    """Replace a verified flat tree in one dedicated atomic provider request."""
+    asset_group_id = numeric_id(asset_group_id, "asset_group_id")
+    _nonempty_list(item_ids, "item_ids", MAX_ITEM_IDS)
+    items = []
+    for value in item_ids:
+        if (not isinstance(value, str) or not value.strip() or len(value.strip()) > 128
+                or any(unicodedata.category(char).startswith("C") for char in value)
+                or any(char.isspace() for char in value.strip())):
+            raise ToolError("INVALID_ARGUMENT", "Item IDs must be nonblank strings of at most "
+                            "128 Unicode codepoints without controls or internal whitespace")
+        items.append(value.strip())
+    if len(set(items)) != len(items):
+        raise ToolError("INVALID_ARGUMENT", "Item IDs must be distinct after trimming; case is preserved")
+    customer_id = ctx.config.customer_id
+    before = _product_state(ctx, customer_id, asset_group_id)
+    fingerprint = _fingerprint(before)
+    group_name = before["group"]["resource_name"]
+    root_name = resource(customer_id, "assetGroupListingGroupFilters", asset_group_id + "~-1")
+    after = [{"resource_name": root_name, "asset_group": group_name,
+              "type_": "SUBDIVISION", "listing_source": "SHOPPING"}]
+    for index, item in enumerate([*items, None], start=2):
+        after.append({
+            "resource_name": resource(customer_id, "assetGroupListingGroupFilters",
+                                      f"{asset_group_id}~-{index}"),
+            "asset_group": group_name, "listing_source": "SHOPPING",
+            "type_": "UNIT_EXCLUDED" if item is None else "UNIT_INCLUDED",
+            "parent_listing_group_filter": root_name,
+            "case_value": {"product_item_id": {} if item is None else {"value": item}},
+        })
+
+    def recheck(current):
+        try:
+            fresh = _product_state(current, customer_id, asset_group_id)
+        except ToolError as exc:
+            if exc.code not in {"PMAX_STATE_UNVERIFIED", "PMAX_PRODUCT_STATE_UNVERIFIED", "INVALID_ID"}:
+                raise
+            raise ToolError("STALE_PLAN", "Group, campaign or listing tree is no longer verified; "
+                            "stage a fresh product-selection plan") from None
+        if _fingerprint(fresh) != fingerprint:
+            raise ToolError("STALE_PLAN", "Group, campaign feed or listing tree changed; "
+                            "stage a fresh product-selection plan")
+
+    def execute(current):
+        client = current.client()
+        batch = []
+        # Validated trees are at most one level deep. Remove every child first.
+        ordered = sorted(before["tree"], key=lambda node: not node.get("parent_listing_group_filter"))
+        for node in ordered:
+            operation = client.get_type("AssetGroupListingGroupFilterOperation")
+            operation.remove = node["resource_name"]
+            batch.append(operation)
+        for node in after:
+            operation = client.get_type("AssetGroupListingGroupFilterOperation")
+            operation.create = node
+            batch.append(operation)
+        # This v25 dedicated request has no partial_failure field. Google
+        # validates the complete resulting tree atomically; _send never retries.
+        return executors._send(
+            current, client, "AssetGroupListingGroupFilterService",
+            "mutate_asset_group_listing_group_filters",
+            "MutateAssetGroupListingGroupFiltersRequest", batch,
+        )
+
+    return {
+        "tool": "set_asset_group_product_selection", "irreversible": True,
+        "summary": f"Irreversibly replace the complete product tree for asset group {asset_group_id} "
+                   f"with {len(items)} included Item IDs and an excluded everything-else leaf. "
+                   "Changes inventory eligibility and may affect delivery and spend under the "
+                   "existing budget. Provider eligibility and policy checks still apply.",
+        "operations": [{"type": "replace_listing_tree", "asset_group": group_name,
+                        "before": before, "after": after, "state_fingerprint": fingerprint}],
+        "execute": execute, "rechecks": [recheck],
+    }
 
 
 def _url_unverified(message="URL settings or exclusions are inconsistent or unverifiable"):
@@ -592,8 +764,11 @@ def _unique(ctx, query, customer_id):
     return rows[0]
 
 
-def campaign_state(ctx, campaign_id, customer_id, *, automation=False):
+def campaign_state(ctx, campaign_id, customer_id, *, automation=False, shopping=False):
     fields = CAMPAIGN_FIELDS + (", campaign.asset_automation_settings" if automation else "")
+    if shopping:
+        fields += (", campaign.shopping_setting.merchant_id, campaign.shopping_setting.feed_label, "
+                   "campaign.shopping_setting.enable_local")
     row = _unique(
         ctx, f"SELECT {fields} FROM campaign "
         f"WHERE campaign.id = {campaign_id} LIMIT 2", customer_id,
@@ -612,6 +787,12 @@ def campaign_state(ctx, campaign_id, customer_id, *, automation=False):
     }
     if automation:
         state["automation_settings"] = _automation_settings(campaign)
+    if shopping:
+        if campaign.shopping_setting.merchant_id <= 0:
+            _product_unverified("Campaign needs a nonzero Merchant Center feed link")
+        state["shopping_setting"] = json_format.MessageToDict(
+            campaign.shopping_setting._pb, preserving_proto_field_name=True,
+        )
     return state
 
 
@@ -634,7 +815,7 @@ def _group_payload(group, customer_id, campaign_id, *, live=False):
     }
 
 
-def group_state(ctx, asset_group_id, customer_id):
+def group_state(ctx, asset_group_id, customer_id, *, shopping=False):
     row = _unique(
         ctx, f"SELECT {GROUP_FIELDS} FROM asset_group "
         f"WHERE asset_group.id = {asset_group_id} LIMIT 2", customer_id,
@@ -643,7 +824,7 @@ def group_state(ctx, asset_group_id, customer_id):
     group = _group_payload(row.asset_group, customer_id, campaign_id, live=True)
     if group["asset_group_id"] != asset_group_id:
         _unverified()
-    campaign = campaign_state(ctx, campaign_id, customer_id)
+    campaign = campaign_state(ctx, campaign_id, customer_id, shopping=shopping)
     # Status plans depend on identity, relationship and lifecycle state, not
     # independently editable names, URLs or serving diagnostics.
     return {

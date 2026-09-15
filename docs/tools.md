@@ -582,6 +582,16 @@ Plan irreversible removal of exact existing negative WEBPAGE URL criteria from a
 | `criterion_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
+### `set_asset_group_product_selection`
+
+Plan irreversible replacement of an existing feed-linked Performance Max asset group's complete product tree. item_ids must contain 1 to 998 distinct trimmed, case-preserved Item IDs, at most 128 Unicode codepoints each, without controls or internal whitespace. Includes these items and excludes everything else. Supports empty trees, a single all-products unit, or flat Item-ID trees with one catch-all; nested trees and other dimensions are refused. Reads at most 1000 existing nodes plus one lookahead and requires complete state. Shows every before/after node and rechecks group, campaign feed and tree before apply; changed state returns STALE_PLAN. Uses one atomic v25 tree request, normal preview and irreversible acknowledgement. Alters inventory eligibility and may affect delivery and spend. Provider acceptance is not guaranteed. Writes only to the configured account; verify afterwards with get_listing_groups.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `item_ids` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
 ### `set_campaign_schedule`
 
 Stage adding ad-schedule criteria (day/hour/minute windows) to a campaign. Adds windows and does not replace existing windows.
