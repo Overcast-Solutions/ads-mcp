@@ -3,6 +3,7 @@
 import pytest
 
 import harness
+from pmax_oracle import assert_catalog
 from tool_catalog import ALL_WRITE_MODE_TOOLS, APPLY_TOOL, MUTATION_TOOLS, READ_TOOLS
 
 WINDOW_ARGS = {"date_range_start": "2026-07-01", "date_range_end": "2026-07-31"}
@@ -18,10 +19,7 @@ def test_read_only_unless_explicitly_false(tmp_path, account_client, value):
     env = {} if value is None else {"ADS_MCP_READ_ONLY": value}
     server = harness.build_server(tmp_path, client=account_client, env=env)
     names = harness.tool_names(server)
-    assert names == READ_TOOLS, (
-        f"ADS_MCP_READ_ONLY={value!r}: expected exactly the read catalog, "
-        f"diff={sorted(names ^ READ_TOOLS)}"
-    )
+    assert_catalog(names, read_only=True)
 
 
 @pytest.mark.parametrize("value", ["false", "False", "FALSE"])
@@ -34,7 +32,7 @@ def test_explicit_false_registers_the_full_catalog(tmp_path, account_client, val
             "ADS_MCP_AUDIT_LOG": str(harness.audit_file(tmp_path)),
         },
     )
-    assert harness.tool_names(server) == ALL_WRITE_MODE_TOOLS
+    assert_catalog(harness.tool_names(server))
 
 
 def test_mutation_tools_are_unregistered_not_refused(tmp_path, account_client):

@@ -273,7 +273,11 @@
             "entity_type",
             "entity_id"
           ],
-          "values": {}
+          "values": {
+            "entity_type": [
+              "asset_group"
+            ]
+          }
         },
         {
           "name": "enable_entity",
@@ -285,7 +289,11 @@
             "entity_type",
             "entity_id"
           ],
-          "values": {}
+          "values": {
+            "entity_type": [
+              "asset_group"
+            ]
+          }
         },
         {
           "name": "remove_entity",
@@ -706,6 +714,154 @@
           ],
           "required": [
             "plan_id"
+          ],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "pmax_management",
+      "purpose": "Inspect existing Performance Max groups, manage optimization signals and URL controls, and replace bounded product Item-ID selections through reviewed plans.",
+      "tools": [
+        {
+          "name": "get_asset_groups",
+          "parameters": [
+            "campaign_id",
+            "customer_id",
+            "page_token"
+          ],
+          "required": [
+            "campaign_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_asset_group_signals",
+          "parameters": [
+            "asset_group_id",
+            "customer_id",
+            "page_token"
+          ],
+          "required": [
+            "asset_group_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "list_audiences",
+          "parameters": [
+            "customer_id",
+            "page_token"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_pmax_url_settings",
+          "parameters": [
+            "campaign_id",
+            "customer_id",
+            "page_token"
+          ],
+          "required": [
+            "campaign_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "add_asset_group_search_themes",
+          "parameters": [
+            "asset_group_id",
+            "themes",
+            "customer_id"
+          ],
+          "required": [
+            "asset_group_id",
+            "themes"
+          ],
+          "values": {}
+        },
+        {
+          "name": "add_asset_group_audience_signal",
+          "parameters": [
+            "asset_group_id",
+            "audience_id",
+            "customer_id"
+          ],
+          "required": [
+            "asset_group_id",
+            "audience_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "remove_asset_group_signals",
+          "parameters": [
+            "asset_group_id",
+            "signal_ids",
+            "customer_id"
+          ],
+          "required": [
+            "asset_group_id",
+            "signal_ids"
+          ],
+          "values": {}
+        },
+        {
+          "name": "set_pmax_final_url_expansion",
+          "parameters": [
+            "campaign_id",
+            "enabled",
+            "customer_id"
+          ],
+          "required": [
+            "campaign_id",
+            "enabled"
+          ],
+          "values": {}
+        },
+        {
+          "name": "add_pmax_url_exclusion",
+          "parameters": [
+            "campaign_id",
+            "url",
+            "match_type",
+            "customer_id"
+          ],
+          "required": [
+            "campaign_id",
+            "url"
+          ],
+          "values": {
+            "match_type": [
+              "EXACT",
+              "CONTAINS"
+            ]
+          }
+        },
+        {
+          "name": "remove_pmax_url_exclusions",
+          "parameters": [
+            "campaign_id",
+            "criterion_ids",
+            "customer_id"
+          ],
+          "required": [
+            "campaign_id",
+            "criterion_ids"
+          ],
+          "values": {}
+        },
+        {
+          "name": "set_asset_group_product_selection",
+          "parameters": [
+            "asset_group_id",
+            "item_ids",
+            "customer_id"
+          ],
+          "required": [
+            "asset_group_id",
+            "item_ids"
           ],
           "values": {}
         }

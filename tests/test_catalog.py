@@ -2,6 +2,7 @@
 zero direct-apply paths exist, and the registry matches what registers."""
 
 import harness
+from pmax_oracle import assert_catalog
 from ads_mcp.tools.registry import all_tool_specs
 from tool_catalog import (
     ALL_WRITE_MODE_TOOLS,
@@ -23,19 +24,15 @@ def test_registry_specs_match_locked_catalog_exactly():
             f"{spec.name}: empty description"
         )
         by_kind.setdefault(spec.kind, set()).add(spec.name)
-    assert by_kind.get("read", set()) == READ_TOOLS, (
-        f"read catalog drift: {sorted(by_kind.get('read', set()) ^ READ_TOOLS)}"
-    )
-    assert by_kind.get("mutation", set()) == MUTATION_TOOLS, (
-        f"mutation catalog drift: {sorted(by_kind.get('mutation', set()) ^ MUTATION_TOOLS)}"
-    )
+    assert_catalog(by_kind.get("read", set()), kind="read")
+    assert_catalog(by_kind.get("mutation", set()), kind="mutation")
     assert by_kind.get("apply", set()) == {APPLY_TOOL}
     assert set(by_kind) == {"read", "mutation", "apply"}, f"unknown kinds: {set(by_kind)}"
 
 
 def test_write_mode_registration_matches_registry(tmp_path, account_client):
     server = harness.build_rw_server(tmp_path, client=account_client)
-    assert harness.tool_names(server) == ALL_WRITE_MODE_TOOLS
+    assert_catalog(harness.tool_names(server))
 
 
 def test_every_mutation_tool_returns_plan_and_never_applies(tmp_path, account_client):

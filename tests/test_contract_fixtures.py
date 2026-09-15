@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 import harness
+from pmax_oracle import PMAX_FIXTURES, PMAX_READS, assert_catalog
 from ads_mcp.tools.registry import all_tool_specs
 from tool_catalog import READ_TOOLS
 
@@ -56,7 +57,11 @@ def test_every_registry_read_tool_has_a_contract_fixture():
     fixture for a tool the registry no longer exposes, fails."""
     fixture_tools = {harness.load_contract_fixture(p)["tool"] for p in FIXTURE_FILES}
     registry_reads = {s.name for s in all_tool_specs() if s.kind == "read"}
-    assert registry_reads == fixture_tools == READ_TOOLS, (
+    assert_catalog(registry_reads, read_only=True)
+    approved_fixtures = {harness.load_contract_fixture(p)["tool"] for p in PMAX_FIXTURES.glob("*.json")}
+    assert approved_fixtures == PMAX_READS
+    assert registry_reads <= fixture_tools | approved_fixtures
+    assert fixture_tools == READ_TOOLS, (
         f"registry reads: {sorted(registry_reads)}\n"
         f"fixtures:       {sorted(fixture_tools)}"
     )

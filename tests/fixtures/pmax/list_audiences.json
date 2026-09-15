@@ -1,0 +1,54 @@
+{
+  "tool": "list_audiences",
+  "args": {},
+  "gaql": {
+    "audience": [
+      {
+        "customer": {
+          "id": 9876543210
+        },
+        "audience": {
+          "id": 901,
+          "resource_name": "customers/9876543210/audiences/901",
+          "name": "Synthetic audience 9876543210-901",
+          "status": "ENABLED",
+          "scope": "CUSTOMER"
+        }
+      },
+      {
+        "customer": {
+          "id": 9876543210
+        },
+        "audience": {
+          "id": 902,
+          "resource_name": "customers/9876543210/audiences/902",
+          "name": "Synthetic audience 9876543210-902",
+          "status": "ENABLED",
+          "scope": "ASSET_GROUP",
+          "asset_group": "customers/9876543210/assetGroups/801"
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "audiences": [
+      {
+        "audience_id": "901",
+        "resource_name": "customers/9876543210/audiences/901",
+        "name": "Synthetic audience 9876543210-901",
+        "status": "ENABLED",
+        "scope": "CUSTOMER",
+        "asset_group_id": null
+      },
+      {
+        "audience_id": "902",
+        "resource_name": "customers/9876543210/audiences/902",
+        "name": "Synthetic audience 9876543210-902",
+        "status": "ENABLED",
+        "scope": "ASSET_GROUP",
+        "asset_group_id": "801"
+      }
+    ]
+  }
+}

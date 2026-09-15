@@ -20,6 +20,7 @@ import pytest
 from google.api_core.exceptions import ServiceUnavailable
 
 import harness as h
+from pmax_oracle import assert_catalog
 import test_auth_cause_contract as plumbing
 from ads_mcp.audit import AuditLog
 from test_confirmation_queue_contract import QueueServer
@@ -140,7 +141,7 @@ def test_symlink_health_matches_plan_and_apply_refusal(tmp_path, boundary, read_
     target_before = file_state(target) if target.exists() else None
     with connected(tmp_path, boundary, read_only) as server:
         config_before = configuration(tmp_path)
-        assert server.catalog() == (READ_TOOLS if read_only else ALL_WRITE_MODE_TOOLS)
+        assert_catalog(server.catalog(), read_only=read_only)
         health_shape(server.call("health_check"), tmp_path, read_only, "OK")
         plan = None
         if not read_only:
@@ -191,7 +192,7 @@ def test_installed_valid_neighbors_keep_observations_and_private_writes(tmp_path
         path.chmod(mode)
     with connected(tmp_path, "installed-stdio", read_only) as server:
         before = configuration(tmp_path)
-        assert server.catalog() == (READ_TOOLS if read_only else ALL_WRITE_MODE_TOOLS)
+        assert_catalog(server.catalog(), read_only=read_only)
         server.retry()
         health_shape(server.call("health_check"), tmp_path, read_only, "OK")
         rows = [json.loads(line) for line in path.read_bytes().splitlines()]

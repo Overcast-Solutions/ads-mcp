@@ -17,6 +17,7 @@ from google.oauth2.credentials import Credentials
 from google.protobuf.json_format import ParseDict
 
 import harness as h
+from pmax_oracle import assert_catalog
 from ads_mcp import auth
 from ads_mcp.config import ConfigError, load_config
 
@@ -49,7 +50,7 @@ oauth2.get_installed_app_credentials = blocked
     proc, messages = h.stdio_tools_list(env)
     assert proc.returncode == 0 and "Traceback" not in proc.stdout + proc.stderr
     tools = next(m["result"]["tools"] for m in messages if m.get("id") == 2)
-    assert {t["name"] for t in tools} == __import__("tool_catalog").READ_TOOLS
+    assert_catalog({t["name"] for t in tools}, read_only=True)
     h.assert_no_secrets(proc.stdout + proc.stderr)
 
 
