@@ -416,3 +416,28 @@ def test_clearing_already_empty_keyword_destinations_is_a_noop(tmp_path):
     server, provider = setup(tmp_path, KIND)
     entity(provider, KIND).update(final_urls=[], final_mobile_urls=[], tracking_url_template="", url_custom_parameters=[])
     rejected(server, provider, SPEC["write"], args(KIND, final_urls=[], final_mobile_urls=[]))
+
+
+@pytest.mark.parametrize("field", ["final_urls", "final_mobile_urls"])
+@pytest.mark.parametrize(
+    "raw_value",
+    [json.dumps(["https://example.invalid/Replacement"]), "null"],
+    ids=["encoded-list", "null-string"],
+)
+def test_raw_url_strings_refuse_before_reads_with_valid_other_list(tmp_path, field, raw_value):
+    server, provider = setup(tmp_path, KIND)
+    values = {"final_urls": AFTER_FINAL, "final_mobile_urls": AFTER_MOBILE}
+    values[field] = raw_value
+    result = h.call_result(server, SPEC["write"], args(KIND, **values))
+    plan_created = any(record["event"] == "plan_created" for record in h.read_audit_records(tmp_path))
+    assert not provider.searches and not plan_created, (
+        "Raw URL strings must refuse before reads or plan creation: "
+        f"reads={len(provider.searches)}, plan_created={plan_created}"
+    )
+    assert not provider.mutations and not provider.planner_calls()
+    text = h.result_text(result)
+    assert "Traceback" not in text and "INTERNAL" not in text and "unknown tool" not in text.lower()
+    h.assert_no_secrets(text)
+    assert "synthetic-private-provider" not in text
+    if not result.is_error:
+        refusal(h.payload_of(result), provider, no_reads=True)
