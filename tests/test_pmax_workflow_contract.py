@@ -193,6 +193,7 @@ def test_source_archive_inventory_requires_new_oracles_goldens_and_guide(tmp_pat
         "tests/pmax_oracle.py", "docs/pmax.md", *["tests/" + name for name in (
             "test_pmax_lifecycle_contract.py", "test_pmax_signals_contract.py", "test_pmax_url_controls_contract.py",
             "test_pmax_product_selection_contract.py", "test_pmax_workflow_contract.py")],
+        "tests/test_pmax_provider_boundary_contract.py", "tests/fixtures/pmax_provider_fields_v25.json",
         *["tests/fixtures/pmax/" + name + ".json" for name in sorted(PMAX_READS)]]
     checker.check_inventory(required, source_archive=True)
     for name in required:
