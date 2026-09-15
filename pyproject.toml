@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Self-hosted Google Ads MCP server with read-only defaults and guarded experimental writes."
 readme = "README.md"
 requires-python = ">=3.12"
-license = "MIT"
+license = "Apache-2.0"
 license-files = ["LICENSE"]
 maintainers = [{name = "ads-mcp maintainers"}]
 classifiers = [

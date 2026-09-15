@@ -93,9 +93,11 @@ def test_docs_tools_md_generated_from_registry_and_current():
 
 def test_license_and_changelog_present():
     license_path = REPO / "LICENSE"
-    assert license_path.exists(), "LICENSE file is missing (MIT per decisions/0002)"
+    assert license_path.exists(), "LICENSE file is missing"
     text = license_path.read_text()
-    assert "MIT" in text and "Permission is hereby granted" in text
+    assert "Apache License" in text and "Version 2.0, January 2004" in text
+    assert "3. Grant of Patent License." in text
+    assert "Copyright (c) 2026 Overcast Solutions" in text
     changelog = REPO / "CHANGELOG.md"
     assert changelog.exists(), "CHANGELOG.md is missing"
     assert changelog.read_text().strip(), "CHANGELOG.md is empty"

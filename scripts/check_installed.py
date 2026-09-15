@@ -38,7 +38,7 @@ def main():
     module = Path(ads_mcp.__file__).resolve()
     assert Path(sys.prefix).resolve() in module.parents, "repository import fallback"
     distribution = importlib.metadata.distribution("ads-mcp")
-    assert distribution.metadata["License-Expression"] == "MIT"
+    assert distribution.metadata["License-Expression"] == "Apache-2.0"
     for name, args in (("ads-mcp", ["--version"]),
                        ("ads-mcp", ["--help"]),
                        ("ads-mcp-generate-token", ["--help"]),

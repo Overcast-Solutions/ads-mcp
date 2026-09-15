@@ -2,6 +2,9 @@
 
 ## 0.1.0 — unreleased
 
+- Adopt Apache License 2.0 for the current source and distribution metadata.
+  Earlier MIT-licensed source remains available under its original license.
+
 - Explicit operator-owned OAuth onboarding, repository metadata and a designated
   private vulnerability-reporting route with public-release activation steps.
 - CI actions pinned to supported Node.js 24 releases, with pull-request checks
@@ -13,7 +16,7 @@
   changes, with conditional RMF deadlines and advance change-review duties.
 - Committed-tree source export with fail-closed scanning, content hashes,
   exact synthetic-fixture exceptions and mandatory independent human review.
-- MIT-licensed package, integration and sourced operator guidance, six-cell
+- Apache-2.0-licensed package, integration and sourced operator guidance, six-cell
   Linux/macOS CI, minimum dependencies and failing advisory scans. Hosted
   execution remains separate release evidence; native Windows is unsupported.
 

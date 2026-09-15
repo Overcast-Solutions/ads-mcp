@@ -3,7 +3,7 @@
 Discuss substantial interface changes with the maintainer before implementation.
 Use synthetic fixtures and reproducible steps; never contribute OAuth material,
 real customer payloads, private workstation paths or local client integrations.
-Contributions are under this project's MIT license; retain applicable third-party
+Contributions are under this project's Apache License 2.0; retain applicable third-party
 notices and explain provenance for copied material.
 
 Use a separate CPython 3.12–3.14 environment on Linux or macOS, install
