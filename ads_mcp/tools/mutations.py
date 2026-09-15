@@ -839,6 +839,35 @@ StatusEntityKind = Annotated[str, Field(json_schema_extra={
 def register(server, ctx):  # noqa: C901 — one tool per block, deliberately flat
     cfg = ctx.config
 
+    @server.tool(
+        name="update_responsive_search_ad_urls",
+        description=_spec(
+            "update_responsive_search_ad_urls",
+            "Stage an existing responsive search ad destination update in the configured "
+            "account. Omitted or null lists preserve current values; supplied lists replace "
+            "them in order. Empty mobile URLs clear them; final URLs must remain nonempty. "
+            "Local limits are 10 unique HTTP(S) URLs per list and 2048 Unicode codepoints "
+            "per URL, without user information, whitespace or controls. Exact spelling is "
+            "preserved. No-op plans refuse. Preview and confirm_and_apply are required; "
+            "fresh checks bind parent, creative and tracking state before an AdService "
+            "URL-only update. Provider policy and validation can still refuse the change.",
+        ),
+    )
+    def update_responsive_search_ad_urls(
+        ad_group_id: str, ad_id: str, final_urls: list[str] | None = None,
+        final_mobile_urls: list[str] | None = None, customer_id: str | None = None,
+    ) -> dict:
+        from ads_mcp import search_urls
+
+        def impl():
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **search_urls.ad_url_plan(
+                ctx, ad_group_id=ad_group_id, ad_id=ad_id,
+                final_urls=final_urls, final_mobile_urls=final_mobile_urls,
+            ))
+
+        return _guarded_mutation(ctx, "update_responsive_search_ad_urls", impl)()
+
     def _signal_plan(tool, customer_id, **kwargs):
         from ads_mcp import pmax
 

@@ -179,6 +179,16 @@ Merchant Center feed health as visible from the Ads API: linked merchant id, pro
 | `campaign_id` | string | yes | — |
 | `customer_id` | string | no | — |
 
+### `get_responsive_search_ad_urls`
+
+Inspect an existing responsive search ad's exact final and mobile URLs, tracking settings and creative leaves. Requires a unique nonremoved ad association and enabled or paused Search parents. Reports direct settings; provider validation and policy review remain authoritative. Read-only account overrides are supported. This singular inspection has no pagination.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `ad_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_search_terms`
 
 Search-term report for a date window; bounded with pagination tokens — no unbounded dumps.
@@ -664,6 +674,18 @@ Stage a keyword CPC bid change using its account bid or inherited ad-group bid. 
 | `criterion_id` | string | yes | — |
 | `current_bid` | number | yes | — |
 | `new_bid` | number | yes | — |
+| `customer_id` | string | no | — |
+
+### `update_responsive_search_ad_urls`
+
+Stage an existing responsive search ad destination update in the configured account. Omitted or null lists preserve current values; supplied lists replace them in order. Empty mobile URLs clear them; final URLs must remain nonempty. Local limits are 10 unique HTTP(S) URLs per list and 2048 Unicode codepoints per URL, without user information, whitespace or controls. Exact spelling is preserved. No-op plans refuse. Preview and confirm_and_apply are required; fresh checks bind parent, creative and tracking state before an AdService URL-only update. Provider policy and validation can still refuse the change.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `ad_id` | string | yes | — |
+| `final_urls` | array&lt;string&gt; | no | — |
+| `final_mobile_urls` | array&lt;string&gt; | no | — |
 | `customer_id` | string | no | — |
 
 ### `upload_image_asset`

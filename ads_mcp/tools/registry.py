@@ -89,6 +89,29 @@ class _PrivateValidationMetadata(FuncMetadata):
             raise ValueError(self._scrub(str(exc))) from None
 
 
+class _URLListMetadata(_PrivateValidationMetadata):
+    """Validate destination lists against their original caller types."""
+
+    _record_refusal: Callable[[], bool] = PrivateAttr()
+
+    def validate_arguments(self, arguments_to_validate):
+        try:
+            return super().validate_arguments(arguments_to_validate)
+        except ValidationError:
+            # Admission happens before the mutation guard. Record only the
+            # refusal category here, never caller values or parser diagnostics.
+            self._record_refusal()
+            raise
+
+    def pre_parse_json(self, data):
+        # An encoded array or null string is not a supplied list or null.
+        # Keep these values intact for the ordinary, privacy-safe validator.
+        url_fields = {key: value for key, value in data.items()
+                      if key in {"final_urls", "final_mobile_urls"}}
+        remaining = {key: value for key, value in data.items() if key not in url_fields}
+        return {**super().pre_parse_json(remaining), **url_fields}
+
+
 class _CampaignFilterMetadata(_PrivateValidationMetadata):
     """Leave decimal filter strings to the domain's identifier validation."""
 
@@ -197,6 +220,13 @@ def register_tools(server, ctx):
         mutations.register(server, ctx)
         tool = server._tool_manager.get_tool("confirm_and_apply")
         tool.fn_metadata = _ConfirmationMetadata(**dict(tool.fn_metadata))
+        tool = server._tool_manager.get_tool("update_responsive_search_ad_urls")
+        tool.fn_metadata = _URLListMetadata(**dict(tool.fn_metadata))
+        tool.fn_metadata._record_refusal = functools.partial(ctx.observe_audit, {
+            "event": "refused", "tool": tool.name,
+            "customer_id": ctx.config.customer_id, "outcome": "INVALID_ARGUMENT",
+            "message": "Destination update arguments do not match the declared schema",
+        })
 
     # MCP's generated models otherwise discard undeclared inputs. Enforce the
     # signature before dispatch (including confirmation), and advertise the

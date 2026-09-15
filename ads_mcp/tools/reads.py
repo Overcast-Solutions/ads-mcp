@@ -181,6 +181,27 @@ def register(server, ctx):
             ctx=ctx, campaign_id=campaign_id, customer_id=customer_id, page_token=page_token,
         )
 
+    @server.tool(
+        name="get_responsive_search_ad_urls",
+        description=_spec(
+            "get_responsive_search_ad_urls",
+            "Inspect an existing responsive search ad's exact final and mobile URLs, "
+            "tracking settings and creative leaves. Requires a unique nonremoved ad "
+            "association and enabled or paused Search parents. Reports direct settings; "
+            "provider validation and policy review remain authoritative. Read-only "
+            "account overrides are supported. This singular inspection has no pagination.",
+        ),
+    )
+    def get_responsive_search_ad_urls(
+        ad_group_id: str, ad_id: str, customer_id: str | None = None,
+    ) -> dict:
+        from ads_mcp import search_urls
+
+        return guarded(ctx, search_urls.get_responsive_search_ad_urls,
+                       name="get_responsive_search_ad_urls")(
+            ctx=ctx, ad_group_id=ad_group_id, ad_id=ad_id, customer_id=customer_id,
+        )
+
     def _windowed_call(impl, name, date_range_start, date_range_end, last_n_days,
                        **kwargs):
         def call():
