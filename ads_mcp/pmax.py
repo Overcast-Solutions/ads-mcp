@@ -52,7 +52,7 @@ CRITERION_FIELDS = (
     "campaign_criterion.criterion_id, campaign_criterion.resource_name, "
     "campaign_criterion.campaign, campaign_criterion.status, "
     "campaign_criterion.negative, campaign_criterion.type, "
-    "campaign_criterion.webpage"
+    "campaign_criterion.webpage.conditions, campaign_criterion.webpage.criterion_name"
 )
 LISTING_FIELDS = ", ".join(
     "asset_group_listing_group_filter." + field for field in (
@@ -240,6 +240,14 @@ def _enum_name(value):
     return name
 
 
+def _provider_enum_name(value, refuse):
+    """Keep known enum behavior while refusing unfamiliar numeric values."""
+    name = getattr(value, "name", None)
+    if name is None:
+        refuse()
+    return name
+
+
 def _automation_settings(campaign):
     settings, seen = [], set()
     for setting in campaign.asset_automation_settings:
@@ -414,8 +422,12 @@ def url_plan(ctx, *, tool, campaign_id, enabled=None, url=None,
     else:
         if any(row["conditions"] == [condition] for row in before["exclusions"]):
             raise ToolError("INVALID_ARGUMENT", "This URL exclusion already exists")
+        criterion_name = "pmax-url-" + _fingerprint({
+            "campaign": campaign_name, "condition": condition,
+        })[:24]
         operations = [{"type": "create", "campaign": campaign_name,
-                       "match_type": match_type, "conditions": [condition]}]
+                       "match_type": match_type, "criterion_name": criterion_name,
+                       "conditions": [condition]}]
         summary = f"Add one {match_type} URL exclusion to campaign {campaign_id}."
     if not automation:
         summary += (" Exclusions are not universal destination blocks: explicitly supplied "
@@ -452,6 +464,7 @@ def url_plan(ctx, *, tool, campaign_id, enabled=None, url=None,
             else:
                 operation.create.campaign = campaign_name
                 operation.create.negative = True
+                operation.create.webpage.criterion_name = change["criterion_name"]
                 operation.create.webpage.conditions = change["conditions"]
             batch.append(operation)
         return executors._send(current, client, "CampaignCriterionService",
@@ -487,7 +500,8 @@ def _signal_payload(signal, customer_id, asset_group_id):
         "audience_resource_name": audience,
         # This enum has no protobuf presence. UNSPECIFIED represents unavailable
         # review status; repeated reasons have no presence either.
-        "approval_status": signal.approval_status.name if signal.approval_status else None,
+        "approval_status": (_provider_enum_name(signal.approval_status, _signal_unverified)
+                            if signal.approval_status else None),
         "disapproval_reasons": list(signal.disapproval_reasons),
     }
 
@@ -535,14 +549,15 @@ def _audience_payload(audience, customer_id):
         _signal_unverified()
     group = (_resource_id(audience.asset_group, customer_id, "assetGroups")
              if audience.asset_group else None)
-    scope = audience.scope.name
+    scope = _provider_enum_name(audience.scope, _signal_unverified)
     if ((scope == "CUSTOMER" and group is not None)
             or (scope == "ASSET_GROUP" and group is None)):
         _signal_unverified("Audience scope and asset-group binding disagree")
     return {
         "audience_id": identity, "resource_name": audience.resource_name,
         "name": audience.name if audience._pb.HasField("name") else None,
-        "status": audience.status.name, "scope": scope, "asset_group_id": group,
+        "status": _provider_enum_name(audience.status, _signal_unverified),
+        "scope": scope, "asset_group_id": group,
     }
 
 
@@ -774,16 +789,18 @@ def campaign_state(ctx, campaign_id, customer_id, *, automation=False, shopping=
         f"WHERE campaign.id = {campaign_id} LIMIT 2", customer_id,
     )
     campaign = row.campaign
+    status = _provider_enum_name(campaign.status, _unverified)
+    channel = _provider_enum_name(campaign.advertising_channel_type, _unverified)
     if (str(campaign.id) != campaign_id
             or campaign.resource_name != resource(customer_id, "campaigns", campaign_id)
-            or campaign.status.name not in LIVE_STATUSES
-            or campaign.advertising_channel_type.name != "PERFORMANCE_MAX"):
+            or status not in LIVE_STATUSES
+            or channel != "PERFORMANCE_MAX"):
         _unverified()
     state = {
         "campaign_id": campaign_id,
         "resource_name": campaign.resource_name,
-        "status": campaign.status.name,
-        "channel_type": campaign.advertising_channel_type.name,
+        "status": status,
+        "channel_type": channel,
     }
     if automation:
         state["automation_settings"] = _automation_settings(campaign)
@@ -798,18 +815,18 @@ def campaign_state(ctx, campaign_id, customer_id, *, automation=False, shopping=
 
 def _group_payload(group, customer_id, campaign_id, *, live=False):
     identity = _resource_id(group.resource_name, customer_id, "assetGroups")
+    status = _provider_enum_name(group.status, _unverified)
     if (str(group.id) != identity
             or group.campaign != resource(customer_id, "campaigns", campaign_id)
-            or group.status.name not in (LIVE_STATUSES if live else
-                                         LIVE_STATUSES | {"REMOVED"})):
+            or status not in (LIVE_STATUSES if live else LIVE_STATUSES | {"REMOVED"})):
         _unverified()
     return {
         "asset_group_id": identity,
         "resource_name": group.resource_name,
         "campaign_id": campaign_id,
         "name": group.name,
-        "status": group.status.name,
-        "primary_status": group.primary_status.name,
+        "status": status,
+        "primary_status": _provider_enum_name(group.primary_status, _unverified),
         "final_urls": list(group.final_urls),
         "final_mobile_urls": list(group.final_mobile_urls),
     }
