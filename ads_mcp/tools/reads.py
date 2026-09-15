@@ -157,6 +157,30 @@ def register(server, ctx):
             ctx=ctx, customer_id=customer_id, page_token=page_token,
         )
 
+    @server.tool(
+        name="get_pmax_url_settings",
+        description=_spec(
+            "get_pmax_url_settings",
+            "Inspect verified Performance Max automation settings and negative WEBPAGE "
+            "URL exclusions with complete condition structure. Distinguishes explicit "
+            "opt-in/out or UNSPECIFIED from absent provider-default settings. Google "
+            "documents expansion as enabled by default for PMax; absence is not opt-out. "
+            "Uses retained account- and campaign-bound pagination with truncation guidance. "
+            "Exclusions are not universal destination blocks: explicitly supplied final "
+            "URLs and applicable Merchant Center inventory can still serve.",
+        ),
+    )
+    def get_pmax_url_settings(
+        campaign_id: str,
+        customer_id: str | None = None,
+        page_token: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        return guarded(ctx, pmax.get_pmax_url_settings, name="get_pmax_url_settings")(
+            ctx=ctx, campaign_id=campaign_id, customer_id=customer_id, page_token=page_token,
+        )
+
     def _windowed_call(impl, name, date_range_start, date_range_end, last_n_days,
                        **kwargs):
         def call():

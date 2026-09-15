@@ -147,6 +147,16 @@ Campaign-level negative keywords.
 |---|---|---|---|
 | `customer_id` | string | no | — |
 
+### `get_pmax_url_settings`
+
+Inspect verified Performance Max automation settings and negative WEBPAGE URL exclusions with complete condition structure. Distinguishes explicit opt-in/out or UNSPECIFIED from absent provider-default settings. Google documents expansion as enabled by default for PMax; absence is not opt-out. Uses retained account- and campaign-bound pagination with truncation guidance. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `get_policy_issues`
 
 Policy issues across ads, PMax asset-group assets, and campaign-linked sitelink assets. mode=summary returns a bounded topic histogram + entity-status breakdown; mode=full paginates with filters (enabled_only, campaign_id, topic) — never an unbounded dump.
@@ -296,6 +306,17 @@ Stage campaign-level negative keywords. match_type defaults EXACT; each keyword 
 | `keywords` | array&lt;string \| object&gt; | yes | — |
 | `customer_id` | string | no | — |
 | `match_type` | string | no | `EXACT` |
+
+### `add_pmax_url_exclusion`
+
+Plan one negative WEBPAGE URL exclusion for a verified Performance Max campaign. EXACT requires an HTTP(S) URL without user info; CONTAINS accepts a nonblank URL fragment. Whitespace, controls and duplicate rules are refused. Creates exactly one URL condition. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve. Requires complete bounded state and a fresh recheck before apply; writes use only the configured account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `url` | string | yes | — |
+| `match_type` | string | no | `EXACT` |
+| `customer_id` | string | no | — |
 
 ### `apply_recommendation`
 
@@ -551,6 +572,16 @@ Stage the IRREVERSIBLE removal of campaign negative keywords.
 | `criterion_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
+### `remove_pmax_url_exclusions`
+
+Plan irreversible removal of exact existing negative WEBPAGE URL criteria from a verified Performance Max campaign. criterion_ids is a nonempty list of distinct positive numeric child IDs, without campaign prefixes or resource names. Preserves unrelated criteria and previews every removed condition. Requires complete bounded state, a fresh recheck, preview and irreversible acknowledgement. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve. Writes use only the configured account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `criterion_ids` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
 ### `set_campaign_schedule`
 
 Stage adding ad-schedule criteria (day/hour/minute windows) to a campaign. Adds windows and does not replace existing windows.
@@ -569,6 +600,16 @@ Stage flipping a conversion action's primary-for-goal flag.
 |---|---|---|---|
 | `conversion_action_id` | string | yes | — |
 | `primary` | boolean | yes | — |
+| `customer_id` | string | no | — |
+
+### `set_pmax_final_url_expansion`
+
+Plan final URL expansion for a verified Performance Max campaign using the current asset automation setting. enabled is a strict boolean. Preserves every unrelated automation setting in order. Expansion permits different landing destinations and generated text for those pages. Disabling it does not disable independent text customization. Complete settings and campaign state are rechecked before apply; changed state requires a fresh preview. Writes target only the configured account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `enabled` | boolean | yes | — |
 | `customer_id` | string | no | — |
 
 ### `update_ad_group`

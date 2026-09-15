@@ -12,6 +12,7 @@ import hashlib
 import json
 import re
 import unicodedata
+from urllib.parse import urlsplit
 
 from google.protobuf import json_format
 from google.protobuf.field_mask_pb2 import FieldMask
@@ -46,6 +47,246 @@ SUPPORTED_SIGNALS = frozenset({"search_theme", "audience"})
 # Local safety limits, not a guarantee of provider acceptance.
 MAX_SEARCH_THEMES = 50
 MAX_THEME_CODEPOINTS = 80
+EXPANSION = "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION"
+CRITERION_FIELDS = (
+    "campaign_criterion.criterion_id, campaign_criterion.resource_name, "
+    "campaign_criterion.campaign, campaign_criterion.status, "
+    "campaign_criterion.negative, campaign_criterion.type, "
+    "campaign_criterion.webpage"
+)
+
+
+def _url_unverified(message="URL settings or exclusions are inconsistent or unverifiable"):
+    raise ToolError("PMAX_URL_STATE_UNVERIFIED", message)
+
+
+def _enum_name(value):
+    # New numeric enum values are not safe to rewrite with this SDK.
+    name = getattr(value, "name", None)
+    if name is None or name == "UNKNOWN":
+        _url_unverified("Unknown provider enum in URL state")
+    return name
+
+
+def _automation_settings(campaign):
+    settings, seen = [], set()
+    for setting in campaign.asset_automation_settings:
+        kind = _enum_name(setting.asset_automation_type)
+        status = _enum_name(setting.asset_automation_status)
+        if kind == "UNSPECIFIED" or kind in seen:
+            _url_unverified("Unknown or duplicate automation type cannot be safely preserved")
+        seen.add(kind)
+        settings.append({"asset_automation_type": kind, "asset_automation_status": status})
+    _, _, truncated = bounded_rows(settings)
+    if truncated:
+        _url_unverified("Automation settings exceed the local verification limit")
+    return settings
+
+
+def _expansion_status(settings):
+    for setting in settings:
+        if setting["asset_automation_type"] == EXPANSION:
+            return {"status": setting["asset_automation_status"], "explicit": True}
+    return {"status": "UNSPECIFIED", "explicit": False}
+
+
+def _exclusions(ctx, customer_id, campaign_id, *, fingerprint=False):
+    campaign_name = resource(customer_id, "campaigns", campaign_id)
+    rows = ctx.search_iter(
+        f"SELECT {CRITERION_FIELDS} FROM campaign_criterion "
+        f"WHERE campaign_criterion.campaign = '{campaign_name}' "
+        "AND campaign_criterion.negative = TRUE AND campaign_criterion.type = WEBPAGE "
+        "AND campaign_criterion.status != REMOVED "
+        "ORDER BY campaign_criterion.criterion_id LIMIT 10001", customer_id,
+    )
+    seen = set()
+    for index, row in enumerate(islice(rows, 10001)):
+        if fingerprint and index == 10000:
+            _url_unverified("Complete exclusion state exceeds the local 10000-row limit")
+        criterion = row.campaign_criterion
+        identity = numeric_id(criterion.criterion_id, "criterion ID")
+        if (criterion.resource_name != resource(customer_id, "campaignCriteria",
+                                                campaign_id + "~" + identity)
+                or criterion.campaign != campaign_name or identity in seen):
+            _url_unverified()
+        seen.add(identity)
+        kind = _enum_name(criterion.type_)
+        status = _enum_name(criterion.status)
+        if kind == "UNSPECIFIED" or status == "UNSPECIFIED":
+            _url_unverified()
+        if not criterion.negative or kind != "WEBPAGE" or status == "REMOVED":
+            continue
+        if (status not in LIVE_STATUSES
+                or criterion._pb.WhichOneof("criterion") != "webpage"):
+            _url_unverified()
+        conditions = []
+        for condition in criterion.webpage.conditions:
+            operand = _enum_name(condition.operand)
+            operator = _enum_name(condition.operator)
+            if (operand == "UNSPECIFIED" or operator == "UNSPECIFIED"
+                    or not condition.argument.strip()):
+                _url_unverified("Incomplete webpage exclusion condition")
+            conditions.append({"operand": operand, "operator": operator,
+                               "argument": condition.argument})
+        if not conditions:
+            _url_unverified("Empty webpage exclusion condition set")
+        payload = {"criterion_id": identity, "resource_name": criterion.resource_name,
+                   "campaign_id": campaign_id, "conditions": conditions}
+        if fingerprint:
+            payload["source"] = json_format.MessageToDict(
+                criterion._pb, preserving_proto_field_name=True,
+            )
+        yield payload
+
+
+def get_pmax_url_settings(ctx, *, campaign_id, customer_id=None, page_token=None):
+    campaign_id = numeric_id(campaign_id, "campaign_id")
+    return _pmax_url_settings(ctx, campaign_id=campaign_id,
+                              customer_id=customer_id, page_token=page_token)
+
+
+@retained("exclusions")
+def _pmax_url_settings(ctx, *, campaign_id, customer_id=None, page_token=None):
+    customer_id = ctx.resolve_customer(customer_id)
+    state = campaign_state(ctx, campaign_id, customer_id, automation=True)
+    settings = state["automation_settings"]
+    return {"customer_id": customer_id, "campaign_id": campaign_id,
+            "final_url_expansion": _expansion_status(settings),
+            "automation_settings": settings,
+            "exclusions": _exclusions(ctx, customer_id, campaign_id)}
+
+
+def _url_state(ctx, customer_id, campaign_id, *, automation):
+    campaign = campaign_state(ctx, campaign_id, customer_id, automation=automation)
+    if automation:
+        return {"campaign": campaign}
+    encoded, _, truncated = ctx.retry_account_read(
+        lambda: bounded_rows(_exclusions(ctx, customer_id, campaign_id, fingerprint=True)),
+        customer_id,
+    )
+    if truncated:
+        _url_unverified("Complete exclusion state exceeds the local 16 MiB limit")
+    return {"campaign": campaign,
+            "exclusions": sorted((json.loads(row) for row in encoded),
+                                 key=lambda row: row["criterion_id"])}
+
+
+def _url_argument(url, match_type):
+    if (not isinstance(match_type, str) or match_type not in {"EXACT", "CONTAINS"}
+            or not isinstance(url, str) or not url
+            or any(char.isspace() or unicodedata.category(char).startswith("C")
+                   for char in url)):
+        raise ToolError("INVALID_ARGUMENT", "Supply a nonblank URL without whitespace "
+                        "or controls and match_type EXACT or CONTAINS")
+    if match_type == "EXACT":
+        try:
+            parsed = urlsplit(url)
+            valid = (parsed.scheme in {"http", "https"} and parsed.hostname
+                     and parsed.username is None and parsed.password is None)
+            parsed.port
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ToolError("INVALID_ARGUMENT", "EXACT requires an HTTP(S) URL without user info")
+    return {"operand": "URL", "operator": "EQUALS" if match_type == "EXACT" else "CONTAINS",
+            "argument": url}
+
+
+def url_plan(ctx, *, tool, campaign_id, enabled=None, url=None,
+             match_type="EXACT", criterion_ids=None):
+    campaign_id = numeric_id(campaign_id, "campaign_id")
+    automation = tool == "set_pmax_final_url_expansion"
+    removing = tool == "remove_pmax_url_exclusions"
+    if automation:
+        if type(enabled) is not bool:
+            raise ToolError("INVALID_ARGUMENT", "enabled must be a boolean")
+    elif removing:
+        _nonempty_list(criterion_ids, "criterion_ids", 10000)
+        criterion_ids = [numeric_id(value, "criterion_ids") for value in criterion_ids]
+        if len(set(criterion_ids)) != len(criterion_ids):
+            raise ToolError("INVALID_ARGUMENT", "Duplicate criterion IDs are not allowed")
+    elif tool == "add_pmax_url_exclusion":
+        condition = _url_argument(url, match_type)
+    else:
+        raise ToolError("INVALID_ARGUMENT", "Unsupported URL operation")
+    customer_id = ctx.config.customer_id
+    before = _url_state(ctx, customer_id, campaign_id, automation=automation)
+    campaign_name = before["campaign"]["resource_name"]
+    if automation:
+        old = before["campaign"]["automation_settings"]
+        new = [{**entry, "asset_automation_status": "OPTED_IN" if enabled else "OPTED_OUT"}
+               if entry["asset_automation_type"] == EXPANSION else dict(entry) for entry in old]
+        if not any(entry["asset_automation_type"] == EXPANSION for entry in old):
+            new.append({"asset_automation_type": EXPANSION,
+                        "asset_automation_status": "OPTED_IN" if enabled else "OPTED_OUT"})
+        operations = [{"type": "update", "resource_name": campaign_name,
+                       "update_mask": ["asset_automation_settings"],
+                       "changes": {"asset_automation_settings": {"old": old, "new": new}},
+                       "previous_expansion": _expansion_status(old)}]
+        summary = (f"Set final URL expansion to {'OPTED_IN' if enabled else 'OPTED_OUT'} "
+                   f"for campaign {campaign_id}. Expansion permits different landing "
+                   "destinations and generated text for those pages. Disabling expansion "
+                   "does not disable independent text customization.")
+    elif removing:
+        by_id = {row["criterion_id"]: row for row in before["exclusions"]}
+        operations = []
+        for identity in criterion_ids:
+            row = by_id.get(identity)
+            if row is None or not any(c["operand"] == "URL" for c in row["conditions"]):
+                _url_unverified("Removal requires an existing negative WEBPAGE URL criterion "
+                                "under this campaign")
+            operations.append({"type": "remove", **{
+                key: value for key, value in row.items() if key != "source"
+            }})
+        summary = f"Irreversibly remove {len(operations)} URL exclusions from campaign {campaign_id}."
+    else:
+        if any(row["conditions"] == [condition] for row in before["exclusions"]):
+            raise ToolError("INVALID_ARGUMENT", "This URL exclusion already exists")
+        operations = [{"type": "create", "campaign": campaign_name,
+                       "match_type": match_type, "conditions": [condition]}]
+        summary = f"Add one {match_type} URL exclusion to campaign {campaign_id}."
+    if not automation:
+        summary += (" Exclusions are not universal destination blocks: explicitly supplied "
+                    "final URLs and applicable Merchant Center inventory can still serve.")
+    fingerprint = _fingerprint(before)
+    for operation in operations:
+        operation["state_fingerprint"] = fingerprint
+
+    def recheck(current):
+        try:
+            after = _url_state(current, customer_id, campaign_id, automation=automation)
+        except ToolError as exc:
+            if exc.code not in {"PMAX_STATE_UNVERIFIED", "PMAX_URL_STATE_UNVERIFIED", "INVALID_ID"}:
+                raise
+            raise ToolError("STALE_PLAN", "URL or campaign state is no longer verified; "
+                            "stage a fresh plan") from None
+        if _fingerprint(after) != fingerprint:
+            raise ToolError("STALE_PLAN", "URL or campaign state changed; stage a fresh plan")
+
+    def execute(current):
+        client = current.client()
+        if automation:
+            operation = client.get_type("CampaignOperation")
+            operation.update.resource_name = campaign_name
+            operation.update.asset_automation_settings = new
+            operation.update_mask = FieldMask(paths=["asset_automation_settings"])
+            return executors._send(current, client, "CampaignService", "mutate_campaigns",
+                                   "MutateCampaignsRequest", [operation])
+        batch = []
+        for change in operations:
+            operation = client.get_type("CampaignCriterionOperation")
+            if removing:
+                operation.remove = change["resource_name"]
+            else:
+                operation.create.campaign = campaign_name
+                operation.create.negative = True
+                operation.create.webpage.conditions = change["conditions"]
+            batch.append(operation)
+        return executors._send(current, client, "CampaignCriterionService",
+                               "mutate_campaign_criteria", "MutateCampaignCriteriaRequest", batch)
+
+    return {"tool": tool, "summary": summary, "operations": operations,
+            "execute": execute, "rechecks": [recheck], "irreversible": removing}
 
 
 def _signal_unverified(message="Signal or audience state is inconsistent or unverifiable"):
@@ -351,9 +592,10 @@ def _unique(ctx, query, customer_id):
     return rows[0]
 
 
-def campaign_state(ctx, campaign_id, customer_id):
+def campaign_state(ctx, campaign_id, customer_id, *, automation=False):
+    fields = CAMPAIGN_FIELDS + (", campaign.asset_automation_settings" if automation else "")
     row = _unique(
-        ctx, f"SELECT {CAMPAIGN_FIELDS} FROM campaign "
+        ctx, f"SELECT {fields} FROM campaign "
         f"WHERE campaign.id = {campaign_id} LIMIT 2", customer_id,
     )
     campaign = row.campaign
@@ -362,12 +604,15 @@ def campaign_state(ctx, campaign_id, customer_id):
             or campaign.status.name not in LIVE_STATUSES
             or campaign.advertising_channel_type.name != "PERFORMANCE_MAX"):
         _unverified()
-    return {
+    state = {
         "campaign_id": campaign_id,
         "resource_name": campaign.resource_name,
         "status": campaign.status.name,
         "channel_type": campaign.advertising_channel_type.name,
     }
+    if automation:
+        state["automation_settings"] = _automation_settings(campaign)
+    return state
 
 
 def _group_payload(group, customer_id, campaign_id, *, live=False):
