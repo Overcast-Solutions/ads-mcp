@@ -54,6 +54,22 @@ the configured account, use expiring single-use plans, and never retry an
 uncertain provider write automatically. A client calling confirmation is not
 proof of human authorization. See [operator responsibilities](operator-guide.md).
 
+## Read-only rollout
+
+Stdio clients must keep the input pipe open until the response arrives.
+Sending requests and immediately closing stdin (EOF) is unsupported: the MCP
+SDK may cancel in-flight responses when the input stream closes. The stdio
+boot regression holds the pipe open through initialization and `tools/list`.
+
+Start with read-only parallel operation: register this server alongside your
+current one without enabling mutations. All 21 read tools are available.
+Compare representative outputs and confirm that your API access permits the
+services you need. `scripts/parity.py` replays all read fixtures offline;
+`--live` performs a read sweep using the supplied fixture arguments. For a live
+sweep, provide fixtures with your real resource IDs and suitable dates through
+`--fixtures`. A successful sweep is separate from comparing another server's
+actual output.
+
 ## Workflow requirements
 
 `python scripts/check_capabilities.py` inspects actual MCP metadata offline

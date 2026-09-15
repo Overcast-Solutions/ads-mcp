@@ -25,3 +25,28 @@ account binding and refusal behavior. A failing acceptance test needs a reviewed
 contract decision, not removal or a platform skip to turn CI green. Report
 vulnerabilities through [SECURITY.md](SECURITY.md). Maintainers review and merge;
 publication and any deployment changes are separate operator decisions.
+
+## Development checks
+
+Create a virtual environment and install the development dependencies:
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/pytest -q
+.venv/bin/python scripts/parity.py
+.venv/bin/python scripts/check_capabilities.py
+.venv/bin/python scripts/verify_apply_surface.py
+.venv/bin/python scripts/gen_tools_md.py --stdout
+```
+
+The source archive includes fixtures, test helpers, documentation and these
+scripts. The wheel provides the runtime and all three console entry points,
+including `ads-mcp-export-source`. The [tool catalog](docs/tools.md) is generated
+from the registry; run `python scripts/gen_tools_md.py` to update it, never edit
+it by hand.
+
+CI covers six current Linux/macOS interpreter cells and Linux 3.12 minimum
+dependencies. Unexecuted hosted jobs remain missing release evidence, not
+passing results. See [release checks and source export](docs/releasing.md)
+and [integration and migration](docs/migration.md) for the remaining checks.
