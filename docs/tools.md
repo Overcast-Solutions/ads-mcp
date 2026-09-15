@@ -38,6 +38,16 @@ Ad-level metrics for a date window; bounded with pagination tokens.
 | `customer_id` | string | no | — |
 | `campaign_id` | string | no | — |
 
+### `get_asset_groups`
+
+List existing asset groups for a verified Performance Max campaign, including status, primary status and final URLs. campaign_id is a positive numeric ID. Results use retained, account- and campaign-bound pagination with explicit truncation guidance. customer_id may explicitly select another accessible account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `get_campaign_performance`
 
 Campaign metrics for a date window (explicit range or last_n_days), with budget, bidding strategy incl. targets, and the serving/primary status trio. Money is decimal with currency. enabled_only=true filters server-side.
@@ -413,7 +423,7 @@ Stage sitelink assets for a campaign (link text <=25 chars, validated client-sid
 
 ### `enable_entity`
 
-Stage a plan to enable a campaign, ad group, ad, or keyword. Enabling may affect spend under the existing campaign budget. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized.
+Stage a plan to enable a campaign, PMax asset group, ad group, ad, or keyword. Enabling may affect spend under the existing campaign budget. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group/asset_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized. Asset-group plans show actual status and the verified PMax parent, and refuse changed state with STALE_PLAN before applying. Asset-group enabling may resume delivery and spend under the existing campaign budget.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
@@ -433,7 +443,7 @@ Stage exclusion of a geo target on a campaign.
 
 ### `pause_entity`
 
-Stage a plan to pause a campaign, ad group, ad, or keyword. Spend-neutral. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized.
+Stage a plan to pause a campaign, PMax asset group, ad group, ad, or keyword. Spend-neutral. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group/asset_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized. Asset-group plans show actual status and the verified PMax parent, and refuse changed state with STALE_PLAN before applying. Asset-group enabling may resume delivery and spend under the existing campaign budget.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|

@@ -91,6 +91,29 @@ def register(server, ctx):
 
     from ads_mcp import reporting
 
+    @server.tool(
+        name="get_asset_groups",
+        description=_spec(
+            "get_asset_groups",
+            "List existing asset groups for a verified Performance Max campaign, "
+            "including status, primary status and final URLs. campaign_id is a "
+            "positive numeric ID. Results use retained, account- and "
+            "campaign-bound pagination with explicit truncation guidance. "
+            "customer_id may explicitly select another accessible account.",
+        ),
+    )
+    def get_asset_groups(
+        campaign_id: str,
+        customer_id: str | None = None,
+        page_token: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        return guarded(ctx, pmax.get_asset_groups, name="get_asset_groups")(
+            ctx=ctx, campaign_id=campaign_id, customer_id=customer_id,
+            page_token=page_token,
+        )
+
     def _windowed_call(impl, name, date_range_start, date_range_end, last_n_days,
                        **kwargs):
         def call():

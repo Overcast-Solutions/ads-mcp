@@ -826,6 +826,11 @@ _ENTITY_SERVICES = {
                 "adGroupCriteria"),
 }
 
+# Metadata declares status-only support without extending removal's mapping.
+StatusEntityKind = Annotated[str, Field(json_schema_extra={
+    "enum": sorted([*_ENTITY_SERVICES, "asset_group"]),
+})]
+
 
 # ---------------------------------------------------------------------------
 # Registration
@@ -1069,17 +1074,28 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
             name=tool_name,
             description=_spec(
                 tool_name,
-                f"Stage a plan to {verb} a campaign, ad group, ad, or "
+                f"Stage a plan to {verb} a campaign, PMax asset group, ad group, ad, or "
                 f"keyword. {effect}Applies only via confirm_and_apply. "
-                "entity_id is a single numeric ID for campaign/ad_group; "
+                "entity_id is a single numeric ID for campaign/ad_group/asset_group; "
                 "ad requires ad_group_id~ad_id and keyword requires "
                 "ad_group_id~criterion_id. Surrounding whitespace and "
-                "leading zeroes in each segment are normalized.",
+                "leading zeroes in each segment are normalized. Asset-group "
+                "plans show actual status and the verified PMax parent, and "
+                "refuse changed state with STALE_PLAN before applying. "
+                "Asset-group enabling may resume delivery and spend under "
+                "the existing campaign budget.",
             ),
         )
-        def _tool(entity_type: str, entity_id: str, customer_id: str | None = None) -> dict:
+        def _tool(entity_type: StatusEntityKind, entity_id: str, customer_id: str | None = None) -> dict:
             def impl(entity_id, **_kw):
                 _check_customer(ctx, customer_id)
+                if entity_type.strip().lower() == "asset_group":
+                    from ads_mcp import pmax
+
+                    return _plan_payload(ctx, **pmax.status_plan(
+                        ctx, tool=tool_name, asset_group_id=entity_id,
+                        status_name=status_name,
+                    ))
                 kind = entity_kind(entity_type)
                 entity_id = _lifecycle_id(entity_id, kind)
                 path = _ENTITY_SERVICES[kind][4]
