@@ -547,5 +547,5 @@ See [docs/tools.md](docs/tools.md) — generated from the registry
 
 ## License
 
-[MIT](LICENSE). Dependencies retain their own licenses; review applicable
+[Apache License 2.0](LICENSE). Dependencies retain their own licenses; review applicable
 obligations when redistributing them or adding bundled material.
