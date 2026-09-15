@@ -176,6 +176,6 @@ def test_none_preserves_existing_omitted_filter_behavior(tmp_path, tool):
 
 def test_documented_lifecycle_ids_explain_the_composite_form():
     from pathlib import Path
-    text = (Path(__file__).resolve().parents[1] / "README.md").read_text().lower()
+    text = (Path(__file__).resolve().parents[1] / "docs/writes.md").read_text().lower()
     assert "~" in text and "ad_group" in text and "keyword" in text
     assert any(word in text for word in ("composite", "parent", "adgroupid", "ad_group_id"))

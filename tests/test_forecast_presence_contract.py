@@ -81,10 +81,10 @@ def test_explicit_zero_and_fractional_clicks_survive(tmp_path, account_client, c
 def test_public_docs_explain_unavailable_impressions(tmp_path, account_client):
     server = h.build_server(tmp_path, client=account_client)
     description = h.tool_map(server)["get_keyword_forecasts"].description.lower()
-    readme = (Path(__file__).resolve().parents[1] / "README.md").read_text().lower()
-    paragraphs = [p for p in readme.split("\n\n") if "impressions" in p]
+    documentation = (Path(__file__).resolve().parents[1] / "docs/reporting.md").read_text().lower()
+    paragraphs = [p for p in documentation.split("\n\n") if "impressions" in p]
     assert any("null" in p and any(word in p for word in ("unavailable", "not provide", "does not", "no impressions"))
-               for p in paragraphs), "README must explain unavailable impressions alongside their null value"
+               for p in paragraphs), "Reporting reference must explain unavailable impressions alongside their null value"
     for text in (description,):
         assert "impressions" in text and "null" in text
         assert any(word in text for word in ("unavailable", "not provide", "does not", "no impressions"))
