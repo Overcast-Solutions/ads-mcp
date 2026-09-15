@@ -1,0 +1,43 @@
+{
+  "tool": "get_change_history",
+  "args": {"date_range_start": "2026-07-28", "date_range_end": "2026-08-01"},
+  "gaql": {
+    "customer": [{"customer": {"id": 9876543210, "time_zone": "America/Los_Angeles"}}],
+    "change_event": [
+      {
+        "change_event": {
+          "change_date_time": "2026-07-30 14:02:11",
+          "user_email": "ops@example.org",
+          "client_type": "GOOGLE_ADS_WEB_CLIENT",
+          "change_resource_type": "CAMPAIGN",
+          "resource_change_operation": "UPDATE",
+          "changed_fields": "maximizeConversionValue.targetRoas",
+          "old_resource": {
+            "campaign": {"maximize_conversion_value": {"target_roas": 3.5}}
+          },
+          "new_resource": {
+            "campaign": {"maximize_conversion_value": {"target_roas": 2.8}}
+          },
+          "campaign": "customers/9876543210/campaigns/111"
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "window": {"start": "2026-07-28", "end": "2026-08-01"},
+    "changes": [
+      {
+        "timestamp": "2026-07-30 14:02:11",
+        "actor": "ops@example.org",
+        "client_type": "GOOGLE_ADS_WEB_CLIENT",
+        "resource_type": "CAMPAIGN",
+        "operation": "UPDATE",
+        "campaign_id": "111",
+        "changes": {
+          "campaign.maximize_conversion_value.target_roas": {"old": 3.5, "new": 2.8}
+        }
+      }
+    ]
+  }
+}

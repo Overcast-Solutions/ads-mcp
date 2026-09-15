@@ -1,0 +1,65 @@
+{
+  "tool": "list_recommendations",
+  "args": {},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "recommendation": [
+      {
+        "recommendation": {
+          "resource_name": "customers/9876543210/recommendations/777",
+          "type": "CAMPAIGN_BUDGET",
+          "dismissed": false,
+          "campaign": "customers/9876543210/campaigns/111",
+          "impact": {
+            "base_metrics": {
+              "impressions": 1200,
+              "clicks": 40,
+              "cost_micros": 52400000,
+              "conversions": 2.0
+            },
+            "potential_metrics": {
+              "impressions": 2600,
+              "clicks": 70,
+              "cost_micros": 90000000,
+              "conversions": 4.5
+            }
+          },
+          "campaign_budget_recommendation": {
+            "current_budget_amount_micros": 50000000,
+            "recommended_budget_amount_micros": 65000000
+          }
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "recommendations": [
+      {
+        "id": "777",
+        "resource_name": "customers/9876543210/recommendations/777",
+        "type": "CAMPAIGN_BUDGET",
+        "campaign_id": "111",
+        "dismissed": false,
+        "impact": {
+          "base": {
+            "impressions": 1200,
+            "clicks": 40,
+            "cost": "52.40 USD",
+            "conversions": 2.0
+          },
+          "potential": {
+            "impressions": 2600,
+            "clicks": 70,
+            "cost": "90.00 USD",
+            "conversions": 4.5
+          }
+        },
+        "budget": {"current": "50.00 USD", "recommended": "65.00 USD"}
+      }
+    ]
+  }
+}

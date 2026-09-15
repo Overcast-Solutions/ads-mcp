@@ -1,0 +1,33 @@
+{
+  "tool": "get_conversion_actions",
+  "args": {},
+  "gaql": {
+    "conversion_action": [
+      {
+        "conversion_action": {
+          "id": 555,
+          "name": "Signup",
+          "category": "SIGNUP",
+          "type": "UPLOAD_CLICKS",
+          "status": "ENABLED",
+          "counting_type": "ONE_PER_CLICK",
+          "primary_for_goal": true
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "conversion_actions": [
+      {
+        "id": "555",
+        "name": "Signup",
+        "category": "SIGNUP",
+        "type": "UPLOAD_CLICKS",
+        "status": "ENABLED",
+        "counting_type": "ONE_PER_CLICK",
+        "primary_for_goal": true
+      }
+    ]
+  }
+}

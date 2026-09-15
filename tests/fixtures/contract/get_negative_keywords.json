@@ -1,0 +1,27 @@
+{
+  "tool": "get_negative_keywords",
+  "args": {},
+  "gaql": {
+    "campaign_criterion": [
+      {
+        "campaign_criterion": {
+          "criterion_id": 444,
+          "negative": true,
+          "keyword": {"text": "cheap", "match_type": "PHRASE"}
+        },
+        "campaign": {"id": 222, "name": "Brand - Search"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "negative_keywords": [
+      {
+        "campaign_id": "222",
+        "criterion_id": "444",
+        "keyword": "cheap",
+        "match_type": "PHRASE"
+      }
+    ]
+  }
+}

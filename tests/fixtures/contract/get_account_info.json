@@ -1,0 +1,28 @@
+{
+  "tool": "get_account_info",
+  "args": {},
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "descriptive_name": "ACME",
+          "currency_code": "USD",
+          "time_zone": "America/Los_Angeles",
+          "auto_tagging_enabled": true,
+          "manager": false,
+          "test_account": false
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "name": "ACME",
+    "currency_code": "USD",
+    "time_zone": "America/Los_Angeles",
+    "auto_tagging_enabled": true,
+    "manager": false,
+    "test_account": false
+  }
+}

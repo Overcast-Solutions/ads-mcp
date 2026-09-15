@@ -1,0 +1,31 @@
+{
+  "tool": "search_geo_targets",
+  "args": {"query": "United States"},
+  "gaql": {
+    "geo_target_constant": [
+      {
+        "geo_target_constant": {
+          "id": 2840,
+          "name": "United States",
+          "canonical_name": "United States",
+          "country_code": "US",
+          "target_type": "Country",
+          "status": "ENABLED"
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "results": [
+      {
+        "id": "2840",
+        "name": "United States",
+        "canonical_name": "United States",
+        "country_code": "US",
+        "target_type": "Country",
+        "status": "ENABLED"
+      }
+    ]
+  }
+}

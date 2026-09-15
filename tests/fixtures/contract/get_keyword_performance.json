@@ -1,0 +1,49 @@
+{
+  "tool": "get_keyword_performance",
+  "args": {"date_range_start": "2026-07-01", "date_range_end": "2026-07-31"},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "keyword_view": [
+      {
+        "ad_group_criterion": {
+          "criterion_id": 401,
+          "status": "ENABLED",
+          "keyword": {"text": "acme widgets", "match_type": "EXACT"},
+          "cpc_bid_micros": 1200000,
+          "quality_info": {"quality_score": 7}
+        },
+        "ad_group": {"id": 201},
+        "campaign": {"id": 222},
+        "metrics": {
+          "impressions": 250,
+          "clicks": 10,
+          "cost_micros": 7000000,
+          "conversions": 0.0
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "window": {"start": "2026-07-01", "end": "2026-07-31"},
+    "keywords": [
+      {
+        "criterion_id": "401",
+        "keyword": "acme widgets",
+        "match_type": "EXACT",
+        "status": "ENABLED",
+        "ad_group_id": "201",
+        "campaign_id": "222",
+        "cpc_bid": "1.20 USD",
+        "quality_score": 7,
+        "impressions": 250,
+        "clicks": 10,
+        "cost": "7.00 USD",
+        "conversions": 0.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "tool": "list_accounts",
+  "args": {},
+  "gaql": {
+    "customer_client": [
+      {
+        "customer_client": {
+          "id": 9876543210,
+          "descriptive_name": "ACME",
+          "manager": false,
+          "level": 0,
+          "status": "ENABLED"
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "accounts": [
+      {
+        "customer_id": "9876543210",
+        "name": "ACME",
+        "manager": false,
+        "level": 0,
+        "status": "ENABLED"
+      }
+    ]
+  },
+  "env": {
+    "GOOGLE_ADS_LOGIN_CUSTOMER_ID": ""
+  }
+}

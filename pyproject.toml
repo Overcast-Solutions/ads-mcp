@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ads-mcp"
+version = "0.1.0"
+description = "Self-hosted Google Ads MCP server with read-only defaults and guarded experimental writes."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+maintainers = [{name = "ads-mcp maintainers"}]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+]
+dependencies = [
+    "google-ads>=31.4.0,<32",
+    "mcp>=2.0.0,<3",
+    "httpx2>=2.12.0,<3",
+    "httpcore2>=2.12.0,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=9,<10"]
+
+[project.urls]
+Repository = "https://github.com/Overcast-Solutions/ads-mcp"
+Documentation = "https://github.com/Overcast-Solutions/ads-mcp#readme"
+Issues = "https://github.com/Overcast-Solutions/ads-mcp/issues"
+Security = "https://github.com/Overcast-Solutions/ads-mcp/security/policy"
+
+[project.scripts]
+ads-mcp = "ads_mcp.server:main"
+ads-mcp-generate-token = "ads_mcp.auth:generate_token_main"
+ads-mcp-export-source = "ads_mcp.source_export:main"
+
+[tool.setuptools.package-data]
+ads_mcp = ["source_scan_exceptions.json"]
+
+[tool.setuptools.packages.find]
+include = ["ads_mcp*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

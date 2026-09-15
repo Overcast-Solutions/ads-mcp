@@ -1,0 +1,38 @@
+{
+  "tool": "health_check",
+  "args": {},
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "descriptive_name": "ACME",
+          "currency_code": "USD"
+        }
+      }
+    ]
+  },
+  "golden": {
+    "status": "OK",
+    "config": {
+      "customer_id": "9876543210",
+      "login_customer_id": "1112223333",
+      "developer_token": "present",
+      "credentials_path": "${CREDENTIALS_PATH}",
+      "token_path": "${TOKEN_PATH}"
+    },
+    "credentials": {
+      "state": "OK"
+    },
+    "guardrails": {
+      "read_only": true,
+      "require_dry_run": true,
+      "max_daily_budget": null,
+      "max_bid_increase_pct": null,
+      "max_first_bid": null,
+      "plan_ttl_seconds": 900,
+      "row_limit": 1000,
+      "audit_log": "${AUDIT_LOG}"
+    }
+  }
+}

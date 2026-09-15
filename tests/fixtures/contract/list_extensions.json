@@ -1,0 +1,45 @@
+{
+  "tool": "list_extensions",
+  "args": {},
+  "gaql": {
+    "campaign_asset": [
+      {
+        "campaign_asset": {"field_type": "SITELINK", "status": "ENABLED"},
+        "asset": {
+          "id": 777001,
+          "type": "SITELINK",
+          "sitelink_asset": {"link_text": "Spring Sale"}
+        },
+        "campaign": {"id": 222}
+      },
+      {
+        "campaign_asset": {"field_type": "CALLOUT", "status": "ENABLED"},
+        "asset": {
+          "id": 777002,
+          "type": "CALLOUT",
+          "callout_asset": {"callout_text": "Free shipping"}
+        },
+        "campaign": {"id": 222}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "extensions": [
+      {
+        "asset_id": "777001",
+        "field_type": "SITELINK",
+        "campaign_id": "222",
+        "status": "ENABLED",
+        "text": "Spring Sale"
+      },
+      {
+        "asset_id": "777002",
+        "field_type": "CALLOUT",
+        "campaign_id": "222",
+        "status": "ENABLED",
+        "text": "Free shipping"
+      }
+    ]
+  }
+}

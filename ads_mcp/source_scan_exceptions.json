@@ -1,0 +1,164 @@
+{
+  "tests/harness.py": {
+    "sha256": "f6dcb50aa8388bc7c90a9f663bcda4b4ffc50f6dc64a0a16579307a5a9826e23",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 2134,
+        "end": 2185,
+        "match_sha256": "afb5b20f7859ed8c5da6a456f37a451b59f644e22a449f7f34310012cf4b1654"
+      },
+      {
+        "rule": "credential",
+        "start": 2191,
+        "end": 2246,
+        "match_sha256": "dfbe11cdb4743c1bcd62d8e57130ed78a9041aec2ccebcd47ce14fe092643ad1"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_local_auth_io_contract.py": {
+    "sha256": "6cc87a9640f804b8f4cffdd1b0075ef50d592f35263c3bb3589227a536e45259",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 886,
+        "end": 927,
+        "match_sha256": "99168d90f78838380b1d66736fc7b61d41128c767b638abed11ca0fe4ccf14e3"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_oauth_consent_contract.py": {
+    "sha256": "6fbf1873db351740274aee78854a5393b1984793d9fd592ce8b65994170046d3",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 1343,
+        "end": 1389,
+        "match_sha256": "811515a502a3af1186d6e2b7bf74937d7363e688c8f125e9c9bfc6f19572efed"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_oauth_http_boundary_contract.py": {
+    "sha256": "d68804ac50d42da645b3dccc0bea9b7d276931020cd04069bae451acf35347df",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 723,
+        "end": 769,
+        "match_sha256": "2393f26859dab9026cc1dc4e6bb861957a27030a50ca4c43617dc88828152757"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_oauth_recovery_contract.py": {
+    "sha256": "f9db6ff6ce2a18a6f6c7fa1c06b38ba806b2cb8d3b104e7704e2673b82d6e3c9",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 645,
+        "end": 695,
+        "match_sha256": "63c517b4b4e51c351eb308854fc11331aebfc07240077bbddc3a515086959082"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_release_source_export_contract.py": {
+    "sha256": "08c95e89e33f61c3847b7a9d39ef60cdba8468accc6942ffd9522a60f153f7a5",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 553,
+        "end": 594,
+        "match_sha256": "88a1504cad21cd29160d124129ee2db251fd565d864221ca4b0c371dd319353f"
+      },
+      {
+        "rule": "credential",
+        "start": 607,
+        "end": 647,
+        "match_sha256": "9ddbe3a69ab74b0d7c41caeaa3dd069fec5548894847cb5791f79021669fd804"
+      },
+      {
+        "rule": "credential",
+        "start": 11609,
+        "end": 11649,
+        "match_sha256": "5ac8d3ab7523986843e7a502beaa209b60099b5c6d78afa2f541c116b2f92e9c"
+      },
+      {
+        "rule": "private_home",
+        "start": 660,
+        "end": 693,
+        "match_sha256": "8452ee533330c1cfe2c2e899b7ec5abccdc4a5393b08f162ca8370e174e953ae"
+      },
+      {
+        "rule": "private_home",
+        "start": 742,
+        "end": 794,
+        "match_sha256": "40d86b9dea83891c8390045d3fdbc5101aa6c752a1519013116f1e546ab3c6a1"
+      },
+      {
+        "rule": "operational_context",
+        "start": 694,
+        "end": 706,
+        "match_sha256": "7a80f6fae1de8f560c3dfb3cd8a2d213e4cdc0c1565eda8b974c9ea4edfe1add"
+      },
+      {
+        "rule": "operational_context",
+        "start": 768,
+        "end": 780,
+        "match_sha256": "cb99b6a8a5c703f254c15f02999da62cd0fa1e06cc16075d2570012595473757"
+      },
+      {
+        "rule": "operational_context",
+        "start": 11674,
+        "end": 11692,
+        "match_sha256": "09dd63ad3b1c6859f9b911027c0f88567328914b1ca7050a98f886294dbea169"
+      },
+      {
+        "rule": "operational_context",
+        "start": 11725,
+        "end": 11743,
+        "match_sha256": "09dd63ad3b1c6859f9b911027c0f88567328914b1ca7050a98f886294dbea169"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_runtime_error_audit_contract.py": {
+    "sha256": "ec9d7ffad9c902589a1ec689a2bc8b6ade2bc226e1fef42c4253ed33680aa3be",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 2720,
+        "end": 2744,
+        "match_sha256": "7d8e3687fb593330aa3845ad3286680459376c0a732766d0241f2b2fe2c3c09d"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  },
+  "tests/test_startup_errors.py": {
+    "sha256": "c8e260eccdf0a66736ac2e27d263995a22eae5ff6cfd279a6acb173c542ed8f4",
+    "matches": [
+      {
+        "rule": "credential",
+        "start": 2234,
+        "end": 2268,
+        "match_sha256": "37d6ada4a301c73fae1f08ecb8c4ff44ea8867db64512529178c513628ac9e65"
+      },
+      {
+        "rule": "credential",
+        "start": 4722,
+        "end": 4762,
+        "match_sha256": "68b0e0046a4577a2015c5326a009a147681c3ac3f5d85307eb9bfd7c9b287477"
+      },
+      {
+        "rule": "credential",
+        "start": 5178,
+        "end": 5218,
+        "match_sha256": "68b0e0046a4577a2015c5326a009a147681c3ac3f5d85307eb9bfd7c9b287477"
+      }
+    ],
+    "reason": "Deliberate synthetic safety-test input; exact file bytes and individual matches reviewed, not a general test exemption."
+  }
+}

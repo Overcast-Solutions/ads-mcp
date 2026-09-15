@@ -1,0 +1,719 @@
+{
+  "version": 1,
+  "capabilities": [
+    {
+      "id": "account_access",
+      "purpose": "Select an advertising account, discover accessible accounts and verify authenticated readiness before work.",
+      "tools": [
+        {
+          "name": "health_check",
+          "parameters": [],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "list_accounts",
+          "parameters": [],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_account_info",
+          "parameters": [
+            "customer_id"
+          ],
+          "required": [],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "faithful_reporting",
+      "purpose": "Inspect account-scoped performance over explicit or relative dates and continue bounded result sets without changing the query.",
+      "tools": [
+        {
+          "name": "run_gaql",
+          "parameters": [
+            "query",
+            "customer_id",
+            "format",
+            "page_token"
+          ],
+          "required": [
+            "query"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_campaign_performance",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "last_n_days",
+            "page_token",
+            "campaign_id",
+            "enabled_only"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_ad_performance",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "last_n_days",
+            "page_token",
+            "campaign_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_keyword_performance",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "last_n_days",
+            "page_token",
+            "campaign_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_search_terms",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "last_n_days",
+            "page_token",
+            "campaign_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_geo_performance",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "last_n_days",
+            "page_token",
+            "campaign_id"
+          ],
+          "required": [],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "account_visibility",
+      "purpose": "Investigate policy, recommendations, change attribution, product eligibility and linked targeting assets using scoped reads.",
+      "tools": [
+        {
+          "name": "get_policy_issues",
+          "parameters": [
+            "customer_id",
+            "mode",
+            "campaign_id",
+            "enabled_only",
+            "topic",
+            "page_token"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "list_recommendations",
+          "parameters": [
+            "customer_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_change_history",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "resource_type",
+            "page_token"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_shopping_performance",
+          "parameters": [
+            "customer_id",
+            "date_range_start",
+            "date_range_end",
+            "last_n_days",
+            "page_token",
+            "campaign_id"
+          ],
+          "required": [
+            "campaign_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_listing_groups",
+          "parameters": [
+            "customer_id",
+            "campaign_id"
+          ],
+          "required": [
+            "campaign_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_product_status",
+          "parameters": [
+            "customer_id",
+            "campaign_id"
+          ],
+          "required": [
+            "campaign_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_conversion_actions",
+          "parameters": [
+            "customer_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_negative_keywords",
+          "parameters": [
+            "customer_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "list_extensions",
+          "parameters": [
+            "customer_id"
+          ],
+          "required": [],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "keyword_planning",
+      "purpose": "Discover keyword ideas from seeds or a page and estimate a dated keyword plan without persisting advertising resources.",
+      "tools": [
+        {
+          "name": "discover_keywords",
+          "parameters": [
+            "customer_id",
+            "seed_keywords",
+            "page_url",
+            "page_token"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "get_keyword_forecasts",
+          "parameters": [
+            "customer_id",
+            "keywords",
+            "date_range_start",
+            "date_range_end",
+            "keyword_texts"
+          ],
+          "required": [],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "managed_creatives",
+      "purpose": "Stage campaign, ad-group, keyword and creative changes with explicit identities, lifecycle intent and spend-bearing inputs.",
+      "tools": [
+        {
+          "name": "update_campaign",
+          "parameters": [
+            "campaign_id",
+            "daily_budget",
+            "bidding_strategy",
+            "target_cpa",
+            "target_roas",
+            "clear_target_cpa",
+            "clear_target_roas",
+            "geo_target_ids",
+            "language_ids"
+          ],
+          "required": [
+            "campaign_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "pause_entity",
+          "parameters": [
+            "entity_type",
+            "entity_id"
+          ],
+          "required": [
+            "entity_type",
+            "entity_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "enable_entity",
+          "parameters": [
+            "entity_type",
+            "entity_id"
+          ],
+          "required": [
+            "entity_type",
+            "entity_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "remove_entity",
+          "parameters": [
+            "entity_type",
+            "entity_id"
+          ],
+          "required": [
+            "entity_type",
+            "entity_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "draft_campaign",
+          "parameters": [
+            "campaign_name",
+            "daily_budget",
+            "contains_eu_political_advertising",
+            "bidding_strategy",
+            "channel_type",
+            "target_cpa",
+            "target_roas",
+            "ad_group_name",
+            "keywords",
+            "status",
+            "geo_target_ids",
+            "language_ids"
+          ],
+          "required": [
+            "campaign_name",
+            "daily_budget"
+          ],
+          "values": {
+            "status": [
+              "ENABLED",
+              "PAUSED",
+              "REMOVED"
+            ]
+          }
+        },
+        {
+          "name": "create_pmax_campaign",
+          "parameters": [
+            "campaign_name",
+            "daily_budget",
+            "contains_eu_political_advertising",
+            "bidding_strategy",
+            "final_urls",
+            "headlines",
+            "long_headlines",
+            "descriptions",
+            "business_name",
+            "landscape_image_asset_ids",
+            "square_image_asset_ids",
+            "logo_asset_ids",
+            "geo_target_ids",
+            "start_paused"
+          ],
+          "required": [
+            "campaign_name",
+            "daily_budget"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_ad_group",
+          "parameters": [
+            "campaign_id",
+            "ad_group_name",
+            "cpc_bid_micros",
+            "status"
+          ],
+          "required": [
+            "campaign_id",
+            "ad_group_name"
+          ],
+          "values": {
+            "status": [
+              "ENABLED",
+              "PAUSED",
+              "REMOVED"
+            ]
+          }
+        },
+        {
+          "name": "update_ad_group",
+          "parameters": [
+            "ad_group_id",
+            "name",
+            "ad_rotation_mode"
+          ],
+          "required": [
+            "ad_group_id"
+          ],
+          "values": {
+            "ad_rotation_mode": [
+              "OPTIMIZE"
+            ]
+          }
+        },
+        {
+          "name": "draft_responsive_search_ad",
+          "parameters": [
+            "ad_group_id",
+            "headlines",
+            "descriptions",
+            "final_url",
+            "path1",
+            "path2",
+            "status"
+          ],
+          "required": [
+            "ad_group_id",
+            "headlines",
+            "descriptions",
+            "final_url"
+          ],
+          "values": {
+            "status": [
+              "ENABLED",
+              "PAUSED",
+              "REMOVED"
+            ]
+          }
+        },
+        {
+          "name": "draft_keywords",
+          "parameters": [
+            "ad_group_id",
+            "keywords"
+          ],
+          "required": [
+            "ad_group_id",
+            "keywords"
+          ],
+          "values": {}
+        },
+        {
+          "name": "remove_keywords",
+          "parameters": [
+            "ad_group_id",
+            "criterion_ids"
+          ],
+          "required": [
+            "ad_group_id",
+            "criterion_ids"
+          ],
+          "values": {}
+        },
+        {
+          "name": "update_keyword_bid",
+          "parameters": [
+            "ad_group_id",
+            "criterion_id",
+            "current_bid",
+            "new_bid"
+          ],
+          "required": [
+            "ad_group_id",
+            "criterion_id",
+            "current_bid",
+            "new_bid"
+          ],
+          "values": {}
+        },
+        {
+          "name": "draft_sitelinks",
+          "parameters": [
+            "campaign_id",
+            "sitelinks"
+          ],
+          "required": [
+            "campaign_id",
+            "sitelinks"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_callouts",
+          "parameters": [
+            "campaign_id",
+            "callouts"
+          ],
+          "required": [
+            "campaign_id",
+            "callouts"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_structured_snippets",
+          "parameters": [
+            "campaign_id",
+            "header",
+            "values"
+          ],
+          "required": [
+            "campaign_id",
+            "header",
+            "values"
+          ],
+          "values": {}
+        },
+        {
+          "name": "remove_extension",
+          "parameters": [
+            "campaign_id",
+            "asset_id",
+            "field_type"
+          ],
+          "required": [
+            "campaign_id",
+            "asset_id",
+            "field_type"
+          ],
+          "values": {}
+        },
+        {
+          "name": "upload_image_asset",
+          "parameters": [
+            "asset_name",
+            "image_data_base64"
+          ],
+          "required": [
+            "asset_name",
+            "image_data_base64"
+          ],
+          "values": {}
+        },
+        {
+          "name": "upload_text_asset",
+          "parameters": [
+            "asset_name",
+            "text_content"
+          ],
+          "required": [
+            "asset_name",
+            "text_content"
+          ],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "targeting_and_goals",
+      "purpose": "Stage audience, geographic, negative-keyword, conversion, bidding and schedule changes, or act on identified recommendations.",
+      "tools": [
+        {
+          "name": "search_geo_targets",
+          "parameters": [
+            "query",
+            "customer_id"
+          ],
+          "required": [
+            "query"
+          ],
+          "values": {}
+        },
+        {
+          "name": "add_negative_keywords",
+          "parameters": [
+            "campaign_id",
+            "keywords",
+            "match_type"
+          ],
+          "required": [
+            "campaign_id",
+            "keywords"
+          ],
+          "values": {}
+        },
+        {
+          "name": "remove_negative_keywords",
+          "parameters": [
+            "campaign_id",
+            "criterion_ids"
+          ],
+          "required": [
+            "campaign_id",
+            "criterion_ids"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_custom_audience",
+          "parameters": [
+            "audience_name",
+            "audience_type",
+            "urls_or_rules"
+          ],
+          "required": [
+            "audience_name",
+            "audience_type",
+            "urls_or_rules"
+          ],
+          "values": {}
+        },
+        {
+          "name": "add_audience_targeting",
+          "parameters": [
+            "campaign_id",
+            "audience_id",
+            "targeting_mode"
+          ],
+          "required": [
+            "campaign_id",
+            "audience_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "remove_geo_target",
+          "parameters": [
+            "campaign_id",
+            "geo_target_id"
+          ],
+          "required": [
+            "campaign_id",
+            "geo_target_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "exclude_geo_target",
+          "parameters": [
+            "campaign_id",
+            "geo_target_id"
+          ],
+          "required": [
+            "campaign_id",
+            "geo_target_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_conversion_action",
+          "parameters": [
+            "name",
+            "counting_type",
+            "click_through_lookback_window_days"
+          ],
+          "required": [
+            "name"
+          ],
+          "values": {}
+        },
+        {
+          "name": "set_conversion_action_primary_status",
+          "parameters": [
+            "conversion_action_id",
+            "primary"
+          ],
+          "required": [
+            "conversion_action_id",
+            "primary"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_portfolio_bidding_strategy",
+          "parameters": [
+            "name",
+            "strategy_type",
+            "target_cpa",
+            "target_roas"
+          ],
+          "required": [
+            "name",
+            "strategy_type"
+          ],
+          "values": {}
+        },
+        {
+          "name": "set_campaign_schedule",
+          "parameters": [
+            "campaign_id",
+            "schedules"
+          ],
+          "required": [
+            "campaign_id",
+            "schedules"
+          ],
+          "values": {}
+        },
+        {
+          "name": "apply_recommendation",
+          "parameters": [
+            "recommendation_id"
+          ],
+          "required": [
+            "recommendation_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "dismiss_recommendation",
+          "parameters": [
+            "recommendation_id"
+          ],
+          "required": [
+            "recommendation_id"
+          ],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "guarded_application",
+      "purpose": "Preview an identified staged plan and explicitly acknowledge irreversible execution through the single application tool.",
+      "tools": [
+        {
+          "name": "confirm_and_apply",
+          "parameters": [
+            "plan_id",
+            "dry_run",
+            "confirm_irreversible"
+          ],
+          "required": [
+            "plan_id"
+          ],
+          "values": {}
+        }
+      ]
+    }
+  ],
+  "forbidden_parameters": [
+    "bypass_require_dry_run",
+    "confirmed_twice"
+  ]
+}

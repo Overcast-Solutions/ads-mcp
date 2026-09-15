@@ -1,0 +1,5 @@
+# Minimum supported direct runtime dependencies; transitives resolve compatibly.
+google-ads==31.4.0
+mcp==2.0.0
+httpx2==2.12.0
+httpcore2==2.12.0

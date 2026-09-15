@@ -1,0 +1,91 @@
+name: release checks
+on:
+  push:
+    branches: [main, 'shipwright/initial-source']
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 8 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  supported:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ['3.12', '3.13', '3.14']
+        dependencies: [current]
+        include:
+          - os: ubuntu-latest
+            python: '3.12'
+            dependencies: minimum
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install current compatible dependencies
+        if: matrix.dependencies == 'current'
+        run: python -m pip install '.[dev]' build
+      - name: Install minimum direct dependencies
+        if: matrix.dependencies == 'minimum'
+        run: python -m pip install -c requirements-min.txt '.[dev]' build
+      - run: python -m pip check
+      - run: python -m pip freeze --all > resolved.txt
+      - name: Full locked suite
+        run: python -m pytest -q --junitxml=results.xml
+      - name: Separate installed wheel and sdist checks
+        run: python scripts/check_release_archives.py --dependencies ${{ matrix.dependencies }} --output "${{ runner.temp }}/archive-evidence"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: checks-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.dependencies }}
+          path: |
+            results.xml
+            resolved.txt
+            ${{ runner.temp }}/archive-evidence/*.log
+            ${{ runner.temp }}/archive-evidence/*.json
+          if-no-files-found: error
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Record incomplete scan before dependency or scanner installation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          Path("dependency-advisories.json").write_text(json.dumps({
+              "status": "scan_not_completed", "clean": False
+          }) + "\n")
+          PY
+      - name: Resolve runtime separately from scanner tooling
+        run: |
+          python -m venv "${{ runner.temp }}/runtime"
+          "${{ runner.temp }}/runtime/bin/python" -m pip install .
+          "${{ runner.temp }}/runtime/bin/python" -m pip check
+          "${{ runner.temp }}/runtime/bin/python" -m pip list --format=json > runtime-packages.json
+          python -m pip install pip-audit
+      - name: Scan exact resolved versions, fail on advisories or scan errors
+        run: python scripts/scan_dependencies.py runtime-packages.json dependency-advisories.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: dependency-advisories
+          path: |
+            runtime-packages.json
+            dependency-advisories.json
+            dependency-advisories.requirements.txt
+          if-no-files-found: error

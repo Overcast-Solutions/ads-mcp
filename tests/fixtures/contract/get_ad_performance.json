@@ -1,0 +1,47 @@
+{
+  "tool": "get_ad_performance",
+  "args": {"date_range_start": "2026-07-01", "date_range_end": "2026-07-31"},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "ad_group_ad": [
+      {
+        "ad_group_ad": {
+          "status": "ENABLED",
+          "ad": {"id": 901, "type": "RESPONSIVE_SEARCH_AD"}
+        },
+        "ad_group": {"id": 201, "name": "Brand core"},
+        "campaign": {"id": 222, "name": "Brand - Search"},
+        "metrics": {
+          "impressions": 280,
+          "clicks": 11,
+          "cost_micros": 7600000,
+          "conversions": 0.0,
+          "ctr": 0.039
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "window": {"start": "2026-07-01", "end": "2026-07-31"},
+    "ads": [
+      {
+        "ad_id": "901",
+        "ad_type": "RESPONSIVE_SEARCH_AD",
+        "status": "ENABLED",
+        "ad_group_id": "201",
+        "ad_group_name": "Brand core",
+        "campaign_id": "222",
+        "campaign_name": "Brand - Search",
+        "impressions": 280,
+        "clicks": 11,
+        "cost": "7.60 USD",
+        "conversions": 0.0,
+        "ctr": 0.039
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "tool": "get_listing_groups",
+  "args": {"campaign_id": "111"},
+  "gaql": {
+    "asset_group_listing_group_filter": [
+      {
+        "asset_group_listing_group_filter": {
+          "resource_name": "customers/9876543210/assetGroupListingGroupFilters/501~9001",
+          "id": 9001,
+          "type": "SUBDIVISION",
+          "asset_group": "customers/9876543210/assetGroups/501"
+        },
+        "asset_group": {"id": 501, "name": "Retail all products"},
+        "campaign": {"id": 111}
+      },
+      {
+        "asset_group_listing_group_filter": {
+          "resource_name": "customers/9876543210/assetGroupListingGroupFilters/501~9002",
+          "id": 9002,
+          "type": "UNIT_INCLUDED",
+          "parent_listing_group_filter": "customers/9876543210/assetGroupListingGroupFilters/501~9001",
+          "case_value": {"product_brand": {"value": "ACME"}},
+          "asset_group": "customers/9876543210/assetGroups/501"
+        },
+        "asset_group": {"id": 501, "name": "Retail all products"},
+        "campaign": {"id": 111}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign_id": "111",
+    "asset_groups": [
+      {
+        "asset_group_id": "501",
+        "name": "Retail all products",
+        "nodes": [
+          {
+            "filter_id": "9001",
+            "parent_filter_id": null,
+            "type": "SUBDIVISION",
+            "dimension": null
+          },
+          {
+            "filter_id": "9002",
+            "parent_filter_id": "9001",
+            "type": "UNIT_INCLUDED",
+            "dimension": {"product_brand": "ACME"}
+          }
+        ]
+      }
+    ]
+  }
+}

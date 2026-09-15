@@ -1,0 +1,60 @@
+{
+  "tool": "get_shopping_performance",
+  "args": {"campaign_id": "111", "date_range_start": "2026-07-01", "date_range_end": "2026-07-31"},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "shopping_performance_view": [
+      {
+        "segments": {"product_item_id": "SKU123", "product_title": "ACME Widget Pro"},
+        "campaign": {"id": 111},
+        "metrics": {
+          "impressions": 500,
+          "clicks": 20,
+          "cost_micros": 12300000,
+          "conversions": 1.0,
+          "conversions_value": 88.0
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      },
+      {
+        "segments": {"product_item_id": "SKU124", "product_title": "ACME Widget Mini"},
+        "campaign": {"id": 111},
+        "metrics": {
+          "impressions": 200,
+          "clicks": 4,
+          "cost_micros": 2100000,
+          "conversions": 0.0,
+          "conversions_value": 0.0
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign_id": "111",
+    "window": {"start": "2026-07-01", "end": "2026-07-31"},
+    "products": [
+      {
+        "item_id": "SKU123",
+        "title": "ACME Widget Pro",
+        "impressions": 500,
+        "clicks": 20,
+        "cost": "12.30 USD",
+        "conversions": 1.0,
+        "conversions_value": "88.00 USD"
+      },
+      {
+        "item_id": "SKU124",
+        "title": "ACME Widget Mini",
+        "impressions": 200,
+        "clicks": 4,
+        "cost": "2.10 USD",
+        "conversions": 0.0,
+        "conversions_value": "0.00 USD"
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "tool": "get_geo_performance",
+  "args": {"date_range_start": "2026-07-01", "date_range_end": "2026-07-31"},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "geographic_view": [
+      {
+        "geographic_view": {
+          "country_criterion_id": 2840,
+          "location_type": "LOCATION_OF_PRESENCE"
+        },
+        "campaign": {"id": 111},
+        "metrics": {
+          "impressions": 800,
+          "clicks": 25,
+          "cost_micros": 30000000,
+          "conversions": 1.5
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "window": {"start": "2026-07-01", "end": "2026-07-31"},
+    "locations": [
+      {
+        "country_id": "2840",
+        "location_type": "LOCATION_OF_PRESENCE",
+        "campaign_id": "111",
+        "impressions": 800,
+        "clicks": 25,
+        "cost": "30.00 USD",
+        "conversions": 1.5
+      }
+    ]
+  }
+}

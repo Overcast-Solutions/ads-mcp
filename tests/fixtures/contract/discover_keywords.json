@@ -1,0 +1,21 @@
+{
+  "tool": "discover_keywords",
+  "args": {"seed_keywords": ["baseball harness"]},
+  "planner": {
+    "generate_keyword_ideas": {
+      "results": [
+        {"text": "baseball training harness",
+         "keyword_idea_metrics": {"avg_monthly_searches": 2400, "competition": "MEDIUM"}},
+        {"text": "pitching velocity trainer",
+         "keyword_idea_metrics": {"avg_monthly_searches": 880, "competition": "LOW"}}
+      ]
+    }
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "ideas": [
+      {"keyword": "baseball training harness", "avg_monthly_searches": 2400, "competition": "MEDIUM"},
+      {"keyword": "pitching velocity trainer", "avg_monthly_searches": 880, "competition": "LOW"}
+    ]
+  }
+}

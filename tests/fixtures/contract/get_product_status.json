@@ -1,0 +1,60 @@
+{
+  "tool": "get_product_status",
+  "args": {
+    "campaign_id": "111"
+  },
+  "gaql": {
+    "campaign": [
+      {
+        "campaign": {
+          "id": 111,
+          "name": "ACME - PMax - Retail",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 555111
+          }
+        }
+      }
+    ],
+    "shopping_product": [
+      {
+        "shopping_product": {
+          "item_id": "SKU123",
+          "title": "ACME Widget Pro",
+          "status": "ELIGIBLE",
+          "campaign": "customers/9876543210/campaigns/111",
+          "merchant_center_id": 555111
+        }
+      },
+      {
+        "shopping_product": {
+          "item_id": "SKU124",
+          "title": "ACME Widget Mini",
+          "status": "ELIGIBLE",
+          "campaign": "customers/9876543210/campaigns/111",
+          "merchant_center_id": 555111
+        }
+      },
+      {
+        "shopping_product": {
+          "item_id": "SKU125",
+          "title": "ACME Widget Max",
+          "status": "NOT_ELIGIBLE",
+          "campaign": "customers/9876543210/campaigns/111",
+          "merchant_center_id": 555111
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign_id": "111",
+    "merchant_id": "555111",
+    "total_products": 3,
+    "status_counts": {
+      "ELIGIBLE": 2,
+      "NOT_ELIGIBLE": 1
+    }
+  }
+}

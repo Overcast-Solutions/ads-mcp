@@ -1,0 +1,38 @@
+{
+  "tool": "get_search_terms",
+  "args": {"date_range_start": "2026-07-01", "date_range_end": "2026-07-31"},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "search_term_view": [
+      {
+        "search_term_view": {"search_term": "buy acme"},
+        "ad_group": {"id": 201},
+        "campaign": {"id": 222},
+        "metrics": {
+          "impressions": 90,
+          "clicks": 7,
+          "cost_micros": 5200000,
+          "conversions": 1.0
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "window": {"start": "2026-07-01", "end": "2026-07-31"},
+    "search_terms": [
+      {
+        "search_term": "buy acme",
+        "ad_group_id": "201",
+        "campaign_id": "222",
+        "impressions": 90,
+        "clicks": 7,
+        "cost": "5.20 USD",
+        "conversions": 1.0
+      }
+    ]
+  }
+}

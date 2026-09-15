@@ -1,0 +1,31 @@
+# Credentials and local config — never committed
+.env
+.env.*
+*credentials*.json
+*token*.json
+google-ads.yaml
+
+# Language/runtime artifacts (stack finalized at /spec)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.eggs/
+.coverage
+.coverage.*
+htmlcov/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# Machine-local agent integrations
+.claude/
+.codex/

@@ -1,0 +1,60 @@
+{
+  "tool": "run_gaql",
+  "args": {
+    "query": "SELECT campaign.id, campaign.name, campaign.status, campaign.maximize_conversion_value.target_roas, metrics.clicks, metrics.conversions FROM campaign ORDER BY campaign.id",
+    "format": "json"
+  },
+  "gaql": {
+    "campaign": [
+      {
+        "campaign": {
+          "id": 111,
+          "name": "ACME - PMax - Retail",
+          "status": "ENABLED",
+          "maximize_conversion_value": {"target_roas": 3.5}
+        },
+        "metrics": {"clicks": 40, "conversions": 2.0}
+      },
+      {
+        "campaign": {
+          "id": 222,
+          "name": "Brand - Search",
+          "status": "PAUSED"
+        },
+        "metrics": {"clicks": 12, "conversions": 0.0}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "format": "json",
+    "fields": [
+      "campaign.id",
+      "campaign.name",
+      "campaign.status",
+      "campaign.maximize_conversion_value.target_roas",
+      "metrics.clicks",
+      "metrics.conversions"
+    ],
+    "rows": [
+      {
+        "campaign": {
+          "id": 111,
+          "name": "ACME - PMax - Retail",
+          "status": "ENABLED",
+          "maximize_conversion_value": {"target_roas": 3.5}
+        },
+        "metrics": {"clicks": 40, "conversions": 2.0}
+      },
+      {
+        "campaign": {
+          "id": 222,
+          "name": "Brand - Search",
+          "status": "PAUSED",
+          "maximize_conversion_value": {"target_roas": null}
+        },
+        "metrics": {"clicks": 12, "conversions": 0.0}
+      }
+    ]
+  }
+}

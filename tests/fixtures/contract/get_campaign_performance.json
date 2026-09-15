@@ -1,0 +1,108 @@
+{
+  "tool": "get_campaign_performance",
+  "args": {"date_range_start": "2026-07-01", "date_range_end": "2026-07-31"},
+  "gaql": {
+    "customer": [
+      {"customer": {"id": 9876543210, "currency_code": "USD"}}
+    ],
+    "campaign": [
+      {
+        "campaign": {
+          "id": 111,
+          "name": "ACME - PMax - Retail",
+          "status": "ENABLED",
+          "serving_status": "SERVING",
+          "primary_status": "ELIGIBLE",
+          "primary_status_reasons": [],
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "bidding_strategy_type": "MAXIMIZE_CONVERSION_VALUE",
+          "maximize_conversion_value": {"target_roas": 3.5}
+        },
+        "campaign_budget": {"id": 311, "amount_micros": 50000000},
+        "metrics": {
+          "impressions": 1200,
+          "clicks": 40,
+          "cost_micros": 52400000,
+          "conversions": 2.0,
+          "conversions_value": 180.0,
+          "ctr": 0.05,
+          "average_cpc": 1310000
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      },
+      {
+        "campaign": {
+          "id": 222,
+          "name": "Brand - Search",
+          "status": "PAUSED",
+          "serving_status": "PENDING",
+          "primary_status": "PAUSED",
+          "primary_status_reasons": ["CAMPAIGN_PAUSED"],
+          "advertising_channel_type": "SEARCH",
+          "bidding_strategy_type": "MANUAL_CPC"
+        },
+        "campaign_budget": {"id": 322, "amount_micros": 20000000},
+        "metrics": {
+          "impressions": 300,
+          "clicks": 12,
+          "cost_micros": 8100000,
+          "conversions": 0.0,
+          "conversions_value": 0.0,
+          "ctr": 0.04,
+          "average_cpc": 680000
+        },
+        "customer": {"id": 9876543210, "currency_code": "USD"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "window": {"start": "2026-07-01", "end": "2026-07-31"},
+    "campaigns": [
+      {
+        "campaign_id": "111",
+        "name": "ACME - PMax - Retail",
+        "status": "ENABLED",
+        "serving_status": "SERVING",
+        "primary_status": "ELIGIBLE",
+        "primary_status_reasons": [],
+        "channel_type": "PERFORMANCE_MAX",
+        "daily_budget": "50.00 USD",
+        "bidding_strategy": {
+          "type": "MAXIMIZE_CONVERSION_VALUE",
+          "target_roas": 3.5,
+          "target_cpa": null
+        },
+        "impressions": 1200,
+        "clicks": 40,
+        "cost": "52.40 USD",
+        "conversions": 2.0,
+        "conversions_value": "180.00 USD",
+        "ctr": 0.05,
+        "average_cpc": "1.31 USD"
+      },
+      {
+        "campaign_id": "222",
+        "name": "Brand - Search",
+        "status": "PAUSED",
+        "serving_status": "PENDING",
+        "primary_status": "PAUSED",
+        "primary_status_reasons": ["CAMPAIGN_PAUSED"],
+        "channel_type": "SEARCH",
+        "daily_budget": "20.00 USD",
+        "bidding_strategy": {
+          "type": "MANUAL_CPC",
+          "target_roas": null,
+          "target_cpa": null
+        },
+        "impressions": 300,
+        "clicks": 12,
+        "cost": "8.10 USD",
+        "conversions": 0.0,
+        "conversions_value": "0.00 USD",
+        "ctr": 0.04,
+        "average_cpc": "0.68 USD"
+      }
+    ]
+  }
+}

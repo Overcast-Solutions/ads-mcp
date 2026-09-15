@@ -1,0 +1,67 @@
+{
+  "tool": "get_policy_issues",
+  "args": {"mode": "summary"},
+  "gaql": {
+    "ad_group_ad": [
+      {
+        "ad_group_ad": {
+          "status": "ENABLED",
+          "ad": {"id": 901},
+          "policy_summary": {
+            "approval_status": "DISAPPROVED",
+            "review_status": "REVIEWED",
+            "policy_topic_entries": [
+              {"topic": "DESTINATION_NOT_WORKING", "type": "PROHIBITED"}
+            ]
+          }
+        },
+        "ad_group": {"id": 201},
+        "campaign": {"id": 222, "name": "Brand - Search"}
+      },
+      {
+        "ad_group_ad": {
+          "status": "PAUSED",
+          "ad": {"id": 902},
+          "policy_summary": {
+            "approval_status": "APPROVED_LIMITED",
+            "review_status": "REVIEWED",
+            "policy_topic_entries": [
+              {"topic": "DESTINATION_NOT_WORKING", "type": "LIMITED"}
+            ]
+          }
+        },
+        "ad_group": {"id": 201},
+        "campaign": {"id": 222, "name": "Brand - Search"}
+      }
+    ],
+    "asset_group_asset": [
+      {
+        "asset_group_asset": {
+          "status": "ENABLED",
+          "asset_group": "customers/9876543210/assetGroups/501",
+          "asset": "customers/9876543210/assets/777005",
+          "field_type": "HEADLINE",
+          "policy_summary": {
+            "approval_status": "APPROVED_LIMITED",
+            "review_status": "REVIEWED",
+            "policy_topic_entries": [
+              {"topic": "TRADEMARKS", "type": "LIMITED"}
+            ]
+          }
+        },
+        "campaign": {"id": 111, "name": "ACME - PMax - Retail"}
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "mode": "summary",
+    "total_issues": 3,
+    "topics": [
+      {"topic": "DESTINATION_NOT_WORKING", "count": 2},
+      {"topic": "TRADEMARKS", "count": 1}
+    ],
+    "entity_status_breakdown": {"ENABLED": 2, "PAUSED": 1},
+    "sources": {"ad": 2, "asset": 1}
+  }
+}

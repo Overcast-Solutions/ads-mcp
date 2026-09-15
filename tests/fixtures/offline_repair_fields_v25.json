@@ -1,0 +1,328 @@
+{
+  "api_version": "v25",
+  "source": "GoogleAdsFieldService",
+  "captured_on": "2026-09-12",
+  "account_rows": 0,
+  "mutations": 0,
+  "fields": [
+    {
+      "name": "ad_group.campaign",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group.id",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "ad_group.name",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.criterion_id",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.activity_city.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.activity_country.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.activity_id.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.activity_rating.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.activity_state.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.hotel_city.city_criterion",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.hotel_class.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.hotel_country_region.country_region_criterion",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.hotel_id.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.hotel_state.state_criterion",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_brand.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_category.category_id",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_category.level",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_channel.channel",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_channel_exclusivity.channel_exclusivity",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_condition.condition",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_custom_attribute.index",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_custom_attribute.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_item_id.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_type.level",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.case_value.product_type.value",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.parent_ad_group_criterion",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.path",
+      "selectable": true,
+      "filterable": false,
+      "data_type": "MESSAGE"
+    },
+    {
+      "name": "ad_group_criterion.listing_group.type",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.negative",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "BOOLEAN"
+    },
+    {
+      "name": "ad_group_criterion.resource_name",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "ad_group_criterion.status",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "ad_group_criterion.type",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset.policy_summary.approval_status",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset.policy_summary.policy_topic_entries",
+      "selectable": true,
+      "filterable": false,
+      "data_type": "MESSAGE"
+    },
+    {
+      "name": "asset.policy_summary.review_status",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset.resource_name",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "asset.type",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "campaign.bidding_strategy",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "campaign.bidding_strategy_type",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "campaign.id",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "campaign.maximize_conversion_value.target_roas",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "DOUBLE"
+    },
+    {
+      "name": "campaign.maximize_conversions.target_cpa_micros",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "campaign.name",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "campaign.resource_name",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "campaign.target_cpa.target_cpa_micros",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "campaign.target_roas.target_roas",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "DOUBLE"
+    },
+    {
+      "name": "campaign_asset.asset",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "campaign_asset.campaign",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "campaign_asset.field_type",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "campaign_asset.status",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "shopping_product.campaign",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    {
+      "name": "shopping_product.merchant_center_id",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "shopping_product.status",
+      "selectable": true,
+      "filterable": true,
+      "data_type": "ENUM"
+    }
+  ],
+  "missing_requested_names": []
+}

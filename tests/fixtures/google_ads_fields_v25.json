@@ -1,0 +1,91 @@
+{
+  "api_version": "v25",
+  "captured_on": "2026-09-12",
+  "google_ads_package_version": "31.2.0",
+  "provenance": {
+    "service": "GoogleAdsFieldService",
+    "method": "search_google_ads_fields",
+    "queries": [
+      "SELECT name, selectable, data_type WHERE name LIKE 'recommendation.%'",
+      "SELECT name, selectable, data_type WHERE name LIKE 'asset_group_listing_group_filter.case_value%'"
+    ],
+    "source_artifact": "google-field-metadata-2026-09-12.json",
+    "extraction": "Bounded subset: recommendation impact and campaign-budget messages; product listing-dimension leaves. No account data is queried by GoogleAdsFieldService.",
+    "rejected_select_source": "Installed read-only server live-read-sweep-2026-09-12.json; API rejection field names only, request identifiers omitted."
+  },
+  "fields": [
+    {
+      "name": "recommendation.campaign_budget_recommendation",
+      "selectable": true,
+      "data_type": "MESSAGE"
+    },
+    {
+      "name": "recommendation.impact",
+      "selectable": true,
+      "data_type": "MESSAGE"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_brand.value",
+      "selectable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_category.category_id",
+      "selectable": true,
+      "data_type": "INT64"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_category.level",
+      "selectable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_channel.channel",
+      "selectable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_condition.condition",
+      "selectable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_custom_attribute.index",
+      "selectable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_custom_attribute.value",
+      "selectable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_item_id.value",
+      "selectable": true,
+      "data_type": "STRING"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_type.level",
+      "selectable": true,
+      "data_type": "ENUM"
+    },
+    {
+      "name": "asset_group_listing_group_filter.case_value.product_type.value",
+      "selectable": true,
+      "data_type": "STRING"
+    }
+  ],
+  "rejected_select": [
+    "asset_group_listing_group_filter.case_value",
+    "recommendation.impact.base_metrics.impressions",
+    "recommendation.impact.base_metrics.clicks",
+    "recommendation.impact.base_metrics.cost_micros",
+    "recommendation.impact.base_metrics.conversions",
+    "recommendation.impact.potential_metrics.impressions",
+    "recommendation.impact.potential_metrics.clicks",
+    "recommendation.impact.potential_metrics.cost_micros",
+    "recommendation.impact.potential_metrics.conversions",
+    "recommendation.campaign_budget_recommendation.current_budget_amount_micros",
+    "recommendation.campaign_budget_recommendation.recommended_budget_amount_micros"
+  ]
+}
