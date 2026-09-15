@@ -38,6 +38,16 @@ Ad-level metrics for a date window; bounded with pagination tokens.
 | `customer_id` | string | no | — |
 | `campaign_id` | string | no | — |
 
+### `get_asset_group_signals`
+
+Inspect a verified Performance Max asset group's optimization signals. Returns composite signal IDs, kinds, theme text or Audience resources, and available approval diagnostics. Other kinds remain visible as unsupported. asset_group_id is a positive numeric ID. Results use retained account- and group-bound pagination with truncation guidance.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `get_asset_groups`
 
 List existing asset groups for a verified Performance Max campaign, including status, primary status and final URLs. campaign_id is a positive numeric ID. Results use retained, account- and campaign-bound pagination with explicit truncation guidance. customer_id may explicitly select another accessible account.
@@ -197,6 +207,15 @@ Accessible accounts under the configured login customer.
 
 *No parameters.*
 
+### `list_audiences`
+
+List existing Audience resources with identity, name, status, scope and asset-group binding. Uses retained account-bound pagination. customer_id may select another accessible account. Does not create audiences or change their composition.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `list_extensions`
 
 Campaign-level extensions/assets (sitelinks, callouts, structured snippets) with status.
@@ -235,6 +254,26 @@ Search geo target constants by name (e.g. 'United States').
 | `customer_id` | string | no | — |
 
 ## Mutation tools (write mode only — every call returns a plan)
+
+### `add_asset_group_audience_signal`
+
+Plan attachment of an existing enabled Audience as a Performance Max optimization signal, not hard targeting. Positive numeric audience_id must belong to the configured account and have CUSTOMER scope or ASSET_GROUP scope matching asset_group_id. Refuses duplicate attachment. Does not create audiences or edit composition. Complete signal state and audience state are bound to the plan and rechecked before apply.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `audience_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `add_asset_group_search_themes`
+
+Plan search-theme additions to a verified Performance Max asset group. themes is a nonempty list of distinct, stripped nonblank strings, at most 80 Unicode codepoints each, without control characters. The local ceiling is 50 resulting themes including existing themes; this does not guarantee Google acceptance. Signals guide optimization, not hard targeting. Requires complete bounded state, fresh apply validation and the normal preview/confirm flow.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `themes` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
 
 ### `add_audience_targeting`
 
@@ -449,6 +488,16 @@ Stage a plan to pause a campaign, PMax asset group, ad group, ad, or keyword. Sp
 |---|---|---|---|
 | `entity_type` | string | yes | — |
 | `entity_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `remove_asset_group_signals`
+
+Plan irreversible removal of existing search_theme or audience signals from a verified Performance Max asset group. signal_ids is a nonempty list of distinct positive numeric child IDs, without group prefixes or resource names. Other signal kinds are unsupported and refused. Signals guide optimization, not hard targeting. Requires complete bounded state, fresh apply validation and irreversible acknowledgement.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `signal_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
 ### `remove_entity`

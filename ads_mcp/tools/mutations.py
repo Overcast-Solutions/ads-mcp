@@ -839,6 +839,76 @@ StatusEntityKind = Annotated[str, Field(json_schema_extra={
 def register(server, ctx):  # noqa: C901 — one tool per block, deliberately flat
     cfg = ctx.config
 
+    def _signal_plan(tool, customer_id, **kwargs):
+        from ads_mcp import pmax
+
+        def impl():
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **pmax.signal_plan(ctx, tool=tool, **kwargs))
+
+        return _guarded_mutation(ctx, tool, impl)()
+
+    @server.tool(
+        name="add_asset_group_search_themes",
+        description=_spec(
+            "add_asset_group_search_themes",
+            "Plan search-theme additions to a verified Performance Max asset group. "
+            "themes is a nonempty list of distinct, stripped nonblank strings, "
+            "at most 80 Unicode codepoints each, without control characters. "
+            "The local ceiling is 50 resulting themes including existing themes; "
+            "this does not guarantee Google acceptance. Signals guide optimization, "
+            "not hard targeting. Requires complete bounded state, fresh apply "
+            "validation and the normal preview/confirm flow.",
+        ),
+    )
+    def add_asset_group_search_themes(
+        asset_group_id: str,
+        themes: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        return _signal_plan("add_asset_group_search_themes", customer_id,
+                            asset_group_id=asset_group_id, themes=themes)
+
+    @server.tool(
+        name="add_asset_group_audience_signal",
+        description=_spec(
+            "add_asset_group_audience_signal",
+            "Plan attachment of an existing enabled Audience as a Performance Max "
+            "optimization signal, not hard targeting. Positive numeric audience_id "
+            "must belong to the configured account and have CUSTOMER scope or "
+            "ASSET_GROUP scope matching asset_group_id. Refuses duplicate attachment. "
+            "Does not create audiences or edit composition. Complete signal state "
+            "and audience state are bound to the plan and rechecked before apply.",
+        ),
+    )
+    def add_asset_group_audience_signal(
+        asset_group_id: str,
+        audience_id: str,
+        customer_id: str | None = None,
+    ) -> dict:
+        return _signal_plan("add_asset_group_audience_signal", customer_id,
+                            asset_group_id=asset_group_id, audience_id=audience_id)
+
+    @server.tool(
+        name="remove_asset_group_signals",
+        description=_spec(
+            "remove_asset_group_signals",
+            "Plan irreversible removal of existing search_theme or audience signals "
+            "from a verified Performance Max asset group. signal_ids is a nonempty "
+            "list of distinct positive numeric child IDs, without group prefixes or "
+            "resource names. Other signal kinds are unsupported and refused. "
+            "Signals guide optimization, not hard targeting. Requires complete "
+            "bounded state, fresh apply validation and irreversible acknowledgement.",
+        ),
+    )
+    def remove_asset_group_signals(
+        asset_group_id: str,
+        signal_ids: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        return _signal_plan("remove_asset_group_signals", customer_id,
+                            asset_group_id=asset_group_id, signal_ids=signal_ids)
+
     def entity_kind(entity_type: str) -> str:
         kind = str(entity_type or "").strip().lower()
         if kind not in _ENTITY_SERVICES:
