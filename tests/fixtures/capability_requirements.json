@@ -866,6 +866,68 @@
           "values": {}
         }
       ]
+    },
+    {
+      "id": "search_destination_management",
+      "purpose": "Inspect existing Search destinations and review precise URL replacements before applying them.",
+      "tools": [
+        {
+          "name": "get_responsive_search_ad_urls",
+          "parameters": [
+            "ad_group_id",
+            "ad_id",
+            "customer_id"
+          ],
+          "required": [
+            "ad_group_id",
+            "ad_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "update_responsive_search_ad_urls",
+          "parameters": [
+            "ad_group_id",
+            "ad_id",
+            "final_urls",
+            "final_mobile_urls",
+            "customer_id"
+          ],
+          "required": [
+            "ad_group_id",
+            "ad_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_keyword_urls",
+          "parameters": [
+            "ad_group_id",
+            "criterion_id",
+            "customer_id"
+          ],
+          "required": [
+            "ad_group_id",
+            "criterion_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "update_keyword_urls",
+          "parameters": [
+            "ad_group_id",
+            "criterion_id",
+            "final_urls",
+            "final_mobile_urls",
+            "customer_id"
+          ],
+          "required": [
+            "ad_group_id",
+            "criterion_id"
+          ],
+          "values": {}
+        }
+      ]
     }
   ],
   "forbidden_parameters": [

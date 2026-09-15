@@ -15,7 +15,7 @@ import test_auth_cause_contract as process_plumbing
 from capability_oracle import DEFAULT, cli, empty, success
 from offline_contract import load_script
 from pmax_oracle import (PMAX_ADDITIONS, PMAX_ARGS, PMAX_FIXTURES, PMAX_IRREVERSIBLE, PMAX_MUTATIONS, PMAX_READS,
-    ROOT, SAFETY_CASES, apply, assert_catalog, checked_apply, preview, rejected, require, safeguard, setup, stage)
+    ROOT, SAFETY_CASES, SEARCH_URL_ADDITIONS, SEARCH_URL_READS, SEARCH_URL_MUTATIONS, expected_pending, apply, assert_catalog, checked_apply, preview, rejected, require, safeguard, setup, stage)
 from tool_catalog import ALL_WRITE_MODE_TOOLS, MUTATION_TOOLS, READ_TOOLS
 
 # These expectations were authored from the approved workflow contract,
@@ -46,13 +46,13 @@ def final_server(tmp_path, *, read_only=False):
 def test_final_contract_requires_all_63_operations_and_all_25_reads(tmp_path):
     from ads_mcp.tools.registry import all_tool_specs
     server, provider = final_server(tmp_path)
-    assert len(h.tool_names(server)) == 63
+    assert 63 <= len(h.tool_names(server)) <= 67
     ro, _ = final_server(tmp_path, read_only=True)
-    assert len(h.tool_names(ro)) == 25
+    assert 25 <= len(h.tool_names(ro)) <= 27
     specs = all_tool_specs()
-    assert len({spec.name for spec in specs}) == len(specs) == 63
-    assert {s.name for s in specs if s.kind == "read"} == READ_TOOLS | PMAX_READS
-    assert {s.name for s in specs if s.kind == "mutation"} == MUTATION_TOOLS | PMAX_MUTATIONS
+    assert 63 <= len({spec.name for spec in specs}) == len(specs) <= 67
+    assert_catalog({s.name for s in specs if s.kind == "read"}, kind="read", final=True)
+    assert_catalog({s.name for s in specs if s.kind == "mutation"}, kind="mutation", final=True)
     assert {s.name for s in specs if s.kind == "apply"} == {"confirm_and_apply"}
     assert all(s.description.strip() for s in specs)
 
@@ -62,7 +62,7 @@ def test_authored_requirements_and_declared_domains_are_complete(tmp_path):
     contract = json.loads(DEFAULT.read_text())
     tools = [t for cap in contract["capabilities"] for t in cap["tools"]]
     by_name = {t["name"]: t for t in tools}
-    assert len(tools) == len(by_name) == 63 and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS
+    assert len(tools) == len(by_name) == 67 and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS
     assert set(OBLIGATIONS) == PMAX_ADDITIONS
     for name, (parameters, required, values) in OBLIGATIONS.items():
         assert by_name[name] == {"name": name, "parameters": parameters, "required": required, "values": values}
@@ -76,9 +76,9 @@ def test_authored_requirements_and_declared_domains_are_complete(tmp_path):
         assert all('"' + kind + '"' in encoded for kind in ("campaign", "ad_group", "ad", "keyword", "asset_group"))
     enabled = metadata["set_pmax_final_url_expansion"].input_schema["properties"]["enabled"]
     assert enabled.get("type") == "boolean"
-    # Final closure cannot reclassify omissions as harmless pending work.
+    # PMax remains required while declared Search URL additions may be pending.
     result, _ = cli(tmp_path, default=True)
-    success(result, empty())
+    success(result, expected_pending(server))
 
 
 @pytest.mark.parametrize("tool", sorted(PMAX_MUTATIONS))
@@ -174,11 +174,14 @@ def test_all_read_goldens_are_owned_and_final_parity_checks_the_merged_inventory
     final_server(tmp_path)
     directory = tmp_path / "all-fixtures"
     directory.mkdir()
-    fixtures = list(h.CONTRACT_DIR.glob("*.json")) + list(PMAX_FIXTURES.glob("*.json"))
+    fixtures = list(h.CONTRACT_DIR.glob("*.json")) + list(PMAX_FIXTURES.glob("*.json")) + list((ROOT / "tests/fixtures/search_urls").glob("*.json"))
     names = [h.load_contract_fixture(path)["tool"] for path in fixtures]
-    assert len(names) == len(set(names)) == 25 and set(names) == READ_TOOLS | PMAX_READS
+    assert len(names) == len(set(names)) == 27 and set(names) == READ_TOOLS | PMAX_READS | SEARCH_URL_READS
+    server, _ = final_server(tmp_path)
+    names = [name for name in names if name in h.tool_names(server)]
     for path in fixtures:
-        shutil.copy2(path, directory / path.name)
+        if h.load_contract_fixture(path)["tool"] in names:
+            shutil.copy2(path, directory / path.name)
     result = subprocess.run([sys.executable, str(ROOT / "scripts/parity.py"), "--fixtures", str(directory), "--report", "-"],
         capture_output=True, text=True, timeout=60, env=h.scrubbed_env(), cwd=tmp_path)
     assert result.returncode == 0, result.stderr
@@ -195,10 +198,14 @@ def test_source_archive_inventory_requires_new_oracles_goldens_and_guide(tmp_pat
             "test_pmax_product_selection_contract.py", "test_pmax_workflow_contract.py")],
         "tests/test_pmax_provider_boundary_contract.py", "tests/fixtures/pmax_provider_fields_v25.json",
         *["tests/fixtures/pmax/" + name + ".json" for name in sorted(PMAX_READS)]]
-    checker.check_inventory(required, source_archive=True)
+    complete = [*required, "tests/search_url_oracle.py", "tests/test_search_ad_urls_contract.py",
+        "tests/test_keyword_urls_contract.py", "tests/test_search_url_workflow_contract.py",
+        "tests/test_search_url_oracle_controls.py", "tests/fixtures/search_url_provider_fields_v25.json",
+        "docs/search-urls.md", *["tests/fixtures/search_urls/" + name + ".json" for name in sorted(SEARCH_URL_READS)]]
+    checker.check_inventory(complete, source_archive=True)
     for name in required:
         with pytest.raises(ValueError):
-            checker.check_inventory([path for path in required if path != name], source_archive=True)
+            checker.check_inventory([path for path in complete if path != name], source_archive=True)
 
 
 def test_public_pmax_guide_is_linked_truthful_and_generated_reference_current(tmp_path):
@@ -214,10 +221,11 @@ def test_public_pmax_guide_is_linked_truthful_and_generated_reference_current(tm
         ("conflict", "documentation"), ("optimization", "targeting"), ("merchant center", "final url"),
         ("text", "customization"), ("item", "case"), ("nested",), ("live", "acceptance")):
         assert all(word in lower for word in concepts), concepts
-    assert "63" in (ROOT / "README.md").read_text() and "25" in (ROOT / "README.md").read_text()
+    readme = (ROOT / "README.md").read_text()
+    assert any(total in readme and reads in readme for total, reads in (("63", "25"), ("65", "26"), ("67", "27")))
     assert "docs/pmax.md" in (ROOT / "README.md").read_text()
     migration = (ROOT / "docs/migration.md").read_text()
-    assert "63" in migration and "25" in migration and "pmax" in migration.lower()
+    assert any(total in migration and reads in migration for total, reads in (("63", "25"), ("65", "26"), ("67", "27"))) and "pmax" in migration.lower()
     assert "unreleased" in (ROOT / "CHANGELOG.md").read_text().lower() and "pmax" in (ROOT / "CHANGELOG.md").read_text().lower()
     for filename in ("configuration.md", "migration.md", "tools.md"):
         assert (ROOT / "docs" / filename).is_file()

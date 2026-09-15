@@ -1,0 +1,2811 @@
+{
+  "api_version": "v25",
+  "checked_on": "2026-09-15",
+  "flag_order": [
+    "selectable",
+    "filterable",
+    "sortable"
+  ],
+  "resources": {
+    "ad_group_ad": {
+      "source_url": "https://developers.google.com/google-ads/api/fields/v25/ad_group_ad?hl=en",
+      "attributed_resources": [
+        "ad_group",
+        "campaign",
+        "customer"
+      ],
+      "fields": {
+        "ad_group_ad.action_items": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.added_by_google_ads": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.app_ad.app_deep_link": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.app_deep_link.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.html5_media_bundles": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.html5_media_bundles.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.mandatory_ad_text": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.youtube_videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_ad.youtube_videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_engagement_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_engagement_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_engagement_ad.images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_engagement_ad.images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_engagement_ad.videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_engagement_ad.videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_pre_registration_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_pre_registration_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_pre_registration_ad.images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_pre_registration_ad.images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.app_pre_registration_ad.youtube_videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.app_pre_registration_ad.youtube_videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.business_name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.call_to_action_text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.carousel_cards": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.carousel_cards.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.description": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.headline": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.logo_image": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_carousel_ad.logo_image.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.business_name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.call_to_action_text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.classic_display_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.classic_display_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.logo_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.logo_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.portrait_marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.portrait_marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.square_marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.square_marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.tall_portrait_marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_multi_asset_ad.tall_portrait_marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.breadcrumb1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.breadcrumb2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.business_name": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.call_to_action": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.call_to_action.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.description": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.headline": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.logo_image": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_product_ad.logo_image.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.breadcrumb1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.breadcrumb2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.business_name": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.call_to_actions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.call_to_actions.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.companion_banners": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.companion_banners.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.logo_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.logo_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.long_headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.demand_gen_video_responsive_ad.videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.device_preference": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.display_upload_ad.display_upload_product_type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.display_upload_ad.media_bundle": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.display_upload_ad.media_bundle.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.display_url": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_dynamic_search_ad.description": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_dynamic_search_ad.description2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.description": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.description2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.headline_part1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.headline_part2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.headline_part3": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.path1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.expanded_text_ad.path2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.final_app_urls": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.final_mobile_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.final_url_suffix": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.final_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.hotel_ad": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.image_asset.asset": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.image_url": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.mime_type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.pixel_height": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.pixel_width": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.preview_image_url": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.preview_pixel_height": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.image_ad.preview_pixel_width": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_app_install_ad": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.accent_color": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.allow_flexible_color": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.business_name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.call_to_action_text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.description": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.format_setting": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.logo_image": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.long_headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.main_color": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.marketing_image": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.price_prefix": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.promo_text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.short_headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.square_logo_image": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.legacy_responsive_display_ad.square_marketing_image": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.local_ad.call_to_actions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.logo_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.logo_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.path1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.local_ad.path2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.local_ad.videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.local_ad.videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.accent_color": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.allow_flexible_color": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.business_name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.call_to_action_text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.control_spec.enable_asset_enhancements": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.control_spec.enable_autogen_video": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.format_setting": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.logo_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.logo_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.long_headline": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.main_color": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.price_prefix": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.promo_text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_display_ad.square_logo_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.square_logo_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.square_marketing_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.square_marketing_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.youtube_videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_display_ad.youtube_videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.responsive_search_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_search_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.responsive_search_ad.path1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.responsive_search_ad.path2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.shopping_comparison_listing_ad.headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.shopping_product_ad": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.shopping_smart_ad": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.smart_campaign_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.smart_campaign_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.synthetic_content_info.advertiser_attestation.source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.synthetic_content_info.advertiser_attestation.status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.synthetic_content_info.system_attestation.source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.synthetic_content_info.system_attestation.status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.system_managed_resource_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.text_ad.description1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.text_ad.description2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.text_ad.headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.tracking_url_template": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.travel_ad": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.url_collections": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.url_custom_parameters": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_ad.audio": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_ad.bumper.action_button_label": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.bumper.action_headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.bumper.companion_banner.asset": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_feed.description1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_feed.description2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_feed.headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_feed.thumbnail": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_stream.action_button_label": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_stream.action_headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.in_stream.companion_banner.asset": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.non_skippable.action_button_label": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.non_skippable.action_headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.non_skippable.companion_banner.asset": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.out_stream.description": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.out_stream.headline": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_ad.video.asset": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_responsive_ad.breadcrumb1": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_responsive_ad.breadcrumb2": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.ad.video_responsive_ad.business_name": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.call_to_actions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.companion_banners": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.companion_banners.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.descriptions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.logo_images": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.logo_images.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.long_headlines": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.videos": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad.video_responsive_ad.videos.asset": [
+          false,
+          true,
+          false
+        ],
+        "ad_group_ad.ad_group": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.ad_group_ad_asset_automation_settings": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.ad_strength": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.end_date_time": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.labels": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.policy_summary.approval_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.policy_summary.policy_topic_entries": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.policy_summary.review_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.primary_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_ad.primary_status_reasons": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_ad.start_date_time": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_ad.status": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "ad_group_criterion": {
+      "source_url": "https://developers.google.com/google-ads/api/fields/v25/ad_group_criterion?hl=en",
+      "attributed_resources": [
+        "ad_group",
+        "campaign",
+        "customer",
+        "language_constant",
+        "mobile_app_category_constant",
+        "shared_set",
+        "topic_constant",
+        "user_interest",
+        "user_list"
+      ],
+      "fields": {
+        "ad_group_criterion.ad_group": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.age_range.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.app_payment_model.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.approval_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.audience.audience": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.bid_modifier": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.brand_list.shared_set": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.combined_audience.combined_audience": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.cpm_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.cpv_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.criterion_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.custom_affinity.custom_affinity": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.custom_audience.custom_audience": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.custom_intent.custom_intent": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.disapproval_reasons": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.display_name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpc_bid_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpm_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpm_bid_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpv_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpv_bid_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_percent_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_percent_cpc_bid_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.entity_bid.item_code": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.extended_demographic.extended_demographic_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.final_mobile_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.final_url_suffix": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.final_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.gender.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.income_range.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.keyword.match_type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.keyword.text": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.labels": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.language.language_constant": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.life_event.life_event_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.activity_city.value": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.case_value.activity_country.value": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.case_value.activity_id.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.activity_rating.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.activity_state.value": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.case_value.hotel_city.city_criterion": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.case_value.hotel_class.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.hotel_country_region.country_region_criterion": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.case_value.hotel_id.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.hotel_state.state_criterion": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.case_value.product_brand.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_category.category_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_category.level": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_channel.channel": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_channel_exclusivity.channel_exclusivity": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_condition.condition": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_custom_attribute.index": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_custom_attribute.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_item_id.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_type.level": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.case_value.product_type.value": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.listing_group.parent_ad_group_criterion": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.listing_group.path": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_criterion.listing_group.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.location.geo_target_constant": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.mobile_app_category.mobile_app_category_constant": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.mobile_application.app_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.mobile_application.name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.negative": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.parental_status.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.percent_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.placement.url": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.position_estimates.estimated_add_clicks_at_first_position_cpc": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.position_estimates.estimated_add_cost_at_first_position_cpc": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.position_estimates.first_page_cpc_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.position_estimates.first_position_cpc_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.position_estimates.top_of_page_cpc_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.primary_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.primary_status_reasons": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.quality_info.creative_quality_score": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.quality_info.post_click_quality_score": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.quality_info.quality_score": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.quality_info.search_predicted_ctr": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.retail_filter_bundle.shared_set": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.system_serving_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.topic.path": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.topic.topic_constant": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.tracking_url_template": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.url_custom_parameters": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_criterion.user_interest.user_interest_category": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.user_list.user_list": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.vertical_ads_item_group_rule_list.shared_set": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.video_lineup.video_lineup_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.webpage.conditions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_criterion.webpage.coverage_percentage": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.webpage.criterion_name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.webpage.sample.sample_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.youtube_channel.channel_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.youtube_video.video_id": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "ad_group": {
+      "source_url": "https://developers.google.com/google-ads/api/fields/v25/ad_group?hl=en",
+      "attributed_resources": [
+        "accessible_bidding_strategy",
+        "bidding_strategy",
+        "campaign",
+        "customer"
+      ],
+      "fields": {
+        "ad_group.ad_rotation_mode": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.ai_max_ad_group_setting.disable_search_term_matching": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.audience_setting.use_audience_grouped": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.base_ad_group": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.campaign": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.cpm_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.cpv_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.channel_config": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.channel_strategy": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.discover": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.display": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.gmail": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.maps": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.youtube_in_feed": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.youtube_in_stream": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.demand_gen_ad_group_settings.channel_controls.selected_channels.youtube_shorts": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.display_custom_bid_dimension": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_target_cpa_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_target_cpa_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_target_cpc": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_target_cpc_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_target_roas": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.effective_target_roas_source": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.exclude_demographic_expansion": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.excluded_parent_asset_field_types": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.excluded_parent_asset_set_types": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.final_url_suffix": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.fixed_cpm_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.labels": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.optimized_targeting_enabled": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.percent_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.primary_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.primary_status_reasons": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.target_cpa_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.target_cpc_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.target_cpm_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.target_cpv_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.target_roas": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.targeting_setting.target_restrictions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group.tracking_url_template": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.url_custom_parameters": [
+          true,
+          false,
+          false
+        ],
+        "ad_group.vertical_ads_format_setting.disable_text_ads": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.vertical_ads_format_setting.enable_booking_links": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.vertical_ads_format_setting.enable_vertical_promotion_ads": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.video_ad_group_settings.video_ad_sequence.step_id": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "campaign": {
+      "source_url": "https://developers.google.com/google-ads/api/fields/v25/campaign?hl=en",
+      "attributed_resources": [
+        "accessible_bidding_strategy",
+        "bidding_strategy",
+        "campaign_budget",
+        "campaign_group",
+        "customer"
+      ],
+      "fields": {
+        "campaign.aca_migration_date_time": [
+          true,
+          true,
+          true
+        ],
+        "campaign.accessible_bidding_strategy": [
+          true,
+          true,
+          false
+        ],
+        "campaign.ad_serving_optimization_status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.advertising_channel_sub_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.advertising_channel_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.ai_max_setting.bundling_required": [
+          true,
+          true,
+          true
+        ],
+        "campaign.ai_max_setting.enable_ai_max": [
+          true,
+          true,
+          true
+        ],
+        "campaign.app_campaign_setting.app_id": [
+          true,
+          true,
+          true
+        ],
+        "campaign.app_campaign_setting.app_store": [
+          true,
+          true,
+          true
+        ],
+        "campaign.app_campaign_setting.bidding_strategy_goal_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.asset_automation_settings": [
+          true,
+          false,
+          false
+        ],
+        "campaign.audience_setting.use_audience_grouped": [
+          true,
+          true,
+          true
+        ],
+        "campaign.base_campaign": [
+          true,
+          true,
+          true
+        ],
+        "campaign.bidding_strategy": [
+          true,
+          true,
+          false
+        ],
+        "campaign.bidding_strategy_system_status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.bidding_strategy_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.brand_guidelines.accent_color": [
+          true,
+          true,
+          false
+        ],
+        "campaign.brand_guidelines.main_color": [
+          true,
+          true,
+          false
+        ],
+        "campaign.brand_guidelines.predefined_font_family": [
+          true,
+          true,
+          false
+        ],
+        "campaign.brand_guidelines_enabled": [
+          true,
+          true,
+          false
+        ],
+        "campaign.broad_match_migration_date_time": [
+          true,
+          true,
+          true
+        ],
+        "campaign.campaign_budget": [
+          true,
+          true,
+          false
+        ],
+        "campaign.campaign_group": [
+          true,
+          true,
+          false
+        ],
+        "campaign.commission.commission_rate_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.contains_eu_political_advertising": [
+          true,
+          true,
+          true
+        ],
+        "campaign.demand_gen_campaign_settings.upgraded_targeting": [
+          true,
+          true,
+          true
+        ],
+        "campaign.dynamic_search_ads_setting.domain_name": [
+          true,
+          true,
+          true
+        ],
+        "campaign.dynamic_search_ads_setting.language_code": [
+          true,
+          true,
+          true
+        ],
+        "campaign.dynamic_search_ads_setting.use_supplied_urls_only": [
+          true,
+          true,
+          true
+        ],
+        "campaign.end_date_time": [
+          true,
+          true,
+          true
+        ],
+        "campaign.excluded_parent_asset_field_types": [
+          true,
+          true,
+          false
+        ],
+        "campaign.excluded_parent_asset_set_types": [
+          true,
+          true,
+          false
+        ],
+        "campaign.experiment_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.feed_types": [
+          true,
+          true,
+          false
+        ],
+        "campaign.final_url_suffix": [
+          true,
+          true,
+          true
+        ],
+        "campaign.fixed_cpm.goal": [
+          true,
+          true,
+          true
+        ],
+        "campaign.fixed_cpm.target_frequency_info.target_count": [
+          true,
+          true,
+          true
+        ],
+        "campaign.fixed_cpm.target_frequency_info.time_unit": [
+          true,
+          true,
+          true
+        ],
+        "campaign.frequency_caps": [
+          true,
+          false,
+          false
+        ],
+        "campaign.geo_target_type_setting.negative_geo_target_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.geo_target_type_setting.positive_geo_target_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.hotel_property_asset_set": [
+          true,
+          true,
+          true
+        ],
+        "campaign.hotel_setting.disable_hotel_setting": [
+          true,
+          true,
+          true
+        ],
+        "campaign.hotel_setting.hotel_center_id": [
+          true,
+          true,
+          true
+        ],
+        "campaign.id": [
+          true,
+          true,
+          true
+        ],
+        "campaign.keyword_match_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.labels": [
+          true,
+          true,
+          false
+        ],
+        "campaign.listing_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.local_campaign_setting.location_source_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.local_services_campaign_settings.category_bids": [
+          true,
+          false,
+          false
+        ],
+        "campaign.manual_cpa": [
+          true,
+          false,
+          false
+        ],
+        "campaign.manual_cpc.enhanced_cpc_enabled": [
+          true,
+          true,
+          true
+        ],
+        "campaign.manual_cpm": [
+          true,
+          false,
+          false
+        ],
+        "campaign.manual_cpv": [
+          true,
+          false,
+          false
+        ],
+        "campaign.maximize_conversion_value.target_roas": [
+          true,
+          true,
+          true
+        ],
+        "campaign.maximize_conversion_value.target_roas_tolerance_percent_millis": [
+          true,
+          true,
+          true
+        ],
+        "campaign.maximize_conversions.target_cpa_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.missing_eu_political_advertising_declaration": [
+          true,
+          true,
+          true
+        ],
+        "campaign.name": [
+          true,
+          true,
+          true
+        ],
+        "campaign.network_settings.target_content_network": [
+          true,
+          true,
+          true
+        ],
+        "campaign.network_settings.target_google_search": [
+          true,
+          true,
+          true
+        ],
+        "campaign.network_settings.target_google_tv_network": [
+          true,
+          true,
+          true
+        ],
+        "campaign.network_settings.target_partner_search_network": [
+          true,
+          true,
+          true
+        ],
+        "campaign.network_settings.target_search_network": [
+          true,
+          true,
+          true
+        ],
+        "campaign.network_settings.target_youtube": [
+          true,
+          true,
+          true
+        ],
+        "campaign.optimization_goal_setting.optimization_goal_types": [
+          true,
+          true,
+          false
+        ],
+        "campaign.optimization_score": [
+          true,
+          true,
+          true
+        ],
+        "campaign.payment_mode": [
+          true,
+          true,
+          true
+        ],
+        "campaign.percent_cpc.cpc_bid_ceiling_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.percent_cpc.enhanced_cpc_enabled": [
+          true,
+          true,
+          true
+        ],
+        "campaign.performance_max_upgrade.performance_max_campaign": [
+          true,
+          true,
+          true
+        ],
+        "campaign.performance_max_upgrade.pre_upgrade_campaign": [
+          true,
+          true,
+          true
+        ],
+        "campaign.performance_max_upgrade.status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.pmax_campaign_settings.brand_targeting_overrides.ignore_exclusions_for_shopping_ads": [
+          true,
+          true,
+          true
+        ],
+        "campaign.pmax_campaign_settings.local_services_enabled": [
+          true,
+          true,
+          true
+        ],
+        "campaign.pmax_campaign_settings.local_services_pmax_campaign_settings.country_code": [
+          true,
+          true,
+          true
+        ],
+        "campaign.pmax_campaign_settings.local_services_pmax_campaign_settings.founding_year": [
+          true,
+          true,
+          false
+        ],
+        "campaign.pmax_campaign_settings.local_services_pmax_campaign_settings.navigational_query_leads_enabled": [
+          true,
+          true,
+          true
+        ],
+        "campaign.pmax_campaign_settings.local_services_pmax_campaign_settings.phone_numbers": [
+          true,
+          false,
+          false
+        ],
+        "campaign.primary_status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.primary_status_reasons": [
+          true,
+          true,
+          false
+        ],
+        "campaign.real_time_bidding_setting.opt_in": [
+          true,
+          true,
+          true
+        ],
+        "campaign.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "campaign.selective_optimization.conversion_actions": [
+          true,
+          true,
+          false
+        ],
+        "campaign.serving_status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.advertising_partner_ids": [
+          true,
+          true,
+          false
+        ],
+        "campaign.shopping_setting.campaign_priority": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.disable_product_feed": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.enable_local": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.feed_label": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.ignore_brand_exclusion_in_shopping_ads": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.merchant_id": [
+          true,
+          true,
+          true
+        ],
+        "campaign.shopping_setting.use_vehicle_inventory": [
+          true,
+          true,
+          true
+        ],
+        "campaign.start_date_time": [
+          true,
+          true,
+          true
+        ],
+        "campaign.status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpa.cpc_bid_ceiling_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpa.cpc_bid_floor_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpa.target_cpa_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpc.target_cpc_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpm.target_frequency_goal.target_count": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpm.target_frequency_goal.time_unit": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_cpv": [
+          true,
+          false,
+          false
+        ],
+        "campaign.target_impression_share.cpc_bid_ceiling_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_impression_share.location": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_impression_share.location_fraction_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_roas.cpc_bid_ceiling_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_roas.cpc_bid_floor_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_roas.target_roas": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_roas.target_roas_tolerance_percent_millis": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_spend.cpc_bid_ceiling_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.target_spend.target_spend_micros": [
+          true,
+          true,
+          true
+        ],
+        "campaign.targeting_setting.target_restrictions": [
+          true,
+          false,
+          false
+        ],
+        "campaign.text_guidelines.messaging_restrictions": [
+          true,
+          false,
+          false
+        ],
+        "campaign.text_guidelines.term_exclusions": [
+          true,
+          true,
+          false
+        ],
+        "campaign.third_party_integration_partners.brand_lift_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "campaign.third_party_integration_partners.brand_safety_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "campaign.third_party_integration_partners.conversion_attribution_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "campaign.third_party_integration_partners.reach_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "campaign.third_party_integration_partners.viewability_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "campaign.tracking_setting.tracking_url": [
+          true,
+          true,
+          true
+        ],
+        "campaign.tracking_url_template": [
+          true,
+          true,
+          true
+        ],
+        "campaign.travel_campaign_settings.travel_account_id": [
+          true,
+          true,
+          true
+        ],
+        "campaign.url_custom_parameters": [
+          true,
+          false,
+          false
+        ],
+        "campaign.vanity_pharma.vanity_pharma_display_url_mode": [
+          true,
+          true,
+          true
+        ],
+        "campaign.vanity_pharma.vanity_pharma_text": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.booking_details.cancellation_date_time": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.booking_details.hold_expiration_date_time": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.booking_details.status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.reservation_ad_category_self_disclosure.alcohol": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.reservation_ad_category_self_disclosure.gambling": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.reservation_ad_category_self_disclosure.politics": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_format_control.format_restriction": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_format_control.non_skippable_in_stream_restrictions.max_duration": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_format_control.non_skippable_in_stream_restrictions.min_duration": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_inventory_control.allow_in_feed": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_inventory_control.allow_in_stream": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_inventory_control.allow_non_skippable_in_stream": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_inventory_control.allow_shorts": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_sequence.minimum_duration": [
+          true,
+          true,
+          true
+        ],
+        "campaign.video_campaign_settings.video_ad_sequence.steps": [
+          true,
+          false,
+          false
+        ],
+        "campaign.view_through_conversion_optimization_enabled": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "customer": {
+      "source_url": "https://developers.google.com/google-ads/api/fields/v25/customer?hl=en",
+      "attributed_resources": [],
+      "fields": {
+        "customer.auto_tagging_enabled": [
+          true,
+          true,
+          true
+        ],
+        "customer.call_reporting_setting.call_conversion_action": [
+          true,
+          true,
+          true
+        ],
+        "customer.call_reporting_setting.call_conversion_reporting_enabled": [
+          true,
+          true,
+          true
+        ],
+        "customer.call_reporting_setting.call_reporting_enabled": [
+          true,
+          true,
+          true
+        ],
+        "customer.contains_eu_political_advertising": [
+          true,
+          false,
+          true
+        ],
+        "customer.conversion_tracking_setting.accepted_customer_data_terms": [
+          true,
+          false,
+          false
+        ],
+        "customer.conversion_tracking_setting.conversion_tracking_id": [
+          true,
+          false,
+          false
+        ],
+        "customer.conversion_tracking_setting.conversion_tracking_status": [
+          true,
+          true,
+          true
+        ],
+        "customer.conversion_tracking_setting.cross_account_conversion_tracking_id": [
+          true,
+          true,
+          true
+        ],
+        "customer.conversion_tracking_setting.enhanced_conversions_for_leads_enabled": [
+          true,
+          false,
+          false
+        ],
+        "customer.conversion_tracking_setting.google_ads_conversion_customer": [
+          true,
+          false,
+          false
+        ],
+        "customer.currency_code": [
+          true,
+          true,
+          true
+        ],
+        "customer.customer_agreement_setting.accepted_lead_form_terms": [
+          true,
+          true,
+          true
+        ],
+        "customer.descriptive_name": [
+          true,
+          true,
+          true
+        ],
+        "customer.final_url_suffix": [
+          true,
+          true,
+          true
+        ],
+        "customer.has_partners_badge": [
+          true,
+          true,
+          true
+        ],
+        "customer.id": [
+          true,
+          true,
+          true
+        ],
+        "customer.image_asset_auto_migration_done": [
+          true,
+          true,
+          true
+        ],
+        "customer.image_asset_auto_migration_done_date_time": [
+          true,
+          true,
+          true
+        ],
+        "customer.local_services_settings.granular_insurance_statuses": [
+          true,
+          false,
+          false
+        ],
+        "customer.local_services_settings.granular_license_statuses": [
+          true,
+          false,
+          false
+        ],
+        "customer.location_asset_auto_migration_done": [
+          true,
+          true,
+          true
+        ],
+        "customer.location_asset_auto_migration_done_date_time": [
+          true,
+          true,
+          true
+        ],
+        "customer.manager": [
+          true,
+          true,
+          true
+        ],
+        "customer.optimization_score": [
+          true,
+          true,
+          true
+        ],
+        "customer.optimization_score_weight": [
+          true,
+          true,
+          true
+        ],
+        "customer.pay_per_conversion_eligibility_failure_reasons": [
+          true,
+          true,
+          false
+        ],
+        "customer.remarketing_setting.google_global_site_tag": [
+          true,
+          false,
+          true
+        ],
+        "customer.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "customer.status": [
+          true,
+          true,
+          true
+        ],
+        "customer.test_account": [
+          true,
+          true,
+          true
+        ],
+        "customer.time_zone": [
+          true,
+          true,
+          true
+        ],
+        "customer.tracking_url_template": [
+          true,
+          true,
+          true
+        ],
+        "customer.video_brand_safety_suitability": [
+          true,
+          true,
+          true
+        ],
+        "customer.video_customer.third_party_integration_partners.brand_lift_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "customer.video_customer.third_party_integration_partners.brand_safety_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "customer.video_customer.third_party_integration_partners.conversion_attribution_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "customer.video_customer.third_party_integration_partners.reach_integration_partners": [
+          true,
+          false,
+          false
+        ],
+        "customer.video_customer.third_party_integration_partners.viewability_integration_partners": [
+          true,
+          false,
+          false
+        ]
+      }
+    }
+  }
+}
