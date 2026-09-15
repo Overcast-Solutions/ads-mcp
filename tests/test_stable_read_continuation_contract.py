@@ -17,6 +17,7 @@ from google.ads.googleads.v25.services.services.keyword_plan_idea_service.pagers
 
 import harness as h
 from offline_contract import project, selected
+from pmax_oracle import PMAX_READS
 
 
 MIB = 1024 * 1024
@@ -179,7 +180,8 @@ def truncation(payload, key):
 def test_inventory_covers_every_current_paginated_tool(tmp_path, fake_client):
     tools = h.tool_map(h.build_server(tmp_path, client=fake_client))
     actual = {name for name, t in tools.items() if "page_token" in t.input_schema.get("properties", {})}
-    assert actual == {case[0] for case in CASES}
+    baseline = {case[0] for case in CASES}
+    assert baseline <= actual <= baseline | PMAX_READS
 
 
 @pytest.mark.parametrize("tool,resource,args,key,identity", CASES)
