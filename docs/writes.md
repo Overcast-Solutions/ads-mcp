@@ -129,6 +129,64 @@ controls the campaign and group. A successful apply returns
 `campaign_resource_name`. Local validation and recorded request tests do not
 establish Google's final policy acceptance.
 
+### URL expansion and exclusions
+
+Read `get_pmax_url_settings(campaign_id)` before changing destinations. Its
+`final_url_expansion.explicit` flag distinguishes a returned setting from an
+absent entry. `UNSPECIFIED` is not an opt-out. Google documents expansion as
+enabled by default for PMax. `set_pmax_final_url_expansion` takes a strict
+boolean and preserves unrelated automation entries and their order. Enabling
+expansion allows different landing pages and text generated for those pages;
+disabling it does not disable independent text customization. See Google's
+[automation settings](https://developers.google.com/google-ads/api/docs/assets/asset-automation-settings).
+
+`add_pmax_url_exclusion` creates one negative webpage criterion with one URL
+condition. The default `EXACT` mode requires an HTTP(S) URL without user info;
+`CONTAINS` accepts a nonblank URL fragment. Neither permits whitespace or
+control characters. Existing exact duplicate rules are refused.
+`remove_pmax_url_exclusions` takes distinct numeric child criterion IDs and
+previews the complete conditions of each selected rule. Removal is irreversible
+and requires `confirm_irreversible=true` after preview.
+
+These exclusions are not universal destination blocks. Explicitly supplied
+final URLs can still receive traffic, and an excluded homepage can still serve
+on some Merchant Center inventory, including Shopping ads on Gmail. Review
+Google's [exclusion exceptions](https://support.google.com/google-ads/answer/14337773).
+
+The read uses retained pagination; writes require complete state within the
+local 10,000-row and 16 MiB bounds. Unknown or ambiguous state refuses a plan.
+Apply reads the campaign and relevant URL state again; changed state returns
+`STALE_PLAN` and requires a fresh plan. An external writer can still race after
+that recheck. Each application uses one provider request without automatic
+write retries. Local request checks do not establish live serving acceptance.
+
+### Item-ID product selection
+
+`set_asset_group_product_selection(asset_group_id, item_ids)` replaces the entire
+listing tree for one existing asset group in a feed-linked PMax campaign. Supply
+1–998 distinct Item IDs, each at most 128 Unicode codepoints after trimming.
+Case is preserved: `SKU-A` and `sku-a` remain different IDs. Control characters,
+internal whitespace and an empty selection are refused. These are local safety
+bounds, not a guarantee of provider acceptance.
+
+The source tree must be empty, a single included/excluded all-products unit, or
+a flat Item-ID subdivision with exactly one catch-all. Nested trees, other
+dimensions, duplicate siblings and inconsistent identities are refused without
+flattening them. A complete read is required within 1,000 nodes and 16 MiB;
+one additional node detects overflow. The plan shows every old and new node.
+Its replacement includes the selected IDs and excludes everything else.
+
+Review the plan, run `confirm_and_apply(plan_id, dry_run=true)`, then apply with
+`dry_run=false, confirm_irreversible=true`. Replacement is irreversible and
+changes inventory eligibility, potentially affecting delivery and spend under
+the existing budget. Apply rechecks the group, campaign feed settings and tree;
+changed state returns `STALE_PLAN` and needs a new plan. An external writer can
+still race after that check. One dedicated v25 request removes children before
+the root and creates the new root before its leaves. It has no partial-failure
+option and is never automatically retried. See Google's
+[atomic tree request](https://developers.google.com/google-ads/api/reference/rpc/v25/MutateAssetGroupListingGroupFiltersRequest).
+Re-read `get_listing_groups(campaign_id)` afterwards to inspect the result.
+
 ## Ads and assets
 
 `draft_campaign`, `create_ad_group` and `draft_responsive_search_ad` accept

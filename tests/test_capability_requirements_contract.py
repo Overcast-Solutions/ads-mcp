@@ -6,6 +6,8 @@ import re
 import tomllib
 
 import pytest
+import harness as h
+from pmax_oracle import PMAX_ADDITIONS, expected_pending
 
 from capability_oracle import (
     BUILTIN_FORBIDDEN, DEFAULT, DETAIL, ROOT, cli, compare, empty, failure,
@@ -30,7 +32,7 @@ def test_authored_default_covers_the_accepted_workflows_and_declared_obligations
         assert capability["tools"]
         tools.extend(capability["tools"])
     by_name = {tool["name"]: tool for tool in tools}
-    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS
+    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS
     for tool in tools:
         assert set(tool) == {"name", "parameters", "required", "values"}
         assert len(tool["parameters"]) == len(set(tool["parameters"]))
@@ -280,7 +282,8 @@ def test_comparison_seam_reports_metadata_failure_without_returning_partial_succ
 
 def test_default_cli_uses_actual_offline_metadata_and_is_not_bound_to_working_directory(tmp_path):
     result, observed = cli(tmp_path, default=True)
-    success(result, empty())
+    server = h.build_rw_server(tmp_path, client=h.FakeGoogleAdsClient())
+    success(result, expected_pending(server))
     assert "metadata collection" in observed
     assert any(event.startswith("initialized:") for event in observed)
 

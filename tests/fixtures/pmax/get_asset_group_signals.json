@@ -1,0 +1,274 @@
+{
+  "tool": "get_asset_group_signals",
+  "args": {
+    "asset_group_id": "801"
+  },
+  "gaql": {
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        }
+      }
+    ],
+    "asset_group": [
+      {
+        "customer": {
+          "id": 9876543210
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        },
+        "asset_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/assetGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Synthetic group 9876543210-801",
+          "status": "ENABLED",
+          "primary_status": "ELIGIBLE",
+          "final_urls": [
+            "https://example.invalid/801"
+          ],
+          "final_mobile_urls": []
+        }
+      }
+    ],
+    "asset_group_signal": [
+      {
+        "customer": {
+          "id": 9876543210
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        },
+        "asset_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/assetGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Synthetic group 9876543210-801",
+          "status": "ENABLED",
+          "primary_status": "ELIGIBLE",
+          "final_urls": [
+            "https://example.invalid/801"
+          ],
+          "final_mobile_urls": []
+        },
+        "asset_group_signal": {
+          "resource_name": "customers/9876543210/assetGroupSignals/801~701",
+          "asset_group": "customers/9876543210/assetGroups/801",
+          "approval_status": "APPROVED",
+          "disapproval_reasons": [],
+          "search_theme": {
+            "text": "Trail footwear"
+          }
+        }
+      },
+      {
+        "customer": {
+          "id": 9876543210
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        },
+        "asset_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/assetGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Synthetic group 9876543210-801",
+          "status": "ENABLED",
+          "primary_status": "ELIGIBLE",
+          "final_urls": [
+            "https://example.invalid/801"
+          ],
+          "final_mobile_urls": []
+        },
+        "asset_group_signal": {
+          "resource_name": "customers/9876543210/assetGroupSignals/801~702",
+          "asset_group": "customers/9876543210/assetGroups/801",
+          "approval_status": "APPROVED",
+          "disapproval_reasons": [],
+          "audience": {
+            "audience": "customers/9876543210/audiences/901"
+          }
+        }
+      },
+      {
+        "customer": {
+          "id": 9876543210
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        },
+        "asset_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/assetGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Synthetic group 9876543210-801",
+          "status": "ENABLED",
+          "primary_status": "ELIGIBLE",
+          "final_urls": [
+            "https://example.invalid/801"
+          ],
+          "final_mobile_urls": []
+        },
+        "asset_group_signal": {
+          "resource_name": "customers/9876543210/assetGroupSignals/801~703",
+          "asset_group": "customers/9876543210/assetGroups/801",
+          "approval_status": "APPROVED",
+          "disapproval_reasons": [],
+          "local_services_id": {
+            "service_id": "synthetic-service"
+          }
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "asset_group_id": "801",
+    "signals": [
+      {
+        "asset_group_id": "801",
+        "signal_id": "801~701",
+        "resource_name": "customers/9876543210/assetGroupSignals/801~701",
+        "kind": "search_theme",
+        "supported": true,
+        "search_theme": "Trail footwear",
+        "audience_resource_name": null,
+        "approval_status": "APPROVED",
+        "disapproval_reasons": []
+      },
+      {
+        "asset_group_id": "801",
+        "signal_id": "801~702",
+        "resource_name": "customers/9876543210/assetGroupSignals/801~702",
+        "kind": "audience",
+        "supported": true,
+        "search_theme": null,
+        "audience_resource_name": "customers/9876543210/audiences/901",
+        "approval_status": "APPROVED",
+        "disapproval_reasons": []
+      },
+      {
+        "asset_group_id": "801",
+        "signal_id": "801~703",
+        "resource_name": "customers/9876543210/assetGroupSignals/801~703",
+        "kind": "local_services_id",
+        "supported": false,
+        "search_theme": null,
+        "audience_resource_name": null,
+        "approval_status": "APPROVED",
+        "disapproval_reasons": []
+      }
+    ]
+  }
+}

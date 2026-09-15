@@ -1,0 +1,126 @@
+{
+  "tool": "get_pmax_url_settings",
+  "args": {
+    "campaign_id": "701"
+  },
+  "gaql": {
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        }
+      }
+    ],
+    "campaign_criterion": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "shopping_setting": {
+            "merchant_id": 12345
+          },
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ]
+        },
+        "campaign_criterion": {
+          "criterion_id": 601,
+          "resource_name": "customers/9876543210/campaignCriteria/701~601",
+          "campaign": "customers/9876543210/campaigns/701",
+          "status": "ENABLED",
+          "negative": true,
+          "type_": "WEBPAGE",
+          "webpage": {
+            "criterion_name": "Synthetic rule 601",
+            "conditions": [
+              {
+                "operand": "URL",
+                "operator": "EQUALS",
+                "argument": "https://example.invalid/exclude/601"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign_id": "701",
+    "final_url_expansion": {
+      "status": "OPTED_IN",
+      "explicit": true
+    },
+    "automation_settings": [
+      {
+        "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+        "asset_automation_status": "OPTED_OUT"
+      },
+      {
+        "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+        "asset_automation_status": "OPTED_IN"
+      },
+      {
+        "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+        "asset_automation_status": "OPTED_IN"
+      }
+    ],
+    "exclusions": [
+      {
+        "criterion_id": "601",
+        "resource_name": "customers/9876543210/campaignCriteria/701~601",
+        "campaign_id": "701",
+        "conditions": [
+          {
+            "operand": "URL",
+            "operator": "EQUALS",
+            "argument": "https://example.invalid/exclude/601"
+          }
+        ]
+      }
+    ]
+  }
+}

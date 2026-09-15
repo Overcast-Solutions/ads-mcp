@@ -5,6 +5,7 @@ import json
 import pytest
 
 import harness
+from pmax_oracle import PMAX_ADDITIONS, expected_pending
 from tool_catalog import MUTATION_ARGS, OPTIONAL_ARGS
 
 from capability_oracle import DEFAULT, cli, compare, empty, record, requirement, success
@@ -138,7 +139,7 @@ def test_authored_requirements_cover_the_public_tool_set():
     data = json.loads(DEFAULT.read_text())
     names = [tool["name"] for capability in data["capabilities"] for tool in capability["tools"]]
     assert len(names) == len(set(names))
-    assert set(names) == ALL_WRITE_MODE_TOOLS
+    assert set(names) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS
 
 
 def test_preview_bypass_names_are_forbidden_even_in_custom_contracts():
@@ -150,9 +151,10 @@ def test_preview_bypass_names_are_forbidden_even_in_custom_contracts():
         forbidden_parameters=sorted("extra." + name for name in names))
 
 
-def test_default_requirements_check_reports_nothing_missing(tmp_path):
+def test_default_requirements_check_reports_exact_pending_additions(tmp_path):
     result, _ = cli(tmp_path, default=True)
-    success(result, empty())
+    server = harness.build_rw_server(tmp_path, client=harness.FakeGoogleAdsClient())
+    success(result, expected_pending(server))
 
 
 def test_requirements_check_detects_missing_tools_and_parameters():

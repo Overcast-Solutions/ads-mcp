@@ -6,6 +6,7 @@ import json
 import pytest
 
 import harness as h
+from pmax_oracle import assert_catalog
 from capability_oracle import (
     DETAIL, cli, empty, events, failure, offline_env, requirement, success,
     tool_requirement,
@@ -182,9 +183,9 @@ def test_installed_stdio_version_matches_distribution_cli_and_tool_inventory(tmp
     assert "error" not in responses[1] and "error" not in responses[2], messages
     info = responses[1]["result"]["serverInfo"]
     tools = responses[2]["result"]["tools"]
-    expected_names = ALL_WRITE_MODE_TOOLS if write_enabled else READ_TOOLS
-    assert {tool["name"] for tool in tools} == expected_names
-    assert len(tools) == len(expected_names)
+    actual_names = {tool["name"] for tool in tools}
+    assert_catalog(actual_names, read_only=not write_enabled)
+    assert len(tools) == len(actual_names)
     assert info["name"] == "ads-mcp" and info.get("version") == expected, info
     if no_metadata:
         assert "metadata unavailable" in observed

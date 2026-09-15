@@ -91,6 +91,96 @@ def register(server, ctx):
 
     from ads_mcp import reporting
 
+    @server.tool(
+        name="get_asset_groups",
+        description=_spec(
+            "get_asset_groups",
+            "List existing asset groups for a verified Performance Max campaign, "
+            "including status, primary status and final URLs. campaign_id is a "
+            "positive numeric ID. Results use retained, account- and "
+            "campaign-bound pagination with explicit truncation guidance. "
+            "customer_id may explicitly select another accessible account.",
+        ),
+    )
+    def get_asset_groups(
+        campaign_id: str,
+        customer_id: str | None = None,
+        page_token: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        return guarded(ctx, pmax.get_asset_groups, name="get_asset_groups")(
+            ctx=ctx, campaign_id=campaign_id, customer_id=customer_id,
+            page_token=page_token,
+        )
+
+    @server.tool(
+        name="get_asset_group_signals",
+        description=_spec(
+            "get_asset_group_signals",
+            "Inspect a verified Performance Max asset group's optimization signals. "
+            "Returns composite signal IDs, kinds, theme text or Audience resources, "
+            "and available approval diagnostics. Other kinds remain visible as "
+            "unsupported. asset_group_id is a positive numeric ID. Results use "
+            "retained account- and group-bound pagination with truncation guidance.",
+        ),
+    )
+    def get_asset_group_signals(
+        asset_group_id: str,
+        customer_id: str | None = None,
+        page_token: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        return guarded(ctx, pmax.get_asset_group_signals, name="get_asset_group_signals")(
+            ctx=ctx, asset_group_id=asset_group_id, customer_id=customer_id,
+            page_token=page_token,
+        )
+
+    @server.tool(
+        name="list_audiences",
+        description=_spec(
+            "list_audiences",
+            "List existing Audience resources with identity, name, status, scope "
+            "and asset-group binding. Uses retained account-bound pagination. "
+            "customer_id may select another accessible account. Does not create "
+            "audiences or change their composition.",
+        ),
+    )
+    def list_audiences(
+        customer_id: str | None = None,
+        page_token: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        return guarded(ctx, pmax.list_audiences, name="list_audiences")(
+            ctx=ctx, customer_id=customer_id, page_token=page_token,
+        )
+
+    @server.tool(
+        name="get_pmax_url_settings",
+        description=_spec(
+            "get_pmax_url_settings",
+            "Inspect verified Performance Max automation settings and negative WEBPAGE "
+            "URL exclusions with complete condition structure. Distinguishes explicit "
+            "opt-in/out or UNSPECIFIED from absent provider-default settings. Google "
+            "documents expansion as enabled by default for PMax; absence is not opt-out. "
+            "Uses retained account- and campaign-bound pagination with truncation guidance. "
+            "Exclusions are not universal destination blocks: explicitly supplied final "
+            "URLs and applicable Merchant Center inventory can still serve.",
+        ),
+    )
+    def get_pmax_url_settings(
+        campaign_id: str,
+        customer_id: str | None = None,
+        page_token: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        return guarded(ctx, pmax.get_pmax_url_settings, name="get_pmax_url_settings")(
+            ctx=ctx, campaign_id=campaign_id, customer_id=customer_id, page_token=page_token,
+        )
+
     def _windowed_call(impl, name, date_range_start, date_range_end, last_n_days,
                        **kwargs):
         def call():

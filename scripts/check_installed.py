@@ -29,7 +29,7 @@ async def catalog(read_only):
     async with mcp.Client(create_server(config, client=object())) as client:
         result = await client.list_tools()
     names = sorted(tool.name for tool in result.tools)
-    assert len(names) == (21 if read_only else 52)
+    assert len(names) == (25 if read_only else 63)
     assert ("confirm_and_apply" in names) is (not read_only)
     return names
 

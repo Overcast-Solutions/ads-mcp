@@ -826,6 +826,11 @@ _ENTITY_SERVICES = {
                 "adGroupCriteria"),
 }
 
+# Metadata declares status-only support without extending removal's mapping.
+StatusEntityKind = Annotated[str, Field(json_schema_extra={
+    "enum": sorted([*_ENTITY_SERVICES, "asset_group"]),
+})]
+
 
 # ---------------------------------------------------------------------------
 # Registration
@@ -833,6 +838,183 @@ _ENTITY_SERVICES = {
 
 def register(server, ctx):  # noqa: C901 — one tool per block, deliberately flat
     cfg = ctx.config
+
+    def _signal_plan(tool, customer_id, **kwargs):
+        from ads_mcp import pmax
+
+        def impl():
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **pmax.signal_plan(ctx, tool=tool, **kwargs))
+
+        return _guarded_mutation(ctx, tool, impl)()
+
+    @server.tool(
+        name="add_asset_group_search_themes",
+        description=_spec(
+            "add_asset_group_search_themes",
+            "Plan search-theme additions to a verified Performance Max asset group. "
+            "themes is a nonempty list of distinct, stripped nonblank strings, "
+            "at most 80 Unicode codepoints each, without control characters. "
+            "The local ceiling is 50 resulting themes including existing themes; "
+            "this does not guarantee Google acceptance. Signals guide optimization, "
+            "not hard targeting. Requires complete bounded state, fresh apply "
+            "validation and the normal preview/confirm flow.",
+        ),
+    )
+    def add_asset_group_search_themes(
+        asset_group_id: str,
+        themes: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        return _signal_plan("add_asset_group_search_themes", customer_id,
+                            asset_group_id=asset_group_id, themes=themes)
+
+    @server.tool(
+        name="add_asset_group_audience_signal",
+        description=_spec(
+            "add_asset_group_audience_signal",
+            "Plan attachment of an existing enabled Audience as a Performance Max "
+            "optimization signal, not hard targeting. Positive numeric audience_id "
+            "must belong to the configured account and have CUSTOMER scope or "
+            "ASSET_GROUP scope matching asset_group_id. Refuses duplicate attachment. "
+            "Does not create audiences or edit composition. Complete signal state "
+            "and audience state are bound to the plan and rechecked before apply.",
+        ),
+    )
+    def add_asset_group_audience_signal(
+        asset_group_id: str,
+        audience_id: str,
+        customer_id: str | None = None,
+    ) -> dict:
+        return _signal_plan("add_asset_group_audience_signal", customer_id,
+                            asset_group_id=asset_group_id, audience_id=audience_id)
+
+    @server.tool(
+        name="remove_asset_group_signals",
+        description=_spec(
+            "remove_asset_group_signals",
+            "Plan irreversible removal of existing search_theme or audience signals "
+            "from a verified Performance Max asset group. signal_ids is a nonempty "
+            "list of distinct positive numeric child IDs, without group prefixes or "
+            "resource names. Other signal kinds are unsupported and refused. "
+            "Signals guide optimization, not hard targeting. Requires complete "
+            "bounded state, fresh apply validation and irreversible acknowledgement.",
+        ),
+    )
+    def remove_asset_group_signals(
+        asset_group_id: str,
+        signal_ids: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        return _signal_plan("remove_asset_group_signals", customer_id,
+                            asset_group_id=asset_group_id, signal_ids=signal_ids)
+
+    def _url_plan(tool, customer_id, **kwargs):
+        from ads_mcp import pmax
+
+        def impl():
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **pmax.url_plan(ctx, tool=tool, **kwargs))
+
+        return _guarded_mutation(ctx, tool, impl)()
+
+    @server.tool(
+        name="set_pmax_final_url_expansion",
+        description=_spec(
+            "set_pmax_final_url_expansion",
+            "Plan final URL expansion for a verified Performance Max campaign using "
+            "the current asset automation setting. enabled is a strict boolean. "
+            "Preserves every unrelated automation setting in order. Expansion permits "
+            "different landing destinations and generated text for those pages. "
+            "Disabling it does not disable independent text customization. Complete "
+            "settings and campaign state are rechecked before apply; changed state "
+            "requires a fresh preview. Writes target only the configured account.",
+        ),
+    )
+    def set_pmax_final_url_expansion(
+        campaign_id: str,
+        enabled: StrictBool,
+        customer_id: str | None = None,
+    ) -> dict:
+        return _url_plan("set_pmax_final_url_expansion", customer_id,
+                         campaign_id=campaign_id, enabled=enabled)
+
+    @server.tool(
+        name="add_pmax_url_exclusion",
+        description=_spec(
+            "add_pmax_url_exclusion",
+            "Plan one negative WEBPAGE URL exclusion for a verified Performance Max "
+            "campaign. EXACT requires an HTTP(S) URL without user info; CONTAINS "
+            "accepts a nonblank URL fragment. Whitespace, controls and duplicate rules "
+            "are refused. Creates exactly one URL condition. Exclusions are not "
+            "universal destination blocks: explicitly supplied final URLs and applicable "
+            "Merchant Center inventory can still serve. Requires complete bounded state "
+            "and a fresh recheck before apply; writes use only the configured account.",
+        ),
+    )
+    def add_pmax_url_exclusion(
+        campaign_id: str,
+        url: str,
+        match_type: Annotated[str, Field(json_schema_extra={"enum": ["EXACT", "CONTAINS"]})] = "EXACT",
+        customer_id: str | None = None,
+    ) -> dict:
+        return _url_plan("add_pmax_url_exclusion", customer_id,
+                         campaign_id=campaign_id, url=url, match_type=match_type)
+
+    @server.tool(
+        name="remove_pmax_url_exclusions",
+        description=_spec(
+            "remove_pmax_url_exclusions",
+            "Plan irreversible removal of exact existing negative WEBPAGE URL criteria "
+            "from a verified Performance Max campaign. criterion_ids is a nonempty "
+            "list of distinct positive numeric child IDs, without campaign prefixes "
+            "or resource names. Preserves unrelated criteria and previews every removed "
+            "condition. Requires complete bounded state, a fresh recheck, preview and "
+            "irreversible acknowledgement. Exclusions are not universal destination "
+            "blocks: explicitly supplied final URLs and applicable Merchant Center "
+            "inventory can still serve. Writes use only the configured account.",
+        ),
+    )
+    def remove_pmax_url_exclusions(
+        campaign_id: str,
+        criterion_ids: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        return _url_plan("remove_pmax_url_exclusions", customer_id,
+                         campaign_id=campaign_id, criterion_ids=criterion_ids)
+
+    @server.tool(
+        name="set_asset_group_product_selection",
+        description=_spec(
+            "set_asset_group_product_selection",
+            "Plan irreversible replacement of an existing feed-linked Performance Max "
+            "asset group's complete product tree. item_ids must contain 1 to 998 distinct "
+            "trimmed, case-preserved Item IDs, at most 128 Unicode codepoints each, without "
+            "controls or internal whitespace. Includes these items and excludes everything "
+            "else. Supports empty trees, a single all-products unit, or flat Item-ID trees "
+            "with one catch-all; nested trees and other dimensions are refused. Reads at "
+            "most 1000 existing nodes plus one lookahead and requires complete state. "
+            "Shows every before/after node and rechecks group, campaign feed and tree before "
+            "apply; changed state returns STALE_PLAN. Uses one atomic v25 tree request, "
+            "normal preview and irreversible acknowledgement. Alters inventory eligibility "
+            "and may affect delivery and spend. Provider acceptance is not guaranteed. "
+            "Writes only to the configured account; verify afterwards with get_listing_groups.",
+        ),
+    )
+    def set_asset_group_product_selection(
+        asset_group_id: str,
+        item_ids: list[str],
+        customer_id: str | None = None,
+    ) -> dict:
+        from ads_mcp import pmax
+
+        def impl():
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **pmax.product_selection_plan(
+                ctx, asset_group_id=asset_group_id, item_ids=item_ids,
+            ))
+
+        return _guarded_mutation(ctx, "set_asset_group_product_selection", impl)()
 
     def entity_kind(entity_type: str) -> str:
         kind = str(entity_type or "").strip().lower()
@@ -1069,17 +1251,28 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
             name=tool_name,
             description=_spec(
                 tool_name,
-                f"Stage a plan to {verb} a campaign, ad group, ad, or "
+                f"Stage a plan to {verb} a campaign, PMax asset group, ad group, ad, or "
                 f"keyword. {effect}Applies only via confirm_and_apply. "
-                "entity_id is a single numeric ID for campaign/ad_group; "
+                "entity_id is a single numeric ID for campaign/ad_group/asset_group; "
                 "ad requires ad_group_id~ad_id and keyword requires "
                 "ad_group_id~criterion_id. Surrounding whitespace and "
-                "leading zeroes in each segment are normalized.",
+                "leading zeroes in each segment are normalized. Asset-group "
+                "plans show actual status and the verified PMax parent, and "
+                "refuse changed state with STALE_PLAN before applying. "
+                "Asset-group enabling may resume delivery and spend under "
+                "the existing campaign budget.",
             ),
         )
-        def _tool(entity_type: str, entity_id: str, customer_id: str | None = None) -> dict:
+        def _tool(entity_type: StatusEntityKind, entity_id: str, customer_id: str | None = None) -> dict:
             def impl(entity_id, **_kw):
                 _check_customer(ctx, customer_id)
+                if entity_type.strip().lower() == "asset_group":
+                    from ads_mcp import pmax
+
+                    return _plan_payload(ctx, **pmax.status_plan(
+                        ctx, tool=tool_name, asset_group_id=entity_id,
+                        status_name=status_name,
+                    ))
                 kind = entity_kind(entity_type)
                 entity_id = _lifecycle_id(entity_id, kind)
                 path = _ENTITY_SERVICES[kind][4]

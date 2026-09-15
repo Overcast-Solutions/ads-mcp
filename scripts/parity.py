@@ -25,13 +25,21 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "tests"))
 
 
-def validate_fixture_inventory(fixtures_dir: Path) -> None:
-    """Require one fixture per locked read tool before any server setup."""
-    from tool_catalog import READ_TOOLS
-
-    if not fixtures_dir.is_dir():
+def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
+    """Keep original goldens intact; None selects both owned fixture sets."""
+    directories = ([fixtures_dir] if fixtures_dir is not None else
+                   [REPO / "tests/fixtures/contract", REPO / "tests/fixtures/pmax"])
+    if any(not directory.is_dir() for directory in directories):
         raise ValueError("fixture directory does not exist or is not a directory")
-    paths = sorted(fixtures_dir.glob("*.json"))
+    return sorted(path for directory in directories for path in directory.glob("*.json"))
+
+
+def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
+    """Accept complete baseline or complete merged inventories before server setup."""
+    from tool_catalog import READ_TOOLS
+    from pmax_oracle import PMAX_READS
+
+    paths = fixture_paths(fixtures_dir)
     if not paths:
         raise ValueError("fixture directory contains no JSON fixtures")
     seen = set()
@@ -41,22 +49,25 @@ def validate_fixture_inventory(fixtures_dir: Path) -> None:
         except (OSError, ValueError):
             raise ValueError("fixture inventory contains unreadable or invalid JSON") from None
         tool = fixture.get("tool") if isinstance(fixture, dict) else None
-        if not isinstance(tool, str) or tool not in READ_TOOLS:
+        if not isinstance(tool, str) or tool not in READ_TOOLS | PMAX_READS:
             raise ValueError("fixture inventory contains an unknown or missing tool identity")
         if tool in seen:
             raise ValueError(f"fixture inventory contains duplicate tool: {tool}")
         seen.add(tool)
-    missing = READ_TOOLS - seen
+    # Baseline directories remain usable. An all-fixtures run or any PMax
+    # fixture requires every approved addition, never a partial extension.
+    required = READ_TOOLS | PMAX_READS if fixtures_dir is None or seen & PMAX_READS else READ_TOOLS
+    missing = required - seen
     if missing:
         raise ValueError("fixture inventory is missing tools: " + ", ".join(sorted(missing)))
 
 
-def offline_report(fixtures_dir: Path, out) -> int:
+def offline_report(fixtures_dir: Path | None, out) -> int:
     import harness  # tests/harness.py — the recorded-fixture transport
 
     failures = 0
     with tempfile.TemporaryDirectory() as tmp:
-        for path in sorted(fixtures_dir.glob("*.json")):
+        for path in fixture_paths(fixtures_dir):
             fixture = harness.load_contract_fixture(path)
             client = harness.FakeGoogleAdsClient()
             for resource, rows in fixture["gaql"].items():
@@ -87,13 +98,13 @@ def offline_report(fixtures_dir: Path, out) -> int:
                 print(f"  golden: {json.dumps(golden)[:400]}", file=out)
     print(
         f"\n{'ALL MATCH' if failures == 0 else f'{failures} DRIFTED'} "
-        f"across {len(list(fixtures_dir.glob('*.json')))} read-tool fixtures",
+        f"across {len(fixture_paths(fixtures_dir))} read-tool fixtures",
         file=out,
     )
     return 1 if failures else 0
 
 
-def live_report(fixtures_dir: Path, out) -> int:
+def live_report(fixtures_dir: Path | None, out) -> int:
     import os
 
     from ads_mcp.config import load_config
@@ -105,7 +116,7 @@ def live_report(fixtures_dir: Path, out) -> int:
     server = create_server(config)
     print(f"live read-surface sweep against customer {config.customer_id}", file=out)
     failures = 0
-    for path in sorted(fixtures_dir.glob("*.json")):
+    for path in fixture_paths(fixtures_dir):
         fixture = harness.load_contract_fixture(path)
         try:
             payload = harness.call(server, fixture["tool"], fixture["args"])
@@ -127,10 +138,16 @@ def main(argv=None) -> int:
         description="ads-mcp own-fixture read report (offline fixture "
         "replay by default).",
     )
-    parser.add_argument(
+    inventory = parser.add_mutually_exclusive_group()
+    inventory.add_argument(
         "--fixtures",
-        default=str(REPO / "tests" / "fixtures" / "contract"),
-        help="directory of golden contract fixtures",
+        default=str(REPO / "tests/fixtures/contract"),
+        help="directory containing the complete 21-read baseline or all 25 read "
+        "fixtures; default is the original 21-read contract directory",
+    )
+    inventory.add_argument(
+        "--all-fixtures", action="store_true",
+        help="combine the owned contract and PMax directories for all 25 reads",
     )
     parser.add_argument(
         "--report", default="-", help="report path, or - for stdout"
@@ -143,7 +160,7 @@ def main(argv=None) -> int:
         "spends API quota (reads only). Operator-run.",
     )
     args = parser.parse_args(argv)
-    fixtures_dir = Path(args.fixtures)
+    fixtures_dir = None if args.all_fixtures else Path(args.fixtures)
     try:
         validate_fixture_inventory(fixtures_dir)
     except (OSError, ValueError) as exc:

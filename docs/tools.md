@@ -38,6 +38,26 @@ Ad-level metrics for a date window; bounded with pagination tokens.
 | `customer_id` | string | no | — |
 | `campaign_id` | string | no | — |
 
+### `get_asset_group_signals`
+
+Inspect a verified Performance Max asset group's optimization signals. Returns composite signal IDs, kinds, theme text or Audience resources, and available approval diagnostics. Other kinds remain visible as unsupported. asset_group_id is a positive numeric ID. Results use retained account- and group-bound pagination with truncation guidance.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
+### `get_asset_groups`
+
+List existing asset groups for a verified Performance Max campaign, including status, primary status and final URLs. campaign_id is a positive numeric ID. Results use retained, account- and campaign-bound pagination with explicit truncation guidance. customer_id may explicitly select another accessible account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `get_campaign_performance`
 
 Campaign metrics for a date window (explicit range or last_n_days), with budget, bidding strategy incl. targets, and the serving/primary status trio. Money is decimal with currency. enabled_only=true filters server-side.
@@ -127,6 +147,16 @@ Campaign-level negative keywords.
 |---|---|---|---|
 | `customer_id` | string | no | — |
 
+### `get_pmax_url_settings`
+
+Inspect verified Performance Max automation settings and negative WEBPAGE URL exclusions with complete condition structure. Distinguishes explicit opt-in/out or UNSPECIFIED from absent provider-default settings. Google documents expansion as enabled by default for PMax; absence is not opt-out. Uses retained account- and campaign-bound pagination with truncation guidance. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `get_policy_issues`
 
 Policy issues across ads, PMax asset-group assets, and campaign-linked sitelink assets. mode=summary returns a bounded topic histogram + entity-status breakdown; mode=full paginates with filters (enabled_only, campaign_id, topic) — never an unbounded dump.
@@ -187,6 +217,15 @@ Accessible accounts under the configured login customer.
 
 *No parameters.*
 
+### `list_audiences`
+
+List existing Audience resources with identity, name, status, scope and asset-group binding. Uses retained account-bound pagination. customer_id may select another accessible account. Does not create audiences or change their composition.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `customer_id` | string | no | — |
+| `page_token` | string | no | — |
+
 ### `list_extensions`
 
 Campaign-level extensions/assets (sitelinks, callouts, structured snippets) with status.
@@ -226,6 +265,26 @@ Search geo target constants by name (e.g. 'United States').
 
 ## Mutation tools (write mode only — every call returns a plan)
 
+### `add_asset_group_audience_signal`
+
+Plan attachment of an existing enabled Audience as a Performance Max optimization signal, not hard targeting. Positive numeric audience_id must belong to the configured account and have CUSTOMER scope or ASSET_GROUP scope matching asset_group_id. Refuses duplicate attachment. Does not create audiences or edit composition. Complete signal state and audience state are bound to the plan and rechecked before apply.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `audience_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `add_asset_group_search_themes`
+
+Plan search-theme additions to a verified Performance Max asset group. themes is a nonempty list of distinct, stripped nonblank strings, at most 80 Unicode codepoints each, without control characters. The local ceiling is 50 resulting themes including existing themes; this does not guarantee Google acceptance. Signals guide optimization, not hard targeting. Requires complete bounded state, fresh apply validation and the normal preview/confirm flow.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `themes` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
 ### `add_audience_targeting`
 
 Stage attaching an audience to a campaign (TARGETING or OBSERVATION mode).
@@ -247,6 +306,17 @@ Stage campaign-level negative keywords. match_type defaults EXACT; each keyword 
 | `keywords` | array&lt;string \| object&gt; | yes | — |
 | `customer_id` | string | no | — |
 | `match_type` | string | no | `EXACT` |
+
+### `add_pmax_url_exclusion`
+
+Plan one negative WEBPAGE URL exclusion for a verified Performance Max campaign. EXACT requires an HTTP(S) URL without user info; CONTAINS accepts a nonblank URL fragment. Whitespace, controls and duplicate rules are refused. Creates exactly one URL condition. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve. Requires complete bounded state and a fresh recheck before apply; writes use only the configured account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `url` | string | yes | — |
+| `match_type` | string | no | `EXACT` |
+| `customer_id` | string | no | — |
 
 ### `apply_recommendation`
 
@@ -413,7 +483,7 @@ Stage sitelink assets for a campaign (link text <=25 chars, validated client-sid
 
 ### `enable_entity`
 
-Stage a plan to enable a campaign, ad group, ad, or keyword. Enabling may affect spend under the existing campaign budget. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized.
+Stage a plan to enable a campaign, PMax asset group, ad group, ad, or keyword. Enabling may affect spend under the existing campaign budget. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group/asset_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized. Asset-group plans show actual status and the verified PMax parent, and refuse changed state with STALE_PLAN before applying. Asset-group enabling may resume delivery and spend under the existing campaign budget.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
@@ -433,12 +503,22 @@ Stage exclusion of a geo target on a campaign.
 
 ### `pause_entity`
 
-Stage a plan to pause a campaign, ad group, ad, or keyword. Spend-neutral. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized.
+Stage a plan to pause a campaign, PMax asset group, ad group, ad, or keyword. Spend-neutral. Applies only via confirm_and_apply. entity_id is a single numeric ID for campaign/ad_group/asset_group; ad requires ad_group_id~ad_id and keyword requires ad_group_id~criterion_id. Surrounding whitespace and leading zeroes in each segment are normalized. Asset-group plans show actual status and the verified PMax parent, and refuse changed state with STALE_PLAN before applying. Asset-group enabling may resume delivery and spend under the existing campaign budget.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
 | `entity_type` | string | yes | — |
 | `entity_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `remove_asset_group_signals`
+
+Plan irreversible removal of existing search_theme or audience signals from a verified Performance Max asset group. signal_ids is a nonempty list of distinct positive numeric child IDs, without group prefixes or resource names. Other signal kinds are unsupported and refused. Signals guide optimization, not hard targeting. Requires complete bounded state, fresh apply validation and irreversible acknowledgement.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `signal_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
 ### `remove_entity`
@@ -492,6 +572,26 @@ Stage the IRREVERSIBLE removal of campaign negative keywords.
 | `criterion_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
+### `remove_pmax_url_exclusions`
+
+Plan irreversible removal of exact existing negative WEBPAGE URL criteria from a verified Performance Max campaign. criterion_ids is a nonempty list of distinct positive numeric child IDs, without campaign prefixes or resource names. Preserves unrelated criteria and previews every removed condition. Requires complete bounded state, a fresh recheck, preview and irreversible acknowledgement. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve. Writes use only the configured account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `criterion_ids` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
+### `set_asset_group_product_selection`
+
+Plan irreversible replacement of an existing feed-linked Performance Max asset group's complete product tree. item_ids must contain 1 to 998 distinct trimmed, case-preserved Item IDs, at most 128 Unicode codepoints each, without controls or internal whitespace. Includes these items and excludes everything else. Supports empty trees, a single all-products unit, or flat Item-ID trees with one catch-all; nested trees and other dimensions are refused. Reads at most 1000 existing nodes plus one lookahead and requires complete state. Shows every before/after node and rechecks group, campaign feed and tree before apply; changed state returns STALE_PLAN. Uses one atomic v25 tree request, normal preview and irreversible acknowledgement. Alters inventory eligibility and may affect delivery and spend. Provider acceptance is not guaranteed. Writes only to the configured account; verify afterwards with get_listing_groups.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `asset_group_id` | string | yes | — |
+| `item_ids` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
 ### `set_campaign_schedule`
 
 Stage adding ad-schedule criteria (day/hour/minute windows) to a campaign. Adds windows and does not replace existing windows.
@@ -510,6 +610,16 @@ Stage flipping a conversion action's primary-for-goal flag.
 |---|---|---|---|
 | `conversion_action_id` | string | yes | — |
 | `primary` | boolean | yes | — |
+| `customer_id` | string | no | — |
+
+### `set_pmax_final_url_expansion`
+
+Plan final URL expansion for a verified Performance Max campaign using the current asset automation setting. enabled is a strict boolean. Preserves every unrelated automation setting in order. Expansion permits different landing destinations and generated text for those pages. Disabling it does not disable independent text customization. Complete settings and campaign state are rechecked before apply; changed state requires a fresh preview. Writes target only the configured account.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `enabled` | boolean | yes | — |
 | `customer_id` | string | no | — |
 
 ### `update_ad_group`

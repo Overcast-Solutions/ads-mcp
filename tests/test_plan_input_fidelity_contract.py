@@ -10,6 +10,7 @@ import pytest
 from google.protobuf.json_format import MessageToDict
 
 import harness as h
+from pmax_oracle import assert_catalog
 from ads_mcp.guardrails import PlanStore
 from tool_catalog import ALL_WRITE_MODE_TOOLS, MUTATION_ARGS, READ_TOOLS
 
@@ -167,7 +168,7 @@ def test_supported_alias_window_and_account_controls_still_dispatch(tmp_path, ac
     h.expect_error(server, "draft_keywords", {**MUTATION_ARGS["draft_keywords"], "customer_id": h.OTHER_CUSTOMER_ID}, code="PLAN_CUSTOMER_MISMATCH")
     assert not account_client.searches and not account_client.mutations
     readonly = h.build_server(tmp_path, client=account_client)
-    assert h.tool_names(readonly) == READ_TOOLS
+    assert_catalog(h.tool_names(readonly), read_only=True)
 
 
 # Adapted after complete reading of root-installed-repro/sitecustomize.py.
