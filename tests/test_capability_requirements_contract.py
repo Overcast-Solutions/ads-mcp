@@ -53,7 +53,7 @@ def test_source_tree_and_archive_checker_use_the_owned_contract():
     assert DEFAULT.is_file()
     assert not [name for name in retired if (ROOT / name).exists()]
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
-    assert project["license"] == "MIT"
+    assert project["license"] == "Apache-2.0"
     assert "LICENSE" in project["license-files"]
     assert "THIRD_PARTY_NOTICES.md" not in project["license-files"]
     archive_check = (ROOT / "scripts" / "check_release_archives.py").read_text()
