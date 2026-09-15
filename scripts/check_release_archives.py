@@ -19,7 +19,17 @@ import zipfile
 RETIRED_PATHS = ("tests/fixtures/incumbent_catalog.json",
                  "scripts/parity_catalog.py", "THIRD_PARTY_NOTICES.md")
 REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
-                   "tests/fixtures/capability_requirements.json")
+                   "tests/fixtures/capability_requirements.json",
+                   "tests/pmax_oracle.py", "docs/pmax.md",
+                   "tests/test_pmax_lifecycle_contract.py",
+                   "tests/test_pmax_signals_contract.py",
+                   "tests/test_pmax_url_controls_contract.py",
+                   "tests/test_pmax_product_selection_contract.py",
+                   "tests/test_pmax_workflow_contract.py",
+                   "tests/fixtures/pmax/get_asset_groups.json",
+                   "tests/fixtures/pmax/get_asset_group_signals.json",
+                   "tests/fixtures/pmax/list_audiences.json",
+                   "tests/fixtures/pmax/get_pmax_url_settings.json")
 
 
 def check_inventory(paths, *, source_archive=False):

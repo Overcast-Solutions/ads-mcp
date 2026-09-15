@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 21 read tools by default and 52 operations when
+ads-mcp 0.1.0 registers 25 read tools by default and 63 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
@@ -62,13 +62,33 @@ SDK may cancel in-flight responses when the input stream closes. The stdio
 boot regression holds the pipe open through initialization and `tools/list`.
 
 Start with read-only parallel operation: register this server alongside your
-current one without enabling mutations. All 21 read tools are available.
+current one without enabling mutations. All 25 read tools are available.
 Compare representative outputs and confirm that your API access permits the
-services you need. `scripts/parity.py` replays all read fixtures offline;
+services you need. `scripts/parity.py --all-fixtures` replays all 25 read fixtures offline;
 `--live` performs a read sweep using the supplied fixture arguments. For a live
 sweep, provide fixtures with your real resource IDs and suitable dates through
 `--fixtures`. A successful sweep is separate from comparing another server's
 actual output.
+
+The default fixture sweep retains the original 21 fixtures. `--all-fixtures`
+combines them with four PMax fixtures. An explicit `--fixtures` directory may contain the complete original
+21-read set or the complete 25-read set; a partial PMax extension is refused.
+Original fixtures retain their output contracts.
+
+## Performance Max workflows
+
+The [PMax guide](pmax.md) covers four added reads and seven added staging tools,
+plus asset-group pause/enable through the existing lifecycle tools. Consumers
+can inspect groups, signals, existing audiences and URL settings in read-only
+mode. Writes use the same account binding and preview/apply flow. Follow the
+guide's returned-ID rules, audience scope prerequisites and supported flat
+Item-ID tree shapes; no audience creation or nested-tree editing is implied.
+
+Review delivery effects as well as budgets: signal, URL and product changes
+can alter eligible traffic under an existing budget. Removals and full product
+tree replacement require irreversible acknowledgement. Changed relevant state
+refuses `STALE_PLAN`; inspect again and stage a fresh plan. Local theme/input
+limits and genuine SDK request tests do not establish live Google acceptance.
 
 ## Workflow requirements
 
