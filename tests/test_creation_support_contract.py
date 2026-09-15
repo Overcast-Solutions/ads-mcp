@@ -48,11 +48,11 @@ def test_supported_shells_keep_real_sdk_creation_graph(tmp_path, account_client,
         assert campaign._pb.HasField("brand_guidelines_enabled") and not campaign.brand_guidelines_enabled
 
 
-def test_creation_supported_subset_is_explicit_in_catalog_and_readme(tmp_path, account_client):
+def test_creation_supported_subset_is_explicit_in_catalog_and_documentation(tmp_path, account_client):
     server = h.build_rw_server(tmp_path, client=account_client)
     description = h.tool_map(server)["draft_campaign"].description
-    readme = (ROOT / "README.md").read_text()
-    for text in (description, readme):
+    documentation = (ROOT / "docs/writes.md").read_text()
+    for text in (description, documentation):
         assert all(name in text.upper() for name in ("SEARCH", "DISPLAY", "PERFORMANCE_MAX"))
         assert "shell" in text.lower() and any(word in text.lower() for word in ("support", "only", "prerequisite"))
-    assert "eligib" in readme.lower() and ("non-retail" in readme.lower() or "nonretail" in readme.lower())
+    assert "eligib" in documentation.lower() and ("non-retail" in documentation.lower() or "nonretail" in documentation.lower())

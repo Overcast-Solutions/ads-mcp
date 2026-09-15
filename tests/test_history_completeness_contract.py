@@ -111,7 +111,7 @@ def test_hard_limit_has_honest_signal_through_every_local_page(tmp_path, count):
 
 
 def test_history_docs_explain_unrecoverable_same_timestamp_ceiling():
-    text = (ROOT / "README.md").read_text().lower()
+    text = (ROOT / "docs/reporting.md").read_text().lower()
     assert "run_gaql" in text and ("10000" in text or "10,000" in text)
     assert "timestamp" in text and ("1000" in text or "1,000" in text)
     assert "calendar" in text and ("29" in text or "thirty" in text or "30" in text)

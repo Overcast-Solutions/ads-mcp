@@ -81,7 +81,7 @@ def test_generated_parameter_tables_have_exactly_four_columns_and_union_text():
 
 
 def test_read_only_docs_match_accepted_spelling_policy(tmp_path):
-    text = (ROOT / "README.md").read_text().lower()
+    text = (ROOT / "docs/configuration.md").read_text().lower()
     assert "only the literal" not in text
     assert all(re.search(r"\b" + word + r"\b", text) for word in ("false", "0", "no", "off"))
     assert "case-insensitive" in text or "case insensitive" in text

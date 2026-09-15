@@ -57,10 +57,12 @@ def test_generate_token_helper_ships_and_is_documented(tmp_path):
     assert "ads-mcp-generate-token" in readme, "README must document the token helper"
 
 
-def test_readme_is_a_complete_setup_guide():
+def test_readme_links_reference_and_covers_initial_setup():
     readme = (REPO / "README.md").read_text()
+    assert "docs/configuration.md" in readme
+    configuration = (REPO / "docs/configuration.md").read_text()
     for var in ENV_VARS_DOCUMENTED:
-        assert var in readme, f"README env-var table is missing {var}"
+        assert var in configuration, f"Configuration reference is missing {var}"
     assert "mcpServers" in readme or "claude mcp add" in readme, (
         "README must include a Claude Code registration snippet"
     )
