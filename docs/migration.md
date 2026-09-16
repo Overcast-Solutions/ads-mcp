@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 26 read tools by default and 65 operations when
+ads-mcp 0.1.0 registers 27 read tools by default and 67 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
@@ -62,9 +62,9 @@ SDK may cancel in-flight responses when the input stream closes. The stdio
 boot regression holds the pipe open through initialization and `tools/list`.
 
 Start with read-only parallel operation: register this server alongside your
-current one without enabling mutations. All 26 read tools are available.
+current one without enabling mutations. All 27 read tools are available.
 Compare representative outputs and confirm that your API access permits the
-services you need. `scripts/parity.py --all-fixtures` replays all 26 read fixtures offline;
+services you need. `scripts/parity.py --all-fixtures` replays all 27 read fixtures offline;
 `--live` performs a read sweep using the supplied fixture arguments. For a live
 sweep, provide fixtures with your real resource IDs and suitable dates through
 `--fixtures`. A successful sweep is separate from comparing another server's
@@ -73,7 +73,7 @@ actual output.
 The default fixture sweep retains the original 21 fixtures. `--all-fixtures`
 combines them with four PMax fixtures and the responsive search ad URL fixture.
 An explicit `--fixtures` directory may contain the complete original
-21-read set, the complete 25-read PMax set or all 26 current reads; partial
+21-read set, the complete 25-read PMax set or all 27 current reads; partial
 extensions are refused.
 Original fixtures retain their output contracts.
 

@@ -7,7 +7,7 @@ Version 0.1.0 is unreleased and is not published to PyPI. Write support is
 experimental. Supports CPython 3.12–3.14 on Linux and macOS; native Windows
 is unsupported. Requires Google Ads SDK 31.4.0 or later within major 31.
 
-- **26 read tools:** authenticated health checks, account and PMax inspection,
+- **27 read tools:** authenticated health checks, account and PMax inspection,
   performance reports, Keyword Planner and raw GAQL with bounded responses.
 - **Reviewed changes:** write tools create plans; application checks account
   binding, expiry, preview requirements and configured budget/CPC limits.
@@ -85,7 +85,7 @@ For a read-only rollout alongside an existing server, follow the
 
 ## Experimental writes
 
-Enabling writes exposes 65 operations. Read the [write guide](docs/writes.md)
+Enabling writes exposes 67 operations. Read the [write guide](docs/writes.md)
 before opting in. Writes require audit
 storage and the appropriate caps; the default flow is plan → dry-run preview →
 `confirm_and_apply`. Irreversible changes require an additional acknowledgement.

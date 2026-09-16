@@ -24,7 +24,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "tests"))
 
-SEARCH_URL_READS = frozenset({"get_responsive_search_ad_urls"})
+SEARCH_URL_READS = frozenset({"get_responsive_search_ad_urls", "get_keyword_urls"})
 
 
 def fixture_paths(fixtures_dir: Path | None) -> list[Path]:

@@ -130,6 +130,16 @@ Keyword metrics (text, match type, bid, quality signals) for a date window; boun
 | `customer_id` | string | no | — |
 | `campaign_id` | string | no | — |
 
+### `get_keyword_urls`
+
+Inspect exact destination overrides and direct tracking settings for an enabled or paused positive keyword under supported Search parents. Shows keyword text and match type. Empty final URLs fall back to the ad destination; direct settings do not resolve the served URL or inherited tracking. Read-only account overrides are supported. This singular inspection has no pagination.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `criterion_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_listing_groups`
 
 Listing-group trees per PMax asset group and standard Shopping ad group for the requested campaign, preserving parent links, dimensions, and exclusions. Empty trees are valid results.
@@ -674,6 +684,18 @@ Stage a keyword CPC bid change using its account bid or inherited ad-group bid. 
 | `criterion_id` | string | yes | — |
 | `current_bid` | number | yes | — |
 | `new_bid` | number | yes | — |
+| `customer_id` | string | no | — |
+
+### `update_keyword_urls`
+
+Stage destination overrides for an existing positive Search keyword in the configured account. Omitted or null lists preserve current values; supplied lists replace them in order. Empty lists clear URLs. Nonempty mobile URLs require final URLs; clearing finals also requires absent tracking template and custom parameters. Tracking is never silently erased. Local limits are 10 unique HTTP(S) URLs per list and 2048 Unicode codepoints per URL, with a host and valid port, without user information, whitespace or controls. Exact spelling is preserved. No-op plans refuse. Preview and confirm_and_apply are required, with fresh keyword and parent checks before a URL-only update. Keyword text, match type, bids, status and suffix are preserved. Provider validation and policy review can still refuse the change.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `criterion_id` | string | yes | — |
+| `final_urls` | array&lt;string&gt; | no | — |
+| `final_mobile_urls` | array&lt;string&gt; | no | — |
 | `customer_id` | string | no | — |
 
 ### `update_responsive_search_ad_urls`

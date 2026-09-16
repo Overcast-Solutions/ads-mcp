@@ -32,6 +32,13 @@ AD_FIELDS = ", ".join(
         "ad.responsive_search_ad.path1", "ad.responsive_search_ad.path2",
     )
 )
+KEYWORD_FIELDS = ", ".join(
+    "ad_group_criterion." + field for field in (
+        "resource_name", "ad_group", "criterion_id", "status", "type", "negative",
+        "keyword.text", "keyword.match_type", "final_urls", "final_mobile_urls",
+        "tracking_url_template", "final_url_suffix", "url_custom_parameters",
+    )
+)
 LIVE_STATUSES = frozenset({"ENABLED", "PAUSED"})
 URL_FIELDS = ("final_urls", "final_mobile_urls")
 
@@ -212,6 +219,120 @@ def get_responsive_search_ad_urls(ctx, *, ad_group_id, ad_id, customer_id=None):
                 "customer_id": customer_id, "outcome": exc.code, "message": exc.message,
             })
         raise
+
+
+def _keyword_state(ctx, customer_id, ad_group_id, criterion_id):
+    try:
+        identity = resource(customer_id, "adGroupCriteria", ad_group_id + "~" + criterion_id)
+        criterion = _unique(
+            ctx, f"SELECT {KEYWORD_FIELDS} FROM ad_group_criterion "
+            f"WHERE ad_group_criterion.resource_name = '{identity}' LIMIT 2", customer_id,
+        ).ad_group_criterion
+        status, kind = _enum(criterion.status), _enum(criterion.type_)
+        match_type = _enum(criterion.keyword.match_type)
+        if (criterion.resource_name != identity or str(criterion.criterion_id) != criterion_id
+                or criterion.ad_group != resource(customer_id, "adGroups", ad_group_id)
+                or status not in LIVE_STATUSES or kind != "KEYWORD" or criterion.negative
+                or match_type not in {"EXACT", "PHRASE", "BROAD"}
+                or not criterion.keyword.text.strip()):
+            _unverified()
+        state = {
+            "customer_id": customer_id, **_parents(ctx, customer_id, ad_group_id),
+            "keyword": {
+                "criterion_id": criterion_id, "resource_name": identity,
+                "status": status, "type": kind, "negative": False,
+                "text": criterion.keyword.text, "match_type": match_type,
+                **_url_state(criterion),
+            },
+            "destination_note": "Empty keyword final URLs use the ad destination. "
+                                "Direct settings do not resolve the served URL or inherited tracking.",
+        }
+        _, _, truncated = bounded_rows([state])
+        if truncated:
+            _unverified()
+        return state
+    except Exception as exc:
+        error = classify_exception(exc, scrub=ctx.scrub)
+        if error.code.startswith("AUTH_") or error.code == "ACCOUNT_NOT_ACCESSIBLE":
+            raise error from None
+        _unverified()
+
+
+def get_keyword_urls(ctx, *, ad_group_id, criterion_id, customer_id=None):
+    ad_group_id = numeric_id(ad_group_id, "ad_group_id")
+    criterion_id = numeric_id(criterion_id, "criterion_id")
+    customer_id = ctx.resolve_customer(customer_id)
+    try:
+        return _keyword_state(ctx, customer_id, ad_group_id, criterion_id)
+    except ToolError as exc:
+        if exc.code == "SEARCH_URL_STATE_UNVERIFIED":
+            ctx.observe_audit({
+                "event": "refused", "tool": "get_keyword_urls",
+                "customer_id": customer_id, "outcome": exc.code, "message": exc.message,
+            })
+        raise
+
+
+def keyword_url_plan(ctx, *, ad_group_id, criterion_id, final_urls=None, final_mobile_urls=None):
+    ad_group_id = numeric_id(ad_group_id, "ad_group_id")
+    criterion_id = numeric_id(criterion_id, "criterion_id")
+    supplied = {key: url_list(value, key) for key, value in
+                (("final_urls", final_urls), ("final_mobile_urls", final_mobile_urls))
+                if value is not None}
+    if not supplied:
+        raise ToolError("INVALID_URL", "Supply at least one destination URL list")
+    if supplied.get("final_urls") == [] and supplied.get("final_mobile_urls"):
+        raise ToolError("KEYWORD_URL_DEPENDENCY", "Clear mobile URLs when clearing final URLs")
+    customer_id = ctx.config.customer_id
+    state = _keyword_state(ctx, customer_id, ad_group_id, criterion_id)
+    keyword = state["keyword"]
+    before = {field: keyword[field] for field in URL_FIELDS}
+    after = {**before, **supplied}
+    if not after["final_urls"]:
+        if after["final_mobile_urls"]:
+            raise ToolError("KEYWORD_URL_DEPENDENCY", "Mobile URLs require final URLs; "
+                            "supply final URLs or clear mobile URLs")
+        if supplied.get("final_urls") == [] and (
+                keyword["tracking_url_template"] or keyword["url_custom_parameters"]):
+            raise ToolError("KEYWORD_URL_DEPENDENCY", "Cannot clear final URLs while a tracking "
+                            "template or custom parameters remain; remove those settings "
+                            "separately before clearing the destination")
+    mask = [field for field in URL_FIELDS if field in supplied and before[field] != after[field]]
+    if not mask:
+        raise ToolError("NO_CHANGES", "The resulting URLs are unchanged; no plan was created")
+    fingerprint = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False,
+                                           separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    def recheck(current):
+        try:
+            fresh = _keyword_state(current, customer_id, ad_group_id, criterion_id)
+        except ToolError:
+            raise ToolError("STALE_PLAN", "Keyword destination state is no longer verified; "
+                            "inspect and stage a fresh plan") from None
+        if fresh != state:
+            raise ToolError("STALE_PLAN", "Keyword destination or parent state changed; "
+                            "inspect and stage a fresh plan")
+
+    def execute(current):
+        client = current.client()
+        operation = client.get_type("AdGroupCriterionOperation")
+        operation.update.resource_name = keyword["resource_name"]
+        for field in mask:
+            getattr(operation.update, field).extend(after[field])
+        operation.update_mask = FieldMask(paths=mask)
+        return executors._send(current, client, "AdGroupCriterionService", "mutate_ad_group_criteria",
+                               "MutateAdGroupCriteriaRequest", [operation])
+
+    return {
+        "tool": "update_keyword_urls",
+        "summary": f"Update destination overrides on keyword {criterion_id}. "
+                   "Keyword text, match type, bids, status and tracking are preserved. "
+                   "Provider validation and policy review still apply; delivery may change.",
+        "operations": [{"type": "update", "resource_name": keyword["resource_name"],
+                        "before": before, "after": after, "update_mask": mask,
+                        "preserved_state": state, "state_fingerprint": fingerprint}],
+        "execute": execute, "rechecks": [recheck],
+    }
 
 
 def ad_url_plan(ctx, *, ad_group_id, ad_id, final_urls=None, final_mobile_urls=None):
