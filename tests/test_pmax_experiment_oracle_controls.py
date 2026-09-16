@@ -201,3 +201,93 @@ def test_provider_substitute_creates_real_four_result_receipt_and_projectable_st
     assert client.data[h.OTHER_CUSTOMER_ID]==before[h.OTHER_CUSTOMER_ID]
     for key in ('experiment','experiment_arm','campaign'):
         for row in client.data[h.CUSTOMER_ID][key]:h.make_row(row)
+
+
+def independent_atomic_create_request():
+    """Build the expected request payload without a creation implementation."""
+    request=h.get_ads_type('MutateGoogleAdsRequest')
+    request.customer_id=h.CUSTOMER_ID
+    request.validate_only=True
+    before=[
+        {'asset_automation_type':'TEXT_ASSET_AUTOMATION','asset_automation_status':'OPTED_IN'},
+        {'asset_automation_type':'FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION','asset_automation_status':'OPTED_OUT'},
+        {'asset_automation_type':'GENERATE_IMAGE_ENHANCEMENT','asset_automation_status':'OPTED_OUT'},
+    ]
+    request.mutate_operations.extend([
+        {'experiment_operation':{'create':{
+            'resource_name':rn('experiments',-1),'name':'Autumn landing trial',
+            'type_':'PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION',
+            'start_date':'2026-09-15','end_date':'2026-10-15',
+        }}},
+        {'experiment_arm_operation':{'create':{
+            'resource_name':rn('experimentArms','-1~-2'),'experiment':rn('experiments',-1),
+            'name':'Control','control':True,'traffic_split':50,'campaigns':[rn('campaigns',703)],
+        }}},
+        {'experiment_arm_operation':{'create':{
+            'resource_name':rn('experimentArms','-1~-3'),'experiment':rn('experiments',-1),
+            'name':'Treatment','control':False,'traffic_split':50,'campaigns':[rn('campaigns',703)],
+        }}},
+        {'campaign_operation':{'update':{
+            'resource_name':rn('campaigns',703),'asset_automation_settings':[
+                {'asset_automation_type':'TEXT_ASSET_AUTOMATION','asset_automation_status':'OPTED_IN'},
+                {'asset_automation_type':'FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION','asset_automation_status':'OPTED_IN'},
+                {'asset_automation_type':'GENERATE_IMAGE_ENHANCEMENT','asset_automation_status':'OPTED_OUT'},
+            ],
+        },'update_mask':{'paths':['asset_automation_settings']}}},
+    ])
+    return request,before
+
+
+def test_creation_request_assertion_accepts_independently_constructed_genuine_sdk_payload():
+    from test_pmax_experiment_create_contract import assert_create_request
+    request,before=independent_atomic_create_request()
+    assert_create_request(request,before)
+    request.validate_only=False
+    assert_create_request(request,before)
+
+
+@pytest.mark.parametrize('fault',[
+    'arm_traffic','arm_campaign','arm_parent','experiment_status',
+    'campaign_mask','lost_preserved_setting','extra_campaign_field',
+])
+def test_creation_request_assertion_rejects_payload_drift(fault):
+    from test_pmax_experiment_create_contract import assert_create_request
+    request,before=independent_atomic_create_request()
+    operations=request.mutate_operations
+    if fault=='arm_traffic':operations[1].experiment_arm_operation.create.traffic_split=49
+    elif fault=='arm_campaign':operations[1].experiment_arm_operation.create.campaigns.append(rn('campaigns',704))
+    elif fault=='arm_parent':operations[2].experiment_arm_operation.create.experiment=rn('experiments',-9)
+    elif fault=='experiment_status':operations[0].experiment_operation.create.status='ENABLED'
+    elif fault=='campaign_mask':operations[3].campaign_operation.update_mask.paths.append('status')
+    elif fault=='lost_preserved_setting':del operations[3].campaign_operation.update.asset_automation_settings[-1]
+    else:operations[3].campaign_operation.update.status='PAUSED'
+    with pytest.raises(AssertionError):assert_create_request(request,before)
+
+
+def test_creation_rollover_fixture_crosses_verified_account_midnight_before_default_expiry():
+    from datetime import datetime,timezone
+    from zoneinfo import ZoneInfo
+    from ads_mcp.errors import ToolError
+    from ads_mcp.guardrails import PlanStore
+    from test_pmax_experiment_create_contract import MIDNIGHT_ROLLOVER_NOW,MIDNIGHT_ROLLOVER_SECONDS
+
+    client=ExperimentClient()
+    customer=h.make_row(client.data[h.CUSTOMER_ID]['customer'][0]).customer
+    assert customer.id==int(h.CUSTOMER_ID) and customer.resource_name=='customers/'+h.CUSTOMER_ID
+    assert customer.time_zone=='America/Denver' and customer.currency_code=='USD'
+    zone=ZoneInfo(customer.time_zone)
+    clock=h.FakeClock(MIDNIGHT_ROLLOVER_NOW)
+    before=datetime.fromtimestamp(clock(),zone)
+    assert before.isoformat()=='2026-09-15T23:59:30-06:00'
+    store=PlanStore(clock=clock)
+    plan=store.create(tool='synthetic_clock_control',customer_id=h.CUSTOMER_ID,
+        summary='Synthetic midnight control',operations=[],execute=lambda _:None)
+    assert store.ttl_seconds==900 and plan.expires_epoch-clock()==900
+    clock.advance(MIDNIGHT_ROLLOVER_SECONDS)
+    after=datetime.fromtimestamp(clock(),zone)
+    assert after.isoformat()=='2026-09-16T00:00:30-06:00' and after.date()>before.date()
+    assert before.astimezone(timezone.utc).date()==after.astimezone(timezone.utc).date()
+    assert plan.expires_epoch-clock()==840 and store.get(plan.id) is plan
+    clock.advance(841)
+    with pytest.raises(ToolError) as error:store.get(plan.id)
+    assert error.value.code=='PLAN_EXPIRED'

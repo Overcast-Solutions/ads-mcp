@@ -13,6 +13,10 @@ from pmax_experiment_oracle import (CREATE,CREATE_ARGS,BAD_IDS,BAD_CUSTOMERS,TYP
     setup,rn,experiment,arm,settings,stage,preview,apply,rejected,live_calls,break_audit,quiet)
 
 
+MIDNIGHT_ROLLOVER_NOW = datetime(2026,9,16,5,59,30,tzinfo=timezone.utc).timestamp()
+MIDNIGHT_ROLLOVER_SECONDS = 60
+
+
 def assert_create_request(request,before):
     assert request._pb.DESCRIPTOR.full_name=='google.ads.googleads.v25.services.MutateGoogleAdsRequest'
     assert request.customer_id==h.CUSTOMER_ID and not request.partial_failure
@@ -25,7 +29,7 @@ def assert_create_request(request,before):
     assert raw['type_']==TYPE and raw['name']==CREATE_ARGS['name']
     assert raw['start_date']==CREATE_ARGS['date_start'] and raw['end_date']==CREATE_ARGS['date_end']
     assert re.fullmatch(r'customers/'+h.CUSTOMER_ID+r'/experiments/-[1-9][0-9]*',raw['resource_name'])
-    arms=[op.experiment_arm_operation.create for op in operations[1:3]]
+    arms=[operations[index].experiment_arm_operation.create for index in (1,2)]
     assert {a.control for a in arms}=={True,False} and [a.traffic_split for a in arms]==[50,50]
     assert len({a.resource_name for a in arms})==2
     for a in arms:
@@ -164,7 +168,7 @@ def test_collision_inventory_caps_use_bounded_complete_reads(tmp_path,resource,c
 
 @pytest.mark.parametrize('drift',['name','status','type','date','timestamp_precision','arm','automation','new_collision','today','incomplete'])
 def test_recheck_refuses_changed_or_unverifiable_eligibility_as_stale(tmp_path,drift):
-    clock=h.FakeClock(NOW);server,client=setup(tmp_path,{CREATE},clock=clock)
+    clock=h.FakeClock(MIDNIGHT_ROLLOVER_NOW if drift=='today' else NOW);server,client=setup(tmp_path,{CREATE},clock=clock)
     plan=stage(server);preview(server,plan);data=client.data[h.CUSTOMER_ID]
     if drift=='name':data['experiment'][0]['experiment']['name']='Changed name'
     elif drift=='status':data['experiment'][0]['experiment']['status']='REMOVED'
@@ -174,7 +178,9 @@ def test_recheck_refuses_changed_or_unverifiable_eligibility_as_stale(tmp_path,d
     elif drift=='arm':data['experiment_arm'][0]['experiment_arm']['name']='Changed arm'
     elif drift=='automation':data['campaign'][2]['campaign']['asset_automation_settings'][2]['asset_automation_status']='OPTED_IN'
     elif drift=='new_collision':data['experiment_arm'][0]['experiment_arm']['campaigns']=[rn('campaigns',703)]
-    elif drift=='today':clock.advance(86400)
+    elif drift=='today':
+        clock.advance(MIDNIGHT_ROLLOVER_SECONDS)
+        assert clock()<h.parse_iso_utc(plan['expires_at']).timestamp()
     else:client.fail_after['experiment']=1
     result=apply(server,plan);assert h.error_of(result)['code']=='STALE_PLAN' and not client.live_mutations()
 
