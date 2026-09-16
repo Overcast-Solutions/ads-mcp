@@ -35,6 +35,7 @@ REQUIRED_SOURCE = [
     "tests/test_pmax_provider_boundary_contract.py", "tests/fixtures/pmax_provider_fields_v25.json",
     *["tests/fixtures/pmax/" + name + ".json" for name in sorted(PMAX_READS)],
     "tests/search_url_oracle.py", "tests/test_search_ad_urls_contract.py", "tests/test_keyword_urls_contract.py",
+    "tests/test_search_url_enum_output_contract.py",
     "tests/test_search_url_workflow_contract.py", "tests/test_search_url_oracle_controls.py",
     "tests/fixtures/search_url_provider_fields_v25.json", "docs/search-urls.md",
     *["tests/fixtures/search_urls/" + name + ".json" for name in sorted(READS)],
