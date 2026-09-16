@@ -259,7 +259,7 @@ BAD_CHANGES += [[change('AGE_RANGE','UNDETERMINED')],[change('INCOME_RANGE','UND
 
 @pytest.mark.parametrize('changes',BAD_CHANGES)
 def test_change_array_original_types_extra_keys_and_finite_values(tmp_path,changes):
-    server,provider=setup(tmp_path,[WRITE]);rejected(server,provider,WRITE,arguments(changes),local=True)
+    server,provider=setup(tmp_path,[WRITE]);rejected(server,provider,WRITE,{**arguments(),'changes':changes},local=True)
 
 
 @pytest.mark.parametrize('field,value',[('status','REMOVED'),('type_','SEARCH_DYNAMIC_ADS'),('type_','DISPLAY_MOBILE_APP')])
