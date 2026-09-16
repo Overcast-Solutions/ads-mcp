@@ -1,0 +1,413 @@
+{
+  "version": 1,
+  "api_version": "v25",
+  "checked_on": "2026-09-16",
+  "sources": [
+    "https://developers.google.com/google-ads/api/fields/v25/campaign",
+    "https://developers.google.com/google-ads/api/fields/v25/customer",
+    "https://developers.google.com/google-ads/api/fields/v25/experiment",
+    "https://developers.google.com/google-ads/api/fields/v25/experiment_arm"
+  ],
+  "fields": {
+    "experiment.resource_name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "RESOURCE_NAME"
+    },
+    "experiment.experiment_id": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "experiment.name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "experiment.type": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "ENUM"
+    },
+    "experiment.status": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "ENUM"
+    },
+    "experiment.start_date": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "experiment.end_date": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "experiment.promote_status": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "ENUM"
+    },
+    "experiment.long_running_operation": {
+      "selectable": true,
+      "filterable": false,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "experiment_arm.resource_name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "RESOURCE_NAME"
+    },
+    "experiment_arm.experiment": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "RESOURCE_NAME"
+    },
+    "experiment_arm.name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "experiment_arm.control": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "BOOLEAN"
+    },
+    "experiment_arm.traffic_split": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "experiment_arm.campaigns": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": true,
+      "data_type": "RESOURCE_NAME"
+    },
+    "campaign.resource_name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "RESOURCE_NAME"
+    },
+    "campaign.id": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "campaign.name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "campaign.status": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "ENUM"
+    },
+    "campaign.advertising_channel_type": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "ENUM"
+    },
+    "campaign.start_date_time": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DATE"
+    },
+    "campaign.end_date_time": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DATE"
+    },
+    "campaign.asset_automation_settings": {
+      "selectable": true,
+      "filterable": false,
+      "sortable": false,
+      "repeated": true,
+      "data_type": "MESSAGE"
+    },
+    "customer.resource_name": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": false,
+      "repeated": false,
+      "data_type": "RESOURCE_NAME"
+    },
+    "customer.id": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "customer.currency_code": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "customer.time_zone": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "STRING"
+    },
+    "metrics.clicks": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "metrics.control_clicks": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "metrics.impressions": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "metrics.control_impressions": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "metrics.cost_micros": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "metrics.control_cost_micros": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "INT64"
+    },
+    "metrics.conversions": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.control_conversions": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.conversions_value": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.control_conversion_value": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.clicks_point_estimate": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.clicks_margin_of_error": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.clicks_p_value": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.conversions_absolute_change_point_estimate": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.conversions_absolute_change_margin_of_error": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "metrics.conversions_absolute_change_p_value": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DOUBLE"
+    },
+    "segments.date": {
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "repeated": false,
+      "data_type": "DATE"
+    }
+  },
+  "from_resources": {
+    "experiment": [
+      "experiment",
+      "customer",
+      "metrics",
+      "segments"
+    ],
+    "experiment_arm": [
+      "experiment_arm",
+      "experiment",
+      "customer"
+    ],
+    "campaign": [
+      "campaign",
+      "customer"
+    ],
+    "customer": [
+      "customer"
+    ]
+  },
+  "sdk_boundary": {
+    "promote_experiment": "google.api_core.operation.Operation wrapping raw google.longrunning.Operation; typed PromoteExperimentMetadata and Empty result",
+    "end_experiment": "None on success; wire response google.protobuf.Empty",
+    "get_operation": "raw google.longrunning.Operation through authenticated ExperimentService transport",
+    "list_experiment_async_errors": "ListExperimentAsyncErrorsPager with response pages; explicit page_size 100 and bounded page iteration"
+  },
+  "metric_presence": {
+    "clicks": {
+      "has_presence": true,
+      "protobuf_type": "int64"
+    },
+    "control_clicks": {
+      "has_presence": true,
+      "protobuf_type": "int64"
+    },
+    "impressions": {
+      "has_presence": true,
+      "protobuf_type": "int64"
+    },
+    "control_impressions": {
+      "has_presence": true,
+      "protobuf_type": "int64"
+    },
+    "cost_micros": {
+      "has_presence": true,
+      "protobuf_type": "int64"
+    },
+    "control_cost_micros": {
+      "has_presence": true,
+      "protobuf_type": "int64"
+    },
+    "conversions": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "control_conversions": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "conversions_value": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "control_conversion_value": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "clicks_point_estimate": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "clicks_margin_of_error": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "clicks_p_value": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "conversions_absolute_change_point_estimate": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "conversions_absolute_change_margin_of_error": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    },
+    "conversions_absolute_change_p_value": {
+      "has_presence": true,
+      "protobuf_type": "double"
+    }
+  }
+}

@@ -14,6 +14,7 @@ from google.api_core.exceptions import ServiceUnavailable
 
 import harness as h
 from shared_targeting_oracle import ADDITIONS as TARGETING_ADDITIONS, READS as TARGETING_READS, WRITES as TARGETING_WRITES
+from pmax_experiment_oracle import ADDITIONS as EXPERIMENT_ADDITIONS, READS as EXPERIMENT_READS, WRITES as EXPERIMENT_WRITES
 from offline_contract import project, selected, refusal
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,8 +46,8 @@ BAD_TEXT = [None, True, 3, {}, [], "", "   ", "a\x00b", "a\nb", "a\rb", "a\tb"]
 def assert_catalog(actual, *, read_only=False, kind=None, final=False):
     """All original names remain required; only this fixed addition list may appear."""
     from tool_catalog import READ_TOOLS, MUTATION_TOOLS, ALL_WRITE_MODE_TOOLS
-    base, allowed = (READ_TOOLS | PMAX_READS | SEARCH_URL_READS, TARGETING_READS) if read_only or kind == "read" else (
-        (MUTATION_TOOLS | PMAX_MUTATIONS | SEARCH_URL_MUTATIONS, TARGETING_WRITES) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS, TARGETING_ADDITIONS))
+    base, allowed = (READ_TOOLS | PMAX_READS | SEARCH_URL_READS | TARGETING_READS, EXPERIMENT_READS) if read_only or kind == "read" else (
+        (MUTATION_TOOLS | PMAX_MUTATIONS | SEARCH_URL_MUTATIONS | TARGETING_WRITES, EXPERIMENT_WRITES) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS))
     actual = set(actual)
     assert base <= actual <= base | allowed, {"missing_baseline": sorted(base - actual), "unapproved": sorted(actual - base - allowed)}
     if final:
@@ -61,7 +62,7 @@ def expected_pending(server):
     """
     from capability_oracle import empty
     tools = h.tool_map(server)
-    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS) - set(tools))
+    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS) - set(tools))
     missing_values = []
     def admits(node):
         if isinstance(node, dict):
