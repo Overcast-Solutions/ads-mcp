@@ -18,7 +18,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Annotated
 from urllib.parse import urlsplit
 
-from pydantic import Field, StrictBool
+from pydantic import Field, StrictBool, StrictStr
 
 from ads_mcp import executors, guardrails
 from ads_mcp.errors import ToolError, classify_exception
@@ -838,6 +838,93 @@ StatusEntityKind = Annotated[str, Field(json_schema_extra={
 
 def register(server, ctx):  # noqa: C901 — one tool per block, deliberately flat
     cfg = ctx.config
+
+    def _shared_plan(tool, **kwargs):
+        from ads_mcp import shared_negatives
+
+        def impl():
+            return _plan_payload(ctx, **shared_negatives.plan(ctx, tool=tool, **kwargs))
+
+        return _guarded_mutation(ctx, tool, impl)()
+
+    @server.tool(
+        name="create_shared_negative_keyword_list",
+        description=_spec(
+            "create_shared_negative_keyword_list",
+            "Stage an empty negative-keyword list in the configured account. Name requires "
+            "original NFC text of 1–255 UTF-8 bytes without edge whitespace or controls. "
+            "Active name collisions refuse under NFC and casefold comparison. "
+            "Execution requires confirm_and_apply and the configured preview safeguards.",
+        ),
+    )
+    def create_shared_negative_keyword_list(name: StrictStr, customer_id: StrictStr | None = None) -> dict:
+        return _shared_plan("create_shared_negative_keyword_list", name=name, customer_id=customer_id)
+
+    @server.tool(
+        name="add_shared_negative_keywords",
+        description=_spec(
+            "add_shared_negative_keywords",
+            "Stage 1–100 exact text/match_type records for a shared negative list. "
+            "Match types are BROAD, PHRASE and EXACT; original text has local limits of "
+            "80 codepoints and 10 words without edge whitespace or controls. "
+            "Duplicate text/match pairs refuse under NFC and casefold comparison. "
+            "Preview shows complete membership and all affected standard Search/Shopping "
+            "campaigns. Execution requires confirm_and_apply; serving may change.",
+        ),
+    )
+    def add_shared_negative_keywords(
+        shared_set_id: StrictStr, keywords: list[dict], customer_id: StrictStr | None = None,
+    ) -> dict:
+        return _shared_plan("add_shared_negative_keywords", shared_set_id=shared_set_id,
+                            keywords=keywords, customer_id=customer_id)
+
+    @server.tool(
+        name="remove_shared_negative_keywords",
+        description=_spec(
+            "remove_shared_negative_keywords",
+            "Stage removal of 1–100 distinct canonical positive criterion ID strings from "
+            "a shared negative list. Complete membership and affected campaigns are reviewed "
+            "and rechecked. Requires confirm_and_apply and irreversible acknowledgement; "
+            "serving may change across all linked campaigns.",
+        ),
+    )
+    def remove_shared_negative_keywords(
+        shared_set_id: StrictStr, criterion_ids: list[StrictStr], customer_id: StrictStr | None = None,
+    ) -> dict:
+        return _shared_plan("remove_shared_negative_keywords", shared_set_id=shared_set_id,
+                            criterion_ids=criterion_ids, customer_id=customer_id)
+
+    @server.tool(
+        name="attach_shared_negative_keyword_list",
+        description=_spec(
+            "attach_shared_negative_keyword_list",
+            "Stage association of a shared negative list with 1–100 distinct canonical "
+            "campaign ID strings in the configured account. Only enabled/paused standard "
+            "Search and Shopping campaigns are supported, including existing links. "
+            "Requires confirm_and_apply; complete list and campaign state are rechecked.",
+        ),
+    )
+    def attach_shared_negative_keyword_list(
+        shared_set_id: StrictStr, campaign_ids: list[StrictStr], customer_id: StrictStr | None = None,
+    ) -> dict:
+        return _shared_plan("attach_shared_negative_keyword_list", shared_set_id=shared_set_id,
+                            campaign_ids=campaign_ids, customer_id=customer_id)
+
+    @server.tool(
+        name="detach_shared_negative_keyword_list",
+        description=_spec(
+            "detach_shared_negative_keyword_list",
+            "Stage removal of 1–100 existing campaign associations from a shared negative "
+            "list. Complete state is reviewed and rechecked; list members remain intact. "
+            "Requires confirm_and_apply and irreversible acknowledgement. Detachment can "
+            "change serving; a surviving campaign and list can subsequently be reattached.",
+        ),
+    )
+    def detach_shared_negative_keyword_list(
+        shared_set_id: StrictStr, campaign_ids: list[StrictStr], customer_id: StrictStr | None = None,
+    ) -> dict:
+        return _shared_plan("detach_shared_negative_keyword_list", shared_set_id=shared_set_id,
+                            campaign_ids=campaign_ids, customer_id=customer_id)
 
     @server.tool(
         name="update_responsive_search_ad_urls",

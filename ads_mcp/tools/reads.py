@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 from google.protobuf import json_format
-from pydantic import StrictInt
+from pydantic import StrictInt, StrictStr
 
 from ads_mcp.audit import audit_writable
 from ads_mcp.errors import ToolError, classify_exception
@@ -49,6 +49,41 @@ def _revive_ints(node):
 
 def register(server, ctx):
     cfg = ctx.config
+
+    @server.tool(
+        name="list_shared_negative_keyword_lists",
+        description=_spec(
+            "list_shared_negative_keyword_lists",
+            "Inspect the complete active negative-keyword list catalog in an accessible account. "
+            "Returns identities, names, types, statuses and member/reference counts. "
+            "Refuses incomplete state; local limits are 100 lists and 16 MiB.",
+        ),
+    )
+    def list_shared_negative_keyword_lists(customer_id: StrictStr | None = None) -> dict:
+        from ads_mcp import shared_negatives
+
+        return guarded(ctx, shared_negatives.inspect, name="list_shared_negative_keyword_lists")(
+            ctx=ctx, customer_id=customer_id,
+        )
+
+    @server.tool(
+        name="get_shared_negative_keyword_list",
+        description=_spec(
+            "get_shared_negative_keyword_list",
+            "Inspect a complete active negative-keyword list, all members and linked campaigns. "
+            "Requires a canonical positive numeric shared_set_id. Supports standard Search "
+            "and Shopping campaigns. Refuses incomplete or inconsistent state; local limits "
+            "are 5000 members, 1000 links and 16 MiB. Explicit accessible accounts are allowed.",
+        ),
+    )
+    def get_shared_negative_keyword_list(
+        shared_set_id: StrictStr, customer_id: StrictStr | None = None,
+    ) -> dict:
+        from ads_mcp import shared_negatives
+
+        return guarded(ctx, shared_negatives.inspect, name="get_shared_negative_keyword_list")(
+            ctx=ctx, shared_set_id=shared_set_id, customer_id=customer_id,
+        )
 
     @server.tool(
         name="run_gaql",

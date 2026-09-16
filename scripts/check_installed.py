@@ -24,6 +24,7 @@ EXPECTED_READS = frozenset({
     "get_search_terms", "get_shopping_performance", "health_check",
     "list_accounts", "list_audiences", "list_extensions", "list_recommendations",
     "run_gaql", "search_geo_targets",
+    "list_shared_negative_keyword_lists", "get_shared_negative_keyword_list",
 })
 EXPECTED_WRITE_MODE = EXPECTED_READS | frozenset({
     "add_asset_group_audience_signal", "add_asset_group_search_themes",
@@ -41,6 +42,9 @@ EXPECTED_WRITE_MODE = EXPECTED_READS | frozenset({
     "set_pmax_final_url_expansion", "update_ad_group", "update_campaign",
     "update_keyword_bid", "update_keyword_urls", "update_responsive_search_ad_urls",
     "upload_image_asset", "upload_text_asset",
+    "create_shared_negative_keyword_list", "add_shared_negative_keywords",
+    "remove_shared_negative_keywords", "attach_shared_negative_keyword_list",
+    "detach_shared_negative_keyword_list",
 })
 
 
