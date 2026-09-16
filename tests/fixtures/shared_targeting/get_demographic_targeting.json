@@ -1,0 +1,189 @@
+{
+  "tool": "get_demographic_targeting",
+  "args": {
+    "ad_group_id": "801"
+  },
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        }
+      }
+    ],
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic SEARCH campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH",
+          "advertising_channel_sub_type": "UNSPECIFIED",
+          "campaign_budget": "customers/9876543210/campaignBudgets/1601"
+        }
+      }
+    ],
+    "ad_group": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic SEARCH campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH",
+          "advertising_channel_sub_type": "UNSPECIFIED",
+          "campaign_budget": "customers/9876543210/campaignBudgets/1601"
+        },
+        "ad_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/adGroups/801",
+          "name": "Synthetic SEARCH group 801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "type_": "SEARCH_STANDARD",
+          "status": "ENABLED",
+          "cpc_bid_micros": 1300000,
+          "optimized_targeting_enabled": false,
+          "targeting_setting": {
+            "target_restrictions": [
+              {
+                "targeting_dimension": "AUDIENCE",
+                "bid_only": true
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "ad_group_criterion": [
+      {
+        "ad_group_criterion": {
+          "criterion_id": 601,
+          "resource_name": "customers/9876543210/adGroupCriteria/801~601",
+          "ad_group": "customers/9876543210/adGroups/801",
+          "type_": "AGE_RANGE",
+          "negative": false,
+          "status": "ENABLED",
+          "age_range": {
+            "type_": "AGE_RANGE_25_34"
+          }
+        },
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "ad_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/adGroups/801",
+          "name": "Synthetic SEARCH group 801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "type_": "SEARCH_STANDARD",
+          "status": "ENABLED",
+          "cpc_bid_micros": 1300000,
+          "optimized_targeting_enabled": false,
+          "targeting_setting": {
+            "target_restrictions": [
+              {
+                "targeting_dimension": "AUDIENCE",
+                "bid_only": true
+              }
+            ]
+          }
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic SEARCH campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH",
+          "advertising_channel_sub_type": "UNSPECIFIED",
+          "campaign_budget": "customers/9876543210/campaignBudgets/1601"
+        }
+      }
+    ],
+    "campaign_criterion": []
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign": {
+      "campaign_id": "701",
+      "resource_name": "customers/9876543210/campaigns/701",
+      "name": "Synthetic SEARCH campaign 701",
+      "status": "ENABLED",
+      "advertising_channel_type": "SEARCH",
+      "advertising_channel_sub_type": "UNSPECIFIED"
+    },
+    "ad_group": {
+      "ad_group_id": "801",
+      "resource_name": "customers/9876543210/adGroups/801",
+      "name": "Synthetic SEARCH group 801",
+      "campaign_id": "701",
+      "status": "ENABLED",
+      "type": "SEARCH_STANDARD",
+      "optimized_targeting_enabled": false,
+      "target_restrictions": [
+        {
+          "targeting_dimension": "AUDIENCE",
+          "bid_only": true
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "criterion_id": "601",
+        "resource_name": "customers/9876543210/adGroupCriteria/801~601",
+        "dimension": "AGE_RANGE",
+        "value": "AGE_RANGE_25_34",
+        "status": "ENABLED",
+        "negative": false,
+        "bid_modifier": null,
+        "cpc_bid_micros": null,
+        "cpm_bid_micros": null,
+        "cpv_bid_micros": null,
+        "percent_cpc_bid_micros": null,
+        "final_url_suffix": "",
+        "tracking_url_template": "",
+        "final_urls": [],
+        "final_mobile_urls": [],
+        "url_custom_parameters": [],
+        "labels": []
+      }
+    ],
+    "campaign_exclusions": [],
+    "supported_values": {
+      "AGE_RANGE": [
+        "AGE_RANGE_18_24",
+        "AGE_RANGE_25_34",
+        "AGE_RANGE_35_44",
+        "AGE_RANGE_45_54",
+        "AGE_RANGE_55_64",
+        "AGE_RANGE_65_UP",
+        "AGE_RANGE_UNDETERMINED"
+      ],
+      "GENDER": [
+        "MALE",
+        "FEMALE",
+        "UNDETERMINED"
+      ],
+      "INCOME_RANGE": [
+        "INCOME_RANGE_0_50",
+        "INCOME_RANGE_50_60",
+        "INCOME_RANGE_60_70",
+        "INCOME_RANGE_70_80",
+        "INCOME_RANGE_80_90",
+        "INCOME_RANGE_90_UP",
+        "INCOME_RANGE_UNDETERMINED"
+      ]
+    },
+    "eligibility_note": "Absent or removed criteria are unconfigured defaults; explicit criteria do not establish effective eligibility."
+  }
+}

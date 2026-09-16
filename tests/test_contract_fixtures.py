@@ -68,7 +68,16 @@ def test_every_registry_read_tool_has_a_contract_fixture():
         "get_responsive_search_ad_urls.json": "get_responsive_search_ad_urls",
         "get_keyword_urls.json": "get_keyword_urls",
     }
-    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values())
+    targeting_fixtures = {
+        path.name: harness.load_contract_fixture(path)["tool"]
+        for path in (REPO / "tests" / "fixtures" / "shared_targeting").glob("*.json")
+    }
+    assert targeting_fixtures == {
+        "list_shared_negative_keyword_lists.json": "list_shared_negative_keyword_lists",
+        "get_shared_negative_keyword_list.json": "get_shared_negative_keyword_list",
+        "get_demographic_targeting.json": "get_demographic_targeting",
+    }
+    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values()) | set(targeting_fixtures.values())
     assert fixture_tools == READ_TOOLS, (
         f"registry reads: {sorted(registry_reads)}\n"
         f"fixtures:       {sorted(fixture_tools)}"

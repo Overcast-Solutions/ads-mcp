@@ -7,6 +7,7 @@ import tomllib
 
 import pytest
 import harness as h
+from shared_targeting_oracle import ADDITIONS as TARGETING_ADDITIONS
 from pmax_oracle import PMAX_ADDITIONS, SEARCH_URL_ADDITIONS, expected_pending
 
 from capability_oracle import (
@@ -32,7 +33,7 @@ def test_authored_default_covers_the_accepted_workflows_and_declared_obligations
         assert capability["tools"]
         tools.extend(capability["tools"])
     by_name = {tool["name"]: tool for tool in tools}
-    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS
+    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS
     for tool in tools:
         assert set(tool) == {"name", "parameters", "required", "values"}
         assert len(tool["parameters"]) == len(set(tool["parameters"]))
