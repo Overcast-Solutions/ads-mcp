@@ -105,6 +105,7 @@ Use independent account controls and review the guide's full limit scope.
 | [Search URLs](docs/search-urls.md) | Inspect and update existing ad and keyword destinations |
 | [Shared targeting](docs/shared-targeting.md) | Shared negative lists and explicit ad-group demographics |
 | [Performance Max](docs/pmax.md) | Asset groups, signals, URL controls and Item-ID selection |
+| [PMax experiments](docs/pmax-experiments.md) | Same-campaign URL tests, results and promotion observation |
 | [Errors](docs/errors.md) | Refusals, recovery and uncertain outcomes |
 | [Tool catalog](docs/tools.md) | Every tool's parameters and defaults |
 | [Operator guide](docs/operator-guide.md) | Account authority, data handling and host responsibilities |

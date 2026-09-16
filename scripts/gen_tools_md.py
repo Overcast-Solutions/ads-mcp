@@ -89,6 +89,11 @@ def render() -> str:
         "`confirm_and_apply` alone can carry out. A dry-run preview is required "
         "by default; operators configure this with `ADS_MCP_REQUIRE_DRY_RUN`.",
         "",
+        "For PMax experiment examples and recovery, see the "
+        "[experiment guide](pmax-experiments.md). Experiment staging performs "
+        "provider validate-only before the separate local preview; "
+        "submitted promotion is not verified application.",
+        "",
     ]
     for kind in ("read", "mutation", "apply"):
         lines += [f"## {KIND_TITLES[kind]}", ""]

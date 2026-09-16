@@ -24,8 +24,8 @@ representative workflows and adapt consumers before changing a deployment.
 5. Decide whether workflows need capabilities outside the documented catalog
    before switching. Shared negative lists and demographic changes have the
    limited scope described in the [targeting guide](shared-targeting.md).
-   PMax URL experiments support inspection and explicit-window reporting;
-   experiment creation and lifecycle actions remain future work.
+   The [PMax experiment guide](pmax-experiments.md) covers inspection, creation,
+   explicit-window reporting, ending and asynchronous promotion observation.
 6. Keep writes disabled until account authority, host approval behavior, audit
    storage and a controlled write-acceptance plan have been reviewed. Read-only
    success does not authorize a write or demonstrate its provider acceptance.
@@ -74,7 +74,8 @@ actual output.
 
 The default fixture sweep combines the original 21 fixtures with four PMax
 fixtures, both Search URL inspection fixtures, the two shared-list fixtures
-and demographic inspection, plus three PMax experiment inspection/reporting reads.
+and demographic inspection, plus four PMax experiment reads for catalog,
+inspection, reporting and operation observation.
 `--all-fixtures` selects the same complete set.
 An explicit `--fixtures` directory may contain the complete original
 21-read set, the complete 25-read PMax set, the 27-read Search URL set or all
@@ -123,6 +124,21 @@ can alter eligible traffic under an existing budget. Removals and full product
 tree replacement require irreversible acknowledgement. Changed relevant state
 refuses `STALE_PLAN`; inspect again and stage a fresh plan. Local theme/input
 limits and genuine SDK request tests do not establish live Google acceptance.
+
+## PMax experiment workflows
+
+The [PMax experiment guide](pmax-experiments.md) covers four reads and three
+staging tools for same-campaign 50/50 URL expansion tests. Staging performs
+provider validate-only; the confirmation dry-run remains a separate local
+preview. Creation preserves unrelated automation settings and existing
+exclusions. End and promotion require irreversible acknowledgement.
+
+Consumers must retain accepted-action context: `submitted` does not establish
+application. Promotion can remain pending; save its exact operation name and
+use the observation read after a restart. Completion requires separate
+verification of experiment promotion status and treatment settings before
+`applied` can be true. Unknown responses, readback failures and audit warnings
+require inspection before any further action, without blind write retries.
 
 ## Workflow requirements
 

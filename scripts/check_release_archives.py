@@ -51,7 +51,29 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/fixtures/shared_targeting/get_demographic_targeting.json",
                    "tests/fixtures/shared_targeting/get_shared_negative_keyword_list.json",
                    "tests/fixtures/shared_targeting/list_shared_negative_keyword_lists.json",
-                   "docs/shared-targeting.md")
+                   "docs/shared-targeting.md",
+                   "tests/pmax_experiment_oracle.py",
+                   "tests/test_pmax_experiment_oracle_controls.py",
+                   "tests/test_pmax_experiment_reads_contract.py",
+                   "tests/test_pmax_experiment_create_contract.py",
+                   "tests/test_pmax_experiment_lifecycle_contract.py",
+                   "tests/test_pmax_experiment_workflow_contract.py",
+                   "tests/fixtures/pmax_experiment_provider_v25.json",
+                   "tests/fixtures/pmax_experiments/list_pmax_url_experiments.json",
+                   "tests/fixtures/pmax_experiments/get_pmax_url_experiment.json",
+                   "tests/fixtures/pmax_experiments/get_pmax_url_experiment_results.json",
+                   "tests/fixtures/pmax_experiments/get_pmax_url_experiment_operation.json",
+                   "docs/pmax-experiments.md")
+
+REQUIRED_PACKAGE_SOURCE = ("ads_mcp/pmax_experiments.py",
+                           "ads_mcp/pmax_experiment_create.py",
+                           "ads_mcp/pmax_experiment_lifecycle.py")
+
+
+def check_package_inventory(paths):
+    """Require experiment implementation modules in both distribution formats."""
+    if not set(REQUIRED_PACKAGE_SOURCE) <= set(paths):
+        raise ValueError("package inventory lacks required experiment modules")
 
 
 def check_inventory(paths, *, source_archive=False):
@@ -73,7 +95,7 @@ def main():
     for retired in RETIRED_PATHS:
         if (source / retired).exists() or (source / retired).is_symlink():
             parser.error("remove retired comparison assets before building archives")
-    for required in REQUIRED_SOURCE:
+    for required in (*REQUIRED_SOURCE, *REQUIRED_PACKAGE_SOURCE):
         if not (source / required).is_file():
             parser.error("source tree lacks the authored contract or required release files")
     output = args.output.resolve()
@@ -98,6 +120,7 @@ def main():
         if kind == "wheel":
             with zipfile.ZipFile(archive) as bundle:
                 check_inventory(bundle.namelist())
+                check_package_inventory(bundle.namelist())
         else:
             with tarfile.open(archive) as bundle:
                 # The sdist has one project-version root directory.
@@ -105,8 +128,9 @@ def main():
                 roots = {name.split("/", 1)[0] for name in members}
                 if len(roots) != 1:
                     raise ValueError("source archive must have one root")
-                check_inventory([name.split("/", 1)[1] for name in members if "/" in name],
-                                source_archive=True)
+                paths = [name.split("/", 1)[1] for name in members if "/" in name]
+                check_inventory(paths, source_archive=True)
+                check_package_inventory(paths)
         environment = output / (kind + "-env")
         venv.EnvBuilder(with_pip=True).create(environment)
         python = environment / "bin/python"
@@ -123,7 +147,7 @@ def main():
             roots = list(extracted.iterdir())
             assert len(roots) == 1
             snapshot = roots[0]
-            for required in REQUIRED_SOURCE:
+            for required in (*REQUIRED_SOURCE, *REQUIRED_PACKAGE_SOURCE):
                 assert (snapshot / required).is_file(), required
         records.append({"archive": archive.name,
                         "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
