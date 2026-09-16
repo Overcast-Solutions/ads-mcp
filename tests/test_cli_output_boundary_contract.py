@@ -219,8 +219,16 @@ def test_complete_default_fixture_report_still_runs_to_completion(tmp_path, dest
     # independently requires complete fixture execution and honest exit status,
     # without importing F018's intentionally red forecast golden dependency.
     from tool_catalog import READ_TOOLS
+    expected_reads = READ_TOOLS | {
+        "get_asset_groups",
+        "get_asset_group_signals",
+        "list_audiences",
+        "get_pmax_url_settings",
+        "get_responsive_search_ad_urls",
+        "get_keyword_urls",
+    }
     rows = re.findall(r"^(\w+)\s+(MATCH|DRIFT)$", text, re.M)
-    assert {name for name, _ in rows} == set(READ_TOOLS) and len(rows) == len(READ_TOOLS)
-    assert f"across {len(READ_TOOLS)} read-tool fixtures" in text
+    assert {name for name, _ in rows} == expected_reads and len(rows) == len(expected_reads)
+    assert f"across {len(expected_reads)} read-tool fixtures" in text
     assert result.returncode == (1 if any(status == "DRIFT" for _, status in rows) else 0)
     assert not result.stderr and "Traceback" not in text
