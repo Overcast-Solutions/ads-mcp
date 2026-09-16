@@ -71,7 +71,7 @@ def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
         required = required | SEARCH_URL_READS
     if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS):
         required = required | SHARED_READS
-    if fixtures_dir is None or seen & DEMO_READS:
+    if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS):
         required = required | DEMO_READS
     missing = required - seen
     if missing:
@@ -158,7 +158,7 @@ def main(argv=None) -> int:
     inventory.add_argument(
         "--fixtures",
         help="directory containing the complete 21-read baseline, 25-read PMax inventory "
-        "or the 27-read Search URL, 29-read shared-list or 30-read targeting inventory; default combines all project read fixtures",
+        "or the 27-read Search URL or 30-read targeting inventory; default combines all project read fixtures",
     )
     inventory.add_argument(
         "--all-fixtures", action="store_true",

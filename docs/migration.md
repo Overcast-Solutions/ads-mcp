@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 29 read tools by default and 74 operations when
+ads-mcp 0.1.0 registers 30 read tools by default and 76 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
@@ -22,8 +22,9 @@ representative workflows and adapt consumers before changing a deployment.
    windows, unsupported fields and provider refusals. Keep customer payloads
    local; retain sanitized outcomes rather than raw report rows in issues.
 5. Decide whether workflows need capabilities outside the documented catalog
-   before switching. Shared negative-list management, demographic changes and
-   experiments are not provided by this release.
+   before switching. Shared negative lists and demographic changes have the
+   limited scope described in the [targeting guide](shared-targeting.md).
+   Experiments remain future work.
 6. Keep writes disabled until account authority, host approval behavior, audit
    storage and a controlled write-acceptance plan have been reviewed. Read-only
    success does not authorize a write or demonstrate its provider acceptance.
@@ -62,20 +63,22 @@ SDK may cancel in-flight responses when the input stream closes. The stdio
 boot regression holds the pipe open through initialization and `tools/list`.
 
 Start with read-only parallel operation: register this server alongside your
-current one without enabling mutations. All 29 read tools are available.
+current one without enabling mutations. All 30 read tools are available.
 Compare representative outputs and confirm that your API access permits the
-services you need. `scripts/parity.py --report -` replays all 29 read fixtures offline;
+services you need. `scripts/parity.py --report -` replays all 30 read fixtures offline;
 `--live` performs a read sweep using the supplied fixture arguments. For a live
 sweep, provide fixtures with your real resource IDs and suitable dates through
 `--fixtures`. A successful sweep is separate from comparing another server's
 actual output.
 
 The default fixture sweep combines the original 21 fixtures with four PMax
-fixtures, both Search URL inspection fixtures and the two shared-list fixtures.
+fixtures, both Search URL inspection fixtures, the two shared-list fixtures
+and demographic inspection.
 `--all-fixtures` selects the same complete set.
 An explicit `--fixtures` directory may contain the complete original
 21-read set, the complete 25-read PMax set, the 27-read Search URL set or all
-29 current reads; partial extensions are refused.
+30 current reads; partial extensions are refused. Any targeting extension must
+include both shared-list reads and demographic inspection.
 Original fixtures retain their output contracts.
 
 ## Search destination workflows
@@ -88,6 +91,22 @@ arrays or null: omitted/null preserves a list, while `[]` requests a supported
 clear. Keyword clears depend on mobile and direct tracking settings. Inspect
 those settings and re-read the resource after applying; these tools do not
 resolve the final served URL or establish provider policy acceptance.
+
+## Shared targeting workflows
+
+The [shared targeting guide](shared-targeting.md) covers two shared-list reads,
+five shared-list staging tools, and demographic inspection and staging. Shared
+lists are same-account campaign negative-keyword lists for standard Search and
+Shopping campaigns. Demographics operate on standard Search and Display ad
+groups. Complete bounded state must be verified before staging and applying;
+list changes show all linked campaigns. Unsupported or incomplete state refuses.
+
+Demographic consumers must distinguish explicit criteria from effective
+eligibility. Inclusion/exclusion switches can remove and recreate a criterion,
+requiring irreversible acknowledgement; direct customization blocks replacement.
+Enabling a paused positive criterion changes only status and retains its settings.
+Campaign exclusions, targeting restrictions and optimized targeting are preserved.
+Local subset rules do not establish country/policy eligibility or live acceptance.
 
 ## Performance Max workflows
 

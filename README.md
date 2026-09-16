@@ -103,6 +103,7 @@ Use independent account controls and review the guide's full limit scope.
 | [Reporting](docs/reporting.md) | GAQL, pagination, date windows, history and forecasts |
 | [Writes](docs/writes.md) | Plans, spend limits, creation requirements and validation |
 | [Search URLs](docs/search-urls.md) | Inspect and update existing ad and keyword destinations |
+| [Shared targeting](docs/shared-targeting.md) | Shared negative lists and explicit ad-group demographics |
 | [Performance Max](docs/pmax.md) | Asset groups, signals, URL controls and Item-ID selection |
 | [Errors](docs/errors.md) | Refusals, recovery and uncertain outcomes |
 | [Tool catalog](docs/tools.md) | Every tool's parameters and defaults |

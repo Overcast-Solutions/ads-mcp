@@ -3010,8 +3010,8 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                     # The change landed; we simply could not record it. Say so
                     # rather than returning a clean success the audit denies.
                     result["audit_warning"] = (
-                        "THE CHANGE WAS APPLIED but the terminal audit record "
-                        f"could not be written to {ctx.config.audit_log}. "
+                        "THE CHANGE WAS APPLIED but one or more audit records "
+                        "could not be written to the configured audit log. "
                         "Reconcile this plan against the account manually."
                     )
             return result
