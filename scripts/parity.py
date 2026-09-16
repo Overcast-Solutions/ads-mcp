@@ -28,7 +28,7 @@ SEARCH_URL_READS = frozenset({"get_responsive_search_ad_urls", "get_keyword_urls
 
 
 def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
-    """Select baseline fixtures or every currently supported owned read."""
+    """Select an explicit inventory or all 27 authored read fixtures."""
     directories = ([fixtures_dir] if fixtures_dir is not None else
                    [REPO / "tests/fixtures/contract", REPO / "tests/fixtures/pmax"])
     if any(not directory.is_dir() for directory in directories):
@@ -149,14 +149,12 @@ def main(argv=None) -> int:
     inventory = parser.add_mutually_exclusive_group()
     inventory.add_argument(
         "--fixtures",
-        default=str(REPO / "tests/fixtures/contract"),
         help="directory containing the complete 21-read baseline, 25-read PMax inventory "
-        "or all 26 currently supported read "
-        "fixtures; default is the original 21-read contract directory",
+        "or all 27 read fixtures; default combines all project read fixtures",
     )
     inventory.add_argument(
         "--all-fixtures", action="store_true",
-        help="combine the owned contract, PMax and supported Search URL fixtures for all 26 reads",
+        help="combine all 27 contract, PMax and Search URL fixtures (the default)",
     )
     parser.add_argument(
         "--report", default="-", help="report path, or - for stdout"
@@ -169,7 +167,7 @@ def main(argv=None) -> int:
         "spends API quota (reads only). Operator-run.",
     )
     args = parser.parse_args(argv)
-    fixtures_dir = None if args.all_fixtures else Path(args.fixtures)
+    fixtures_dir = Path(args.fixtures) if args.fixtures is not None else None
     try:
         validate_fixture_inventory(fixtures_dir)
     except (OSError, ValueError) as exc:

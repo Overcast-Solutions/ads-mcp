@@ -14,6 +14,36 @@ from ads_mcp.config import Config
 from ads_mcp.server import create_server
 
 
+EXPECTED_READS = frozenset({
+    "discover_keywords", "get_account_info", "get_ad_performance",
+    "get_asset_group_signals", "get_asset_groups", "get_campaign_performance",
+    "get_change_history", "get_conversion_actions", "get_geo_performance",
+    "get_keyword_forecasts", "get_keyword_performance", "get_keyword_urls",
+    "get_listing_groups", "get_negative_keywords", "get_pmax_url_settings",
+    "get_policy_issues", "get_product_status", "get_responsive_search_ad_urls",
+    "get_search_terms", "get_shopping_performance", "health_check",
+    "list_accounts", "list_audiences", "list_extensions", "list_recommendations",
+    "run_gaql", "search_geo_targets",
+})
+EXPECTED_WRITE_MODE = EXPECTED_READS | frozenset({
+    "add_asset_group_audience_signal", "add_asset_group_search_themes",
+    "add_audience_targeting", "add_negative_keywords", "add_pmax_url_exclusion",
+    "apply_recommendation", "confirm_and_apply", "create_ad_group",
+    "create_callouts", "create_conversion_action", "create_custom_audience",
+    "create_pmax_campaign", "create_portfolio_bidding_strategy",
+    "create_structured_snippets", "dismiss_recommendation", "draft_campaign",
+    "draft_keywords", "draft_responsive_search_ad", "draft_sitelinks",
+    "enable_entity", "exclude_geo_target", "pause_entity",
+    "remove_asset_group_signals", "remove_entity", "remove_extension",
+    "remove_geo_target", "remove_keywords", "remove_negative_keywords",
+    "remove_pmax_url_exclusions", "set_asset_group_product_selection",
+    "set_campaign_schedule", "set_conversion_action_primary_status",
+    "set_pmax_final_url_expansion", "update_ad_group", "update_campaign",
+    "update_keyword_bid", "update_keyword_urls", "update_responsive_search_ad_urls",
+    "upload_image_asset", "upload_text_asset",
+})
+
+
 def no_network(*args, **kwargs):
     raise RuntimeError("Installed catalog checks must not contact a provider")
 
@@ -29,8 +59,8 @@ async def catalog(read_only):
     async with mcp.Client(create_server(config, client=object())) as client:
         result = await client.list_tools()
     names = sorted(tool.name for tool in result.tools)
-    assert len(names) == (25 if read_only else 63)
-    assert ("confirm_and_apply" in names) is (not read_only)
+    expected = EXPECTED_READS if read_only else EXPECTED_WRITE_MODE
+    assert len(names) == len(expected) and set(names) == expected
     return names
 
 

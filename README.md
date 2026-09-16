@@ -102,6 +102,7 @@ Use independent account controls and review the guide's full limit scope.
 | [Configuration](docs/configuration.md) | Environment variables, defaults and audit storage |
 | [Reporting](docs/reporting.md) | GAQL, pagination, date windows, history and forecasts |
 | [Writes](docs/writes.md) | Plans, spend limits, creation requirements and validation |
+| [Search URLs](docs/search-urls.md) | Inspect and update existing ad and keyword destinations |
 | [Performance Max](docs/pmax.md) | Asset groups, signals, URL controls and Item-ID selection |
 | [Errors](docs/errors.md) | Refusals, recovery and uncertain outcomes |
 | [Tool catalog](docs/tools.md) | Every tool's parameters and defaults |

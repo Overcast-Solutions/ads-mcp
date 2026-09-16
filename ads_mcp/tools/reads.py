@@ -186,7 +186,7 @@ def register(server, ctx):
         description=_spec(
             "get_responsive_search_ad_urls",
             "Inspect an existing responsive search ad's exact final and mobile URLs, "
-            "tracking settings and creative leaves. Requires a unique nonremoved ad "
+            "tracking settings and creative content. Requires a unique nonremoved ad "
             "association and enabled or paused Search parents. Reports direct settings; "
             "provider validation and policy review remain authoritative. Read-only "
             "account overrides are supported. This singular inspection has no pagination.",

@@ -848,8 +848,9 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
             "them in order. Empty mobile URLs clear them; final URLs must remain nonempty. "
             "Local limits are 10 unique HTTP(S) URLs per list and 2048 Unicode codepoints "
             "per URL, without user information, whitespace or controls. Exact spelling is "
-            "preserved. No-op plans refuse. Preview and confirm_and_apply are required; "
-            "fresh checks bind parent, creative and tracking state before an AdService "
+            "preserved. No-op plans refuse. Execution requires confirm_and_apply; "
+            "preview is required by default, configured with ADS_MCP_REQUIRE_DRY_RUN. "
+            "Fresh checks bind parent, creative and tracking state before an AdService "
             "URL-only update. Provider policy and validation can still refuse the change.",
         ),
     )
@@ -879,8 +880,9 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
             "and custom parameters. Tracking is never silently erased. Local limits are "
             "10 unique HTTP(S) URLs per list and 2048 Unicode codepoints per URL, with a "
             "host and valid port, without user information, whitespace or controls. Exact "
-            "spelling is preserved. No-op plans refuse. Preview and confirm_and_apply "
-            "are required, with fresh keyword and parent checks before a URL-only update. "
+            "spelling is preserved. No-op plans refuse. Execution requires confirm_and_apply; "
+            "preview is required by default, configured with ADS_MCP_REQUIRE_DRY_RUN. "
+            "Fresh keyword and parent checks precede a URL-only update. "
             "Keyword text, match type, bids, status and suffix are preserved. Provider "
             "validation and policy review can still refuse the change.",
         ),
