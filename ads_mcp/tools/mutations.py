@@ -839,6 +839,32 @@ StatusEntityKind = Annotated[str, Field(json_schema_extra={
 def register(server, ctx):  # noqa: C901 — one tool per block, deliberately flat
     cfg = ctx.config
 
+    @server.tool(
+        name="update_demographic_targeting",
+        description=_spec(
+            "update_demographic_targeting",
+            "Stage 1–20 exact dimension/value/action records in the configured account. "
+            "Supports AGE_RANGE, GENDER and INCOME_RANGE on standard Search and Display, "
+            "plus PARENTAL_STATUS on Display. Use explicit category enum names and INCLUDE "
+            "or EXCLUDE. Replacements refuse direct customization and require irreversible "
+            "acknowledgement. Every requested dimension must retain a known unexcluded "
+            "category after campaign exclusions and the entire batch. Requires preview and "
+            "confirm_and_apply with complete state rechecks; provider geography and policy "
+            "limits still apply. Does not establish effective eligibility or alter expansion.",
+        ),
+    )
+    def update_demographic_targeting(
+        ad_group_id: StrictStr, changes: list[dict], customer_id: StrictStr | None = None,
+    ) -> dict:
+        from ads_mcp import demographics
+
+        def impl():
+            return _plan_payload(ctx, **demographics.plan(
+                ctx, ad_group_id=ad_group_id, changes=changes, customer_id=customer_id,
+            ))
+
+        return _guarded_mutation(ctx, "update_demographic_targeting", impl)()
+
     def _shared_plan(tool, **kwargs):
         from ads_mcp import shared_negatives
 

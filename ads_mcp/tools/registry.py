@@ -257,6 +257,7 @@ def register_tools(server, ctx):
             "create_shared_negative_keyword_list", "add_shared_negative_keywords",
             "remove_shared_negative_keywords", "attach_shared_negative_keyword_list",
             "detach_shared_negative_keyword_list",
+            "get_demographic_targeting", "update_demographic_targeting",
         }:
             tool.fn_metadata = _OriginalJSONMetadata(**dict(tool.fn_metadata))
         if not isinstance(tool.fn_metadata, _PrivateValidationMetadata):

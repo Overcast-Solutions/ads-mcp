@@ -51,6 +51,24 @@ def register(server, ctx):
     cfg = ctx.config
 
     @server.tool(
+        name="get_demographic_targeting",
+        description=_spec(
+            "get_demographic_targeting",
+            "Inspect complete explicit demographics on a standard Search or Display ad group. "
+            "Returns criteria, campaign exclusions, supported categories, direct settings and "
+            "parent expansion settings. Absent criteria are unconfigured defaults, not proof "
+            "of effective eligibility. Limits are 100 nonremoved criteria per level and 16 MiB. "
+            "Requires a canonical positive ad_group_id; explicit accessible accounts are allowed.",
+        ),
+    )
+    def get_demographic_targeting(ad_group_id: StrictStr, customer_id: StrictStr | None = None) -> dict:
+        from ads_mcp import demographics
+
+        return guarded(ctx, demographics.inspect, name="get_demographic_targeting")(
+            ctx=ctx, ad_group_id=ad_group_id, customer_id=customer_id,
+        )
+
+    @server.tool(
         name="list_shared_negative_keyword_lists",
         description=_spec(
             "list_shared_negative_keyword_lists",

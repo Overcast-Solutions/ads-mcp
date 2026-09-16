@@ -25,6 +25,7 @@ EXPECTED_READS = frozenset({
     "list_accounts", "list_audiences", "list_extensions", "list_recommendations",
     "run_gaql", "search_geo_targets",
     "list_shared_negative_keyword_lists", "get_shared_negative_keyword_list",
+    "get_demographic_targeting",
 })
 EXPECTED_WRITE_MODE = EXPECTED_READS | frozenset({
     "add_asset_group_audience_signal", "add_asset_group_search_themes",
@@ -45,6 +46,7 @@ EXPECTED_WRITE_MODE = EXPECTED_READS | frozenset({
     "create_shared_negative_keyword_list", "add_shared_negative_keywords",
     "remove_shared_negative_keywords", "attach_shared_negative_keyword_list",
     "detach_shared_negative_keyword_list",
+    "update_demographic_targeting",
 })
 
 

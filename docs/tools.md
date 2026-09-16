@@ -92,6 +92,15 @@ Conversion actions with category, type, status, counting type, and primary-for-g
 |---|---|---|---|
 | `customer_id` | string | no | — |
 
+### `get_demographic_targeting`
+
+Inspect complete explicit demographics on a standard Search or Display ad group. Returns criteria, campaign exclusions, supported categories, direct settings and parent expansion settings. Absent criteria are unconfigured defaults, not proof of effective eligibility. Limits are 100 nonremoved criteria per level and 16 MiB. Requires a canonical positive ad_group_id; explicit accessible accounts are allowed.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_geo_performance`
 
 Geographic performance for a date window; bounded with pagination tokens.
@@ -739,6 +748,16 @@ Stage campaign changes: daily budget, status, name, bidding strategy, additive g
 | `bidding_strategy` | string | no | — |
 | `geo_target_ids` | array&lt;string&gt; | no | — |
 | `language_ids` | array&lt;string&gt; | no | — |
+
+### `update_demographic_targeting`
+
+Stage 1–20 exact dimension/value/action records in the configured account. Supports AGE_RANGE, GENDER and INCOME_RANGE on standard Search and Display, plus PARENTAL_STATUS on Display. Use explicit category enum names and INCLUDE or EXCLUDE. Replacements refuse direct customization and require irreversible acknowledgement. Every requested dimension must retain a known unexcluded category after campaign exclusions and the entire batch. Requires preview and confirm_and_apply with complete state rechecks; provider geography and policy limits still apply. Does not establish effective eligibility or alter expansion.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `changes` | array&lt;object&gt; | yes | — |
+| `customer_id` | string | no | — |
 
 ### `update_keyword_bid`
 
