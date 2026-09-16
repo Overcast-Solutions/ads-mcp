@@ -254,6 +254,7 @@ def register_tools(server, ctx):
     for tool in server._tool_manager.list_tools():
         if tool.name in {
             "list_pmax_url_experiments", "get_pmax_url_experiment", "get_pmax_url_experiment_results",
+            "create_pmax_url_experiment",
             "list_shared_negative_keyword_lists", "get_shared_negative_keyword_list",
             "create_shared_negative_keyword_list", "add_shared_negative_keywords",
             "remove_shared_negative_keywords", "attach_shared_negative_keyword_list",

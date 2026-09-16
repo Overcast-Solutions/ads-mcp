@@ -840,6 +840,34 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
     cfg = ctx.config
 
     @server.tool(
+        name="create_pmax_url_experiment",
+        description=_spec(
+            "create_pmax_url_experiment",
+            "Stage a provider-validated 50/50 final URL expansion experiment on one enabled "
+            "PMax campaign in the configured account. Requires expansion explicitly opted out, "
+            "no nonremoved experiment collision, an exact NFC name of 1–255 UTF-8 bytes, "
+            "and explicit ISO dates within campaign dates. Start must be today through 365 "
+            "days ahead in the verified account timezone; duration is at most 366 inclusive days. "
+            "Preserves unrelated automation settings. Requires preview and confirm_and_apply; "
+            "provider validate-only is separate from preview and cannot guarantee serving. "
+            "Accepted creation is followed by readback; unknown verification requires inspection.",
+        ),
+    )
+    def create_pmax_url_experiment(
+        campaign_id: StrictStr, name: StrictStr, date_start: StrictStr, date_end: StrictStr,
+        customer_id: StrictStr | None = None,
+    ) -> dict:
+        from ads_mcp import pmax_experiment_create
+
+        def impl():
+            return _plan_payload(ctx, **pmax_experiment_create.plan(
+                ctx, campaign_id=campaign_id, name=name, date_start=date_start,
+                date_end=date_end, customer_id=customer_id,
+            ))
+
+        return _guarded_mutation(ctx, "create_pmax_url_experiment", impl)()
+
+    @server.tool(
         name="update_demographic_targeting",
         description=_spec(
             "update_demographic_targeting",
@@ -2990,16 +3018,17 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                 raise
             ctx.current_tool = applying_tool
             result = {"applied": True, "plan": entry.payload()}
-            if entry.tool == "create_pmax_campaign":
+            if entry.tool in {"create_pmax_campaign", "create_pmax_url_experiment"}:
                 result.update(execution_result)
             if ctx.audit is not None:
-                # Terminal record: written only after the API accepted it.
+                # Experiment receipt and readback have separate outcomes.
+                experiment_create = entry.tool == "create_pmax_url_experiment"
                 wrote = ctx.audit.write(
                     {
-                        "event": "applied",
+                        "event": "applied" if result["applied"] else "submitted",
                         "tool": entry.tool,
                         "customer_id": ctx.config.customer_id,
-                        "outcome": "success",
+                        "outcome": result.get("verification", "success") if experiment_create else "success",
                         "plan_id": entry.id,
                         "summary": entry.summary,
                         "operations": entry.operations,
@@ -3010,7 +3039,8 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                     # The change landed; we simply could not record it. Say so
                     # rather than returning a clean success the audit denies.
                     result["audit_warning"] = (
-                        "THE CHANGE WAS APPLIED but one or more audit records "
+                        ("THE CHANGE WAS SUBMITTED but one or more audit records "
+                         if experiment_create else "THE CHANGE WAS APPLIED but one or more audit records ") +
                         "could not be written to the configured audit log. "
                         "Reconcile this plan against the account manually."
                     )

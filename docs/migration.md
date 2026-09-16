@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 33 read tools by default and 79 operations when
+ads-mcp 0.1.0 registers 33 read tools by default and 80 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.

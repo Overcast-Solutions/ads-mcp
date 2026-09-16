@@ -488,6 +488,18 @@ Stage a new Performance Max campaign (start_paused defaults true) with its asset
 | `square_image_asset_ids` | array&lt;string&gt; | no | — |
 | `logo_asset_ids` | array&lt;string&gt; | no | — |
 
+### `create_pmax_url_experiment`
+
+Stage a provider-validated 50/50 final URL expansion experiment on one enabled PMax campaign in the configured account. Requires expansion explicitly opted out, no nonremoved experiment collision, an exact NFC name of 1–255 UTF-8 bytes, and explicit ISO dates within campaign dates. Start must be today through 365 days ahead in the verified account timezone; duration is at most 366 inclusive days. Preserves unrelated automation settings. Requires preview and confirm_and_apply; provider validate-only is separate from preview and cannot guarantee serving. Accepted creation is followed by readback; unknown verification requires inspection.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `name` | string | yes | — |
+| `date_start` | string | yes | — |
+| `date_end` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `create_portfolio_bidding_strategy`
 
 Stage a portfolio bidding strategy (TARGET_CPA / TARGET_ROAS).

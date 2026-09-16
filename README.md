@@ -85,7 +85,7 @@ For a read-only rollout alongside an existing server, follow the
 
 ## Experimental writes
 
-Enabling writes exposes 79 operations. Read the [write guide](docs/writes.md)
+Enabling writes exposes 80 operations. Read the [write guide](docs/writes.md)
 before opting in. Writes require audit
 storage and the appropriate caps; the default flow is plan → dry-run preview →
 `confirm_and_apply`. Irreversible changes require an additional acknowledgement.
