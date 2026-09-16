@@ -63,11 +63,14 @@ def _unverified():
     )
 
 
-def _enum(value):
-    name = getattr(value, "name", None)
-    if name is None or name == "UNKNOWN":
+def _enum(message, field):
+    """Resolve raw enum numbers without triggering proto-plus warnings."""
+    raw = message._pb
+    descriptor = raw.DESCRIPTOR.fields_by_name[field].enum_type
+    value = descriptor.values_by_number.get(getattr(raw, field))
+    if value is None or value.name == "UNKNOWN":
         _unverified()
-    return name
+    return value.name
 
 
 def _resource_id(value, customer_id, kind):
@@ -121,15 +124,15 @@ def _parents(ctx, customer_id, ad_group_id):
     group = _unique(ctx, f"SELECT {GROUP_FIELDS} FROM ad_group "
                     f"WHERE ad_group.id = {ad_group_id} LIMIT 2", customer_id).ad_group
     campaign_id = _resource_id(group.campaign, customer_id, "campaigns")
-    group_status, group_type = _enum(group.status), _enum(group.type_)
+    group_status, group_type = _enum(group, "status"), _enum(group, "type_")
     if (str(group.id) != ad_group_id
             or group.resource_name != resource(customer_id, "adGroups", ad_group_id)
             or group_status not in LIVE_STATUSES or group_type != "SEARCH_STANDARD"):
         _unverified()
     campaign = _unique(ctx, f"SELECT {CAMPAIGN_FIELDS} FROM campaign "
                        f"WHERE campaign.id = {campaign_id} LIMIT 2", customer_id).campaign
-    campaign_status = _enum(campaign.status)
-    channel = _enum(campaign.advertising_channel_type)
+    campaign_status = _enum(campaign, "status")
+    channel = _enum(campaign, "advertising_channel_type")
     if (str(campaign.id) != campaign_id
             or campaign.resource_name != resource(customer_id, "campaigns", campaign_id)
             or campaign_status not in LIVE_STATUSES or channel != "SEARCH"):
@@ -164,7 +167,7 @@ def _creative(ad):
         for asset in getattr(creative, field):
             if not asset.text.strip():
                 _unverified()
-            result[field].append({"text": asset.text, "pinned_field": _enum(asset.pinned_field)})
+            result[field].append({"text": asset.text, "pinned_field": _enum(asset, "pinned_field")})
         if not result[field]:
             _unverified()
     return result
@@ -178,7 +181,7 @@ def _ad_state(ctx, customer_id, ad_group_id, ad_id):
             customer_id,
         ).ad_group_ad
         ad = association.ad
-        status, ad_type = _enum(association.status), _enum(ad.type_)
+        status, ad_type = _enum(association, "status"), _enum(ad, "type_")
         if (association.resource_name != resource(customer_id, "adGroupAds", ad_group_id + "~" + ad_id)
                 or association.ad_group != resource(customer_id, "adGroups", ad_group_id)
                 or ad.resource_name != resource(customer_id, "ads", ad_id)
@@ -228,8 +231,8 @@ def _keyword_state(ctx, customer_id, ad_group_id, criterion_id):
             ctx, f"SELECT {KEYWORD_FIELDS} FROM ad_group_criterion "
             f"WHERE ad_group_criterion.resource_name = '{identity}' LIMIT 2", customer_id,
         ).ad_group_criterion
-        status, kind = _enum(criterion.status), _enum(criterion.type_)
-        match_type = _enum(criterion.keyword.match_type)
+        status, kind = _enum(criterion, "status"), _enum(criterion, "type_")
+        match_type = _enum(criterion.keyword, "match_type")
         if (criterion.resource_name != identity or str(criterion.criterion_id) != criterion_id
                 or criterion.ad_group != resource(customer_id, "adGroups", ad_group_id)
                 or status not in LIVE_STATUSES or kind != "KEYWORD" or criterion.negative
