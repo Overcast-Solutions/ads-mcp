@@ -92,6 +92,15 @@ Conversion actions with category, type, status, counting type, and primary-for-g
 |---|---|---|---|
 | `customer_id` | string | no | — |
 
+### `get_demographic_targeting`
+
+Inspect complete explicit demographics on a standard Search or Display ad group. Returns criteria, campaign exclusions, supported categories, direct settings and parent expansion settings. Absent criteria are unconfigured defaults, not proof of effective eligibility. Limits are 100 nonremoved criteria per level and 16 MiB. Requires a canonical positive ad_group_id; explicit accessible accounts are allowed.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_geo_performance`
 
 Geographic performance for a date window; bounded with pagination tokens.
@@ -212,6 +221,15 @@ Search-term report for a date window; bounded with pagination tokens — no unbo
 | `customer_id` | string | no | — |
 | `campaign_id` | string | no | — |
 
+### `get_shared_negative_keyword_list`
+
+Inspect a complete active negative-keyword list, all members and linked campaigns. Requires a canonical positive numeric shared_set_id. Supports standard Search and Shopping campaigns. Refuses incomplete or inconsistent state; local limits are 5000 members, 1000 links and 16 MiB. Explicit accessible accounts are allowed.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `shared_set_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_shopping_performance`
 
 Product-level shopping metrics for a campaign and date window.
@@ -257,6 +275,14 @@ Campaign-level extensions/assets (sitelinks, callouts, structured snippets) with
 ### `list_recommendations`
 
 Google's active recommendations with typed impact projections (base vs potential cost and conversions). Read-only; applying or dismissing routes through the guardrail plan flow.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `customer_id` | string | no | — |
+
+### `list_shared_negative_keyword_lists`
+
+Inspect the complete active negative-keyword list catalog in an accessible account. Returns identities, names, types, statuses and member/reference counts. Refuses incomplete state; local limits are 100 lists and 16 MiB.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
@@ -338,6 +364,16 @@ Plan one negative WEBPAGE URL exclusion for a verified Performance Max campaign.
 | `match_type` | string | no | `EXACT` |
 | `customer_id` | string | no | — |
 
+### `add_shared_negative_keywords`
+
+Stage 1–100 exact text/match_type records for a shared negative list. Match types are BROAD, PHRASE and EXACT; original text has local limits of 80 codepoints and 10 words without edge whitespace or controls. Duplicate text/match pairs refuse under NFC and casefold comparison. Preview shows complete membership and all affected standard Search/Shopping campaigns. Execution requires confirm_and_apply; serving may change.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `shared_set_id` | string | yes | — |
+| `keywords` | array&lt;object&gt; | yes | — |
+| `customer_id` | string | no | — |
+
 ### `apply_recommendation`
 
 Stage applying a Google recommendation (bare id or full resource name, normalized to one account-scoped resource). Budget recommendations are checked against the spend cap. Applies only via confirm_and_apply.
@@ -345,6 +381,16 @@ Stage applying a Google recommendation (bare id or full resource name, normalize
 | Parameter | Type | Required | Default |
 |---|---|---|---|
 | `recommendation_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `attach_shared_negative_keyword_list`
+
+Stage association of a shared negative list with 1–100 distinct canonical campaign ID strings in the configured account. Only enabled/paused standard Search and Shopping campaigns are supported, including existing links. Requires confirm_and_apply; complete list and campaign state are rechecked.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `shared_set_id` | string | yes | — |
+| `campaign_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
 ### `create_ad_group`
@@ -426,6 +472,15 @@ Stage a portfolio bidding strategy (TARGET_CPA / TARGET_ROAS).
 | `target_roas` | number | no | — |
 | `customer_id` | string | no | — |
 
+### `create_shared_negative_keyword_list`
+
+Stage an empty negative-keyword list in the configured account. Name requires original NFC text of 1–255 UTF-8 bytes without edge whitespace or controls. Active name collisions refuse under NFC and casefold comparison. Execution requires confirm_and_apply and the configured preview safeguards.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `name` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `create_structured_snippets`
 
 Stage structured snippet assets (header + values).
@@ -435,6 +490,16 @@ Stage structured snippet assets (header + values).
 | `campaign_id` | string | yes | — |
 | `header` | string | yes | — |
 | `values` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
+### `detach_shared_negative_keyword_list`
+
+Stage removal of 1–100 existing campaign associations from a shared negative list. Complete state is reviewed and rechecked; list members remain intact. Requires confirm_and_apply and irreversible acknowledgement. Detachment can change serving; a surviving campaign and list can subsequently be reattached.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `shared_set_id` | string | yes | — |
+| `campaign_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
 ### `dismiss_recommendation`
@@ -602,6 +667,16 @@ Plan irreversible removal of exact existing negative WEBPAGE URL criteria from a
 | `criterion_ids` | array&lt;string&gt; | yes | — |
 | `customer_id` | string | no | — |
 
+### `remove_shared_negative_keywords`
+
+Stage removal of 1–100 distinct canonical positive criterion ID strings from a shared negative list. Complete membership and affected campaigns are reviewed and rechecked. Requires confirm_and_apply and irreversible acknowledgement; serving may change across all linked campaigns.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `shared_set_id` | string | yes | — |
+| `criterion_ids` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
 ### `set_asset_group_product_selection`
 
 Plan irreversible replacement of an existing feed-linked Performance Max asset group's complete product tree. item_ids must contain 1 to 998 distinct trimmed, case-preserved Item IDs, at most 128 Unicode codepoints each, without controls or internal whitespace. Includes these items and excludes everything else. Supports empty trees, a single all-products unit, or flat Item-ID trees with one catch-all; nested trees and other dimensions are refused. Reads at most 1000 existing nodes plus one lookahead and requires complete state. Shows every before/after node and rechecks group, campaign feed and tree before apply; changed state returns STALE_PLAN. Uses one atomic v25 tree request, normal preview and irreversible acknowledgement. Alters inventory eligibility and may affect delivery and spend. Provider acceptance is not guaranteed. Writes only to the configured account; verify afterwards with get_listing_groups.
@@ -673,6 +748,16 @@ Stage campaign changes: daily budget, status, name, bidding strategy, additive g
 | `bidding_strategy` | string | no | — |
 | `geo_target_ids` | array&lt;string&gt; | no | — |
 | `language_ids` | array&lt;string&gt; | no | — |
+
+### `update_demographic_targeting`
+
+Stage 1–20 exact dimension/value/action records in the configured account. Supports AGE_RANGE, GENDER and INCOME_RANGE on standard Search and Display, plus PARENTAL_STATUS on Display. Use explicit category enum names and INCLUDE or EXCLUDE. Replacements refuse direct customization and require irreversible acknowledgement. Every requested dimension must retain a known unexcluded category after campaign exclusions and the entire batch. Requires preview and confirm_and_apply with complete state rechecks; provider geography and policy limits still apply. Does not establish effective eligibility or alter expansion.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `ad_group_id` | string | yes | — |
+| `changes` | array&lt;object&gt; | yes | — |
+| `customer_id` | string | no | — |
 
 ### `update_keyword_bid`
 

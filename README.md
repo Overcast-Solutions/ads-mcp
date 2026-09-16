@@ -7,7 +7,7 @@ Version 0.1.0 is unreleased and is not published to PyPI. Write support is
 experimental. Supports CPython 3.12–3.14 on Linux and macOS; native Windows
 is unsupported. Requires Google Ads SDK 31.4.0 or later within major 31.
 
-- **27 read tools:** authenticated health checks, account and PMax inspection,
+- **30 read tools:** authenticated health checks, account and PMax inspection,
   performance reports, Keyword Planner and raw GAQL with bounded responses.
 - **Reviewed changes:** write tools create plans; application checks account
   binding, expiry, preview requirements and configured budget/CPC limits.
@@ -85,7 +85,7 @@ For a read-only rollout alongside an existing server, follow the
 
 ## Experimental writes
 
-Enabling writes exposes 67 operations. Read the [write guide](docs/writes.md)
+Enabling writes exposes 76 operations. Read the [write guide](docs/writes.md)
 before opting in. Writes require audit
 storage and the appropriate caps; the default flow is plan → dry-run preview →
 `confirm_and_apply`. Irreversible changes require an additional acknowledgement.
@@ -103,6 +103,7 @@ Use independent account controls and review the guide's full limit scope.
 | [Reporting](docs/reporting.md) | GAQL, pagination, date windows, history and forecasts |
 | [Writes](docs/writes.md) | Plans, spend limits, creation requirements and validation |
 | [Search URLs](docs/search-urls.md) | Inspect and update existing ad and keyword destinations |
+| [Shared targeting](docs/shared-targeting.md) | Shared negative lists and explicit ad-group demographics |
 | [Performance Max](docs/pmax.md) | Asset groups, signals, URL controls and Item-ID selection |
 | [Errors](docs/errors.md) | Refusals, recovery and uncertain outcomes |
 | [Tool catalog](docs/tools.md) | Every tool's parameters and defaults |

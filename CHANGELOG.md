@@ -2,6 +2,16 @@
 
 ## 0.1.0 — unreleased
 
+- Inspect, create and maintain same-account shared negative-keyword lists for
+  supported Search and Shopping campaigns. Membership previews include all
+  linked campaigns; removals and detachments require acknowledgement.
+- Inspect and change explicit ad-group demographics on standard Search and
+  Display. Immutable polarity changes remove and recreate criteria, refusing
+  direct customization loss. Positive status-only updates preserve settings.
+  The shared targeting guide explains defaults, inherited exclusions, local
+  limits and provider policy boundaries; experiments remain future work.
+- Audit loss after a sent mutation remains visible in the structured result,
+  without emitting the private audit-log path in a separate stderr diagnostic.
 - Inspect and edit final and mobile URLs on existing responsive search ads
   and positive keywords in supported Search ad groups. Plans preserve creative,
   tracking, bids and status, verify relevant state before applying, and update
@@ -13,10 +23,13 @@
   Relevant state is checked again before apply; removals and tree replacement
   require irreversible acknowledgement. The PMax guide documents local limits,
   provider documentation conflicts and delivery effects.
-- 67 total operations in write mode, including 27 reads. Default offline
-  fixture replay covers the original 21, four PMax and two Search URL reads.
+- 76 total operations in write mode, including 30 reads. Default offline
+  fixture replay covers the original 21, four PMax, two Search URL and three
+  shared targeting reads.
   Installed archive checks require exact tool identities; source archives
-  must include the PMax and Search URL contracts, fixtures and guides.
+  must include the PMax, Search URL and shared targeting contracts, fixtures
+  and guides. Installed console workflows exercise synthetic provider state;
+  these checks do not establish live Google acceptance.
 - Adopt Apache License 2.0 for the current source and distribution metadata.
   Earlier MIT-licensed source remains available under its original license.
 
@@ -38,8 +51,8 @@
 - Cloud-project API access following the September 9, 2026 developer-token
   sunset: legacy configuration is optional and never transmitted. Requires
   Google Ads SDK 31.4.0+, with named production-project approval guidance.
-- 27 read tools for account discovery, GAQL, reporting, policy issues,
-  recommendations, PMax, Search destinations and shopping data, and
+- 30 read tools for account discovery, GAQL, reporting, policy issues,
+  recommendations, PMax, Search destinations, shared targeting and shopping data, and
   nonpersistent Keyword Planner requests.
 - Account selection and campaign scoping on applicable reads, typed money,
   explicit pagination, supported report-field selections and preserved listing

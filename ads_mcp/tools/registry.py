@@ -99,6 +99,13 @@ class _SearchURLMetadata(_PrivateValidationMetadata):
         return {**super().pre_parse_json(remaining), "customer_id": data["customer_id"]}
 
 
+class _OriginalJSONMetadata(_PrivateValidationMetadata):
+    """Keep the caller's JSON types intact for strict workflow validation."""
+
+    def pre_parse_json(self, data):
+        return data
+
+
 class _URLListMetadata(_SearchURLMetadata):
     """Validate destination lists against their original caller types."""
 
@@ -245,6 +252,14 @@ def register_tools(server, ctx):
     # signature before dispatch (including confirmation), and advertise the
     # same closed shape. Inherit aliases, defaults and the SDK's dump behavior.
     for tool in server._tool_manager.list_tools():
+        if tool.name in {
+            "list_shared_negative_keyword_lists", "get_shared_negative_keyword_list",
+            "create_shared_negative_keyword_list", "add_shared_negative_keywords",
+            "remove_shared_negative_keywords", "attach_shared_negative_keyword_list",
+            "detach_shared_negative_keyword_list",
+            "get_demographic_targeting", "update_demographic_targeting",
+        }:
+            tool.fn_metadata = _OriginalJSONMetadata(**dict(tool.fn_metadata))
         if not isinstance(tool.fn_metadata, _PrivateValidationMetadata):
             tool.fn_metadata = _PrivateValidationMetadata(**dict(tool.fn_metadata))
         tool.fn_metadata._scrub = ctx.scrub

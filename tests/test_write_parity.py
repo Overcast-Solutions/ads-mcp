@@ -6,6 +6,7 @@ import pytest
 
 import harness
 from pmax_oracle import PMAX_ADDITIONS, SEARCH_URL_ADDITIONS, expected_pending
+from shared_targeting_oracle import ADDITIONS as TARGETING_ADDITIONS
 from tool_catalog import MUTATION_ARGS, OPTIONAL_ARGS
 
 from capability_oracle import DEFAULT, cli, compare, empty, record, requirement, success
@@ -139,7 +140,7 @@ def test_authored_requirements_cover_the_public_tool_set():
     data = json.loads(DEFAULT.read_text())
     names = [tool["name"] for capability in data["capabilities"] for tool in capability["tools"]]
     assert len(names) == len(set(names))
-    assert set(names) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS
+    assert set(names) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS
 
 
 def test_preview_bypass_names_are_forbidden_even_in_custom_contracts():

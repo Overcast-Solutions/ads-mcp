@@ -1,0 +1,122 @@
+{
+  "tool": "list_shared_negative_keyword_lists",
+  "args": {},
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        }
+      }
+    ],
+    "shared_set": [
+      {
+        "shared_set": {
+          "id": 401,
+          "resource_name": "customers/9876543210/sharedSets/401",
+          "name": "Synthetic exclusions 401",
+          "type_": "NEGATIVE_KEYWORDS",
+          "status": "ENABLED",
+          "member_count": 1,
+          "reference_count": 1
+        },
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        }
+      }
+    ],
+    "shared_criterion": [
+      {
+        "shared_criterion": {
+          "criterion_id": 601,
+          "resource_name": "customers/9876543210/sharedCriteria/401~601",
+          "shared_set": "customers/9876543210/sharedSets/401",
+          "type_": "KEYWORD",
+          "negative": false,
+          "keyword": {
+            "text": "clearance item 601",
+            "match_type": "EXACT"
+          }
+        },
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "shared_set": {
+          "id": 401,
+          "resource_name": "customers/9876543210/sharedSets/401",
+          "name": "Synthetic exclusions 401",
+          "type_": "NEGATIVE_KEYWORDS",
+          "status": "ENABLED",
+          "member_count": 1,
+          "reference_count": 1
+        }
+      }
+    ],
+    "campaign_shared_set": [
+      {
+        "campaign_shared_set": {
+          "resource_name": "customers/9876543210/campaignSharedSets/701~401",
+          "campaign": "customers/9876543210/campaigns/701",
+          "shared_set": "customers/9876543210/sharedSets/401",
+          "status": "ENABLED"
+        },
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic SEARCH campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH",
+          "advertising_channel_sub_type": "UNSPECIFIED",
+          "campaign_budget": "customers/9876543210/campaignBudgets/1601"
+        },
+        "shared_set": {
+          "id": 401,
+          "resource_name": "customers/9876543210/sharedSets/401",
+          "name": "Synthetic exclusions 401",
+          "type_": "NEGATIVE_KEYWORDS",
+          "status": "ENABLED",
+          "member_count": 1,
+          "reference_count": 1
+        }
+      }
+    ],
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic SEARCH campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH",
+          "advertising_channel_sub_type": "UNSPECIFIED",
+          "campaign_budget": "customers/9876543210/campaignBudgets/1601"
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "lists": [
+      {
+        "shared_set_id": "401",
+        "resource_name": "customers/9876543210/sharedSets/401",
+        "name": "Synthetic exclusions 401",
+        "type": "NEGATIVE_KEYWORDS",
+        "status": "ENABLED",
+        "member_count": 1,
+        "reference_count": 1
+      }
+    ]
+  }
+}

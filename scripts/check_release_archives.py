@@ -41,7 +41,17 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/fixtures/search_url_provider_fields_v25.json",
                    "tests/fixtures/search_urls/get_responsive_search_ad_urls.json",
                    "tests/fixtures/search_urls/get_keyword_urls.json",
-                   "docs/search-urls.md")
+                   "docs/search-urls.md",
+                   "tests/shared_targeting_oracle.py",
+                   "tests/test_shared_targeting_oracle_controls.py",
+                   "tests/test_shared_negative_lists_contract.py",
+                   "tests/test_demographic_targeting_contract.py",
+                   "tests/test_shared_targeting_workflow_contract.py",
+                   "tests/fixtures/shared_targeting_provider_v25.json",
+                   "tests/fixtures/shared_targeting/get_demographic_targeting.json",
+                   "tests/fixtures/shared_targeting/get_shared_negative_keyword_list.json",
+                   "tests/fixtures/shared_targeting/list_shared_negative_keyword_lists.json",
+                   "docs/shared-targeting.md")
 
 
 def check_inventory(paths, *, source_archive=False):

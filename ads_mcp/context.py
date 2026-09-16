@@ -161,15 +161,9 @@ class ServerContext:
             critical=False,
         )
         if not wrote:
-            # The change reached the API and we could not record it. Nothing
-            # can undo it, so make the loss loud rather than silent.
+            # Confirmation surfaces this loss in its structured result, even
+            # when a later step fails. Keep private log paths off stderr.
             self._local.audit_loss = True
-            print(
-                f"ads-mcp: AUDIT LOSS — {service}.{method} was sent for plan "
-                f"{self.current_plan_id} but could not be recorded in "
-                f"{self.config.audit_log}",
-                file=__import__("sys").stderr,
-            )
 
     @property
     def audit_loss(self) -> bool:

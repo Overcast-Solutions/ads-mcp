@@ -928,6 +928,124 @@
           "values": {}
         }
       ]
+    },
+    {
+      "id": "shared_negative_lists",
+      "purpose": "Inspect complete shared keyword exclusions and stage same-account membership and campaign associations.",
+      "tools": [
+        {
+          "name": "add_shared_negative_keywords",
+          "parameters": [
+            "shared_set_id",
+            "keywords",
+            "customer_id"
+          ],
+          "required": [
+            "shared_set_id",
+            "keywords"
+          ],
+          "values": {}
+        },
+        {
+          "name": "attach_shared_negative_keyword_list",
+          "parameters": [
+            "shared_set_id",
+            "campaign_ids",
+            "customer_id"
+          ],
+          "required": [
+            "shared_set_id",
+            "campaign_ids"
+          ],
+          "values": {}
+        },
+        {
+          "name": "create_shared_negative_keyword_list",
+          "parameters": [
+            "name",
+            "customer_id"
+          ],
+          "required": [
+            "name"
+          ],
+          "values": {}
+        },
+        {
+          "name": "detach_shared_negative_keyword_list",
+          "parameters": [
+            "shared_set_id",
+            "campaign_ids",
+            "customer_id"
+          ],
+          "required": [
+            "shared_set_id",
+            "campaign_ids"
+          ],
+          "values": {}
+        },
+        {
+          "name": "get_shared_negative_keyword_list",
+          "parameters": [
+            "shared_set_id",
+            "customer_id"
+          ],
+          "required": [
+            "shared_set_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "list_shared_negative_keyword_lists",
+          "parameters": [
+            "customer_id"
+          ],
+          "required": [],
+          "values": {}
+        },
+        {
+          "name": "remove_shared_negative_keywords",
+          "parameters": [
+            "shared_set_id",
+            "criterion_ids",
+            "customer_id"
+          ],
+          "required": [
+            "shared_set_id",
+            "criterion_ids"
+          ],
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": "demographic_controls",
+      "purpose": "Inspect explicit demographic settings and stage conservative standard Search or Display ad-group changes.",
+      "tools": [
+        {
+          "name": "get_demographic_targeting",
+          "parameters": [
+            "ad_group_id",
+            "customer_id"
+          ],
+          "required": [
+            "ad_group_id"
+          ],
+          "values": {}
+        },
+        {
+          "name": "update_demographic_targeting",
+          "parameters": [
+            "ad_group_id",
+            "changes",
+            "customer_id"
+          ],
+          "required": [
+            "ad_group_id",
+            "changes"
+          ],
+          "values": {}
+        }
+      ]
     }
   ],
   "forbidden_parameters": [

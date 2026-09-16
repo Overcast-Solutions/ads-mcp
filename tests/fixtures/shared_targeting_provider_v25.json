@@ -1,0 +1,455 @@
+{
+  "version": 1,
+  "api_version": "v25",
+  "scope": "Selected reporting permissions and protobuf presence facts for the local shared-list and demographic contract. Request evidence is not live provider acceptance.",
+  "resources": {
+    "customer": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/customer",
+      "fields": {
+        "customer.id": [
+          true,
+          true,
+          true
+        ],
+        "customer.currency_code": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": []
+    },
+    "campaign": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/campaign",
+      "fields": {
+        "campaign.id": [
+          true,
+          true,
+          true
+        ],
+        "campaign.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "campaign.name": [
+          true,
+          true,
+          true
+        ],
+        "campaign.status": [
+          true,
+          true,
+          true
+        ],
+        "campaign.advertising_channel_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.advertising_channel_sub_type": [
+          true,
+          true,
+          true
+        ],
+        "campaign.campaign_budget": [
+          true,
+          true,
+          false
+        ]
+      },
+      "attributed_resources": [
+        "customer"
+      ]
+    },
+    "ad_group": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/ad_group",
+      "fields": {
+        "ad_group.id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.name": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.campaign": [
+          true,
+          true,
+          false
+        ],
+        "ad_group.status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.targeting_setting.target_restrictions": [
+          true,
+          false,
+          false
+        ],
+        "ad_group.optimized_targeting_enabled": [
+          true,
+          true,
+          true
+        ],
+        "ad_group.cpc_bid_micros": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": [
+        "customer",
+        "campaign"
+      ]
+    },
+    "shared_set": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/shared_set",
+      "fields": {
+        "shared_set.id": [
+          true,
+          true,
+          true
+        ],
+        "shared_set.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "shared_set.name": [
+          true,
+          true,
+          true
+        ],
+        "shared_set.type": [
+          true,
+          true,
+          true
+        ],
+        "shared_set.status": [
+          true,
+          true,
+          true
+        ],
+        "shared_set.member_count": [
+          true,
+          true,
+          true
+        ],
+        "shared_set.reference_count": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": [
+        "customer"
+      ]
+    },
+    "shared_criterion": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/shared_criterion",
+      "fields": {
+        "shared_criterion.criterion_id": [
+          true,
+          true,
+          true
+        ],
+        "shared_criterion.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "shared_criterion.shared_set": [
+          true,
+          true,
+          false
+        ],
+        "shared_criterion.type": [
+          true,
+          true,
+          true
+        ],
+        "shared_criterion.negative": [
+          true,
+          true,
+          true
+        ],
+        "shared_criterion.keyword.text": [
+          true,
+          true,
+          true
+        ],
+        "shared_criterion.keyword.match_type": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": [
+        "customer",
+        "shared_set"
+      ]
+    },
+    "campaign_shared_set": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/campaign_shared_set",
+      "fields": {
+        "campaign_shared_set.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "campaign_shared_set.campaign": [
+          true,
+          true,
+          false
+        ],
+        "campaign_shared_set.shared_set": [
+          true,
+          true,
+          false
+        ],
+        "campaign_shared_set.status": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": [
+        "customer",
+        "campaign",
+        "shared_set"
+      ]
+    },
+    "ad_group_criterion": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/ad_group_criterion",
+      "fields": {
+        "ad_group_criterion.criterion_id": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.ad_group": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.negative": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.age_range.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.gender.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.income_range.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.parental_status.type": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.bid_modifier": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.cpm_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.cpv_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.percent_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.final_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.final_mobile_urls": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.final_url_suffix": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.tracking_url_template": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.url_custom_parameters": [
+          true,
+          false,
+          false
+        ],
+        "ad_group_criterion.labels": [
+          true,
+          true,
+          false
+        ],
+        "ad_group_criterion.effective_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpm_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_cpv_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.effective_percent_cpc_bid_micros": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.approval_status": [
+          true,
+          true,
+          true
+        ],
+        "ad_group_criterion.primary_status": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": [
+        "customer",
+        "campaign",
+        "ad_group"
+      ]
+    },
+    "campaign_criterion": {
+      "source": "https://developers.google.com/google-ads/api/fields/v25/campaign_criterion",
+      "fields": {
+        "campaign_criterion.criterion_id": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.resource_name": [
+          true,
+          true,
+          false
+        ],
+        "campaign_criterion.campaign": [
+          true,
+          true,
+          false
+        ],
+        "campaign_criterion.type": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.status": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.negative": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.age_range.type": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.gender.type": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.income_range.type": [
+          true,
+          true,
+          true
+        ],
+        "campaign_criterion.parental_status.type": [
+          true,
+          true,
+          true
+        ]
+      },
+      "attributed_resources": [
+        "customer",
+        "campaign"
+      ]
+    }
+  },
+  "numeric_presence": {
+    "bid_modifier": true,
+    "cpc_bid_micros": true,
+    "cpm_bid_micros": true,
+    "cpv_bid_micros": true,
+    "percent_cpc_bid_micros": true
+  },
+  "shared_negative_has_presence": true,
+  "request_sources": {
+    "shared_create": "https://developers.google.com/google-ads/api/docs/targeting/shared-sets",
+    "demographic_immutability": "https://developers.google.com/google-ads/api/reference/rpc/v25/AdGroupCriterion",
+    "atomic_request": "https://developers.google.com/google-ads/api/reference/rpc/v25/MutateAdGroupCriteriaRequest",
+    "local_exclusion_checks": "https://developers.google.com/google-ads/api/reference/rpc/v25/CriterionErrorEnum.CriterionError"
+  }
+}
