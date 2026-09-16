@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 30 read tools by default and 76 operations when
+ads-mcp 0.1.0 registers 33 read tools by default and 79 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
@@ -24,7 +24,8 @@ representative workflows and adapt consumers before changing a deployment.
 5. Decide whether workflows need capabilities outside the documented catalog
    before switching. Shared negative lists and demographic changes have the
    limited scope described in the [targeting guide](shared-targeting.md).
-   Experiments remain future work.
+   PMax URL experiments support inspection and explicit-window reporting;
+   experiment creation and lifecycle actions remain future work.
 6. Keep writes disabled until account authority, host approval behavior, audit
    storage and a controlled write-acceptance plan have been reviewed. Read-only
    success does not authorize a write or demonstrate its provider acceptance.
@@ -63,9 +64,9 @@ SDK may cancel in-flight responses when the input stream closes. The stdio
 boot regression holds the pipe open through initialization and `tools/list`.
 
 Start with read-only parallel operation: register this server alongside your
-current one without enabling mutations. All 30 read tools are available.
+current one without enabling mutations. All 33 read tools are available.
 Compare representative outputs and confirm that your API access permits the
-services you need. `scripts/parity.py --report -` replays all 30 read fixtures offline;
+services you need. `scripts/parity.py --report -` replays all 33 read fixtures offline;
 `--live` performs a read sweep using the supplied fixture arguments. For a live
 sweep, provide fixtures with your real resource IDs and suitable dates through
 `--fixtures`. A successful sweep is separate from comparing another server's
@@ -73,11 +74,11 @@ actual output.
 
 The default fixture sweep combines the original 21 fixtures with four PMax
 fixtures, both Search URL inspection fixtures, the two shared-list fixtures
-and demographic inspection.
+and demographic inspection, plus three PMax experiment inspection/reporting reads.
 `--all-fixtures` selects the same complete set.
 An explicit `--fixtures` directory may contain the complete original
 21-read set, the complete 25-read PMax set, the 27-read Search URL set or all
-30 current reads; partial extensions are refused. Any targeting extension must
+30 targeting reads or all 33 current reads; partial extensions are refused. Any targeting extension must
 include both shared-list reads and demographic inspection.
 Original fixtures retain their output contracts.
 

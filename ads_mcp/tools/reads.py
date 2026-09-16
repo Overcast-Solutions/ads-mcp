@@ -51,6 +51,62 @@ def register(server, ctx):
     cfg = ctx.config
 
     @server.tool(
+        name="list_pmax_url_experiments",
+        description=_spec(
+            "list_pmax_url_experiments",
+            "Inspect the complete PMax URL expansion experiment catalog in an accessible account. "
+            "Verifies each experiment, its two same-campaign 50/50 arms and campaign settings. "
+            "Includes inactive experiments with their observed states. Local limits: 100 experiments "
+            "and 16 MiB; incomplete or unsupported state refuses.",
+        ),
+    )
+    def list_pmax_url_experiments(customer_id: StrictStr | None = None) -> dict:
+        from ads_mcp import pmax_experiments
+
+        return guarded(ctx, pmax_experiments.inspect, name="list_pmax_url_experiments")(
+            ctx=ctx, customer_id=customer_id,
+        )
+
+    @server.tool(
+        name="get_pmax_url_experiment",
+        description=_spec(
+            "get_pmax_url_experiment",
+            "Inspect one PMax URL expansion experiment, both same-campaign 50/50 arms and "
+            "complete campaign automation settings. Requires a canonical positive experiment_id. "
+            "Returns actual known lifecycle states, verified account currency and time zone. "
+            "Explicit accessible accounts are supported; incomplete state refuses.",
+        ),
+    )
+    def get_pmax_url_experiment(experiment_id: StrictStr, customer_id: StrictStr | None = None) -> dict:
+        from ads_mcp import pmax_experiments
+
+        return guarded(ctx, pmax_experiments.inspect, name="get_pmax_url_experiment")(
+            ctx=ctx, experiment_id=experiment_id, customer_id=customer_id,
+        )
+
+    @server.tool(
+        name="get_pmax_url_experiment_results",
+        description=_spec(
+            "get_pmax_url_experiment_results",
+            "Report direct experiment control and treatment metrics for an explicit YYYY-MM-DD "
+            "window of 1 to 366 inclusive days. Preserves exact cost micros and absent versus zero "
+            "metrics with verified currency and time zone. Click statistics are relative changes; "
+            "conversion statistics are absolute treatment-minus-control changes. No winner is inferred. "
+            "Requires a complete supported experiment; explicit accessible accounts are supported.",
+        ),
+    )
+    def get_pmax_url_experiment_results(
+        experiment_id: StrictStr, date_start: StrictStr, date_end: StrictStr,
+        customer_id: StrictStr | None = None,
+    ) -> dict:
+        from ads_mcp import pmax_experiments
+
+        return guarded(ctx, pmax_experiments.results, name="get_pmax_url_experiment_results")(
+            ctx=ctx, experiment_id=experiment_id, date_start=date_start,
+            date_end=date_end, customer_id=customer_id,
+        )
+
+    @server.tool(
         name="get_demographic_targeting",
         description=_spec(
             "get_demographic_targeting",

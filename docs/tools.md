@@ -166,6 +166,26 @@ Campaign-level negative keywords.
 |---|---|---|---|
 | `customer_id` | string | no | — |
 
+### `get_pmax_url_experiment`
+
+Inspect one PMax URL expansion experiment, both same-campaign 50/50 arms and complete campaign automation settings. Requires a canonical positive experiment_id. Returns actual known lifecycle states, verified account currency and time zone. Explicit accessible accounts are supported; incomplete state refuses.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `experiment_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `get_pmax_url_experiment_results`
+
+Report direct experiment control and treatment metrics for an explicit YYYY-MM-DD window of 1 to 366 inclusive days. Preserves exact cost micros and absent versus zero metrics with verified currency and time zone. Click statistics are relative changes; conversion statistics are absolute treatment-minus-control changes. No winner is inferred. Requires a complete supported experiment; explicit accessible accounts are supported.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `experiment_id` | string | yes | — |
+| `date_start` | string | yes | — |
+| `date_end` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_pmax_url_settings`
 
 Inspect verified Performance Max automation settings and negative WEBPAGE URL exclusions with complete condition structure. Distinguishes explicit opt-in/out or UNSPECIFIED from absent provider-default settings. Google documents expansion as enabled by default for PMax; absence is not opt-out. Uses retained account- and campaign-bound pagination with truncation guidance. Exclusions are not universal destination blocks: explicitly supplied final URLs and applicable Merchant Center inventory can still serve.
@@ -267,6 +287,14 @@ List existing Audience resources with identity, name, status, scope and asset-gr
 ### `list_extensions`
 
 Campaign-level extensions/assets (sitelinks, callouts, structured snippets) with status.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `customer_id` | string | no | — |
+
+### `list_pmax_url_experiments`
+
+Inspect the complete PMax URL expansion experiment catalog in an accessible account. Verifies each experiment, its two same-campaign 50/50 arms and campaign settings. Includes inactive experiments with their observed states. Local limits: 100 experiments and 16 MiB; incomplete or unsupported state refuses.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
