@@ -175,6 +175,16 @@ Inspect one PMax URL expansion experiment, both same-campaign 50/50 arms and com
 | `experiment_id` | string | yes | — |
 | `customer_id` | string | no | — |
 
+### `get_pmax_url_experiment_operation`
+
+Observe the latest promotion operation of a supported same-campaign PMax URL experiment in an accessible account. Supply the exact opaque operation_name; it is authenticated through the original Ads transport, never fetched as a URL. Verifies account, arms, latest handle and typed metadata. Separates pending, failed and completed operations from verified treatment application. Error details are redacted and bounded to 10 pages, 1000 statuses and 16 MiB; partial collection is explicit. Safe to use after a server restart.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `experiment_id` | string | yes | — |
+| `operation_name` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `get_pmax_url_experiment_results`
 
 Report direct experiment control and treatment metrics for an explicit YYYY-MM-DD window of 1 to 366 inclusive days. Preserves exact cost micros and absent versus zero metrics with verified currency and time zone. Click statistics are relative changes; conversion statistics are absolute treatment-minus-control changes. No winner is inferred. Requires a complete supported experiment; explicit accessible accounts are supported.
@@ -616,6 +626,15 @@ Stage a plan to enable a campaign, PMax asset group, ad group, ad, or keyword. E
 | `entity_id` | string | yes | — |
 | `customer_id` | string | no | — |
 
+### `end_pmax_url_experiment`
+
+Stage ending a verified enabled PMax URL experiment that has started and has not passed its end date in the account timezone. Promotion must be NOT_STARTED. Uses the dedicated provider validate-only request before creating a plan. Requires preview, confirm_and_apply and irreversible acknowledgement; this workflow cannot resume the experiment. Rechecks complete state before one real action. Returns accepted submission and separately observed state, without promising a HALTED status or manually reverting settings. Configured account only.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `experiment_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
 ### `exclude_geo_target`
 
 Stage exclusion of a geo target on a campaign.
@@ -634,6 +653,15 @@ Stage a plan to pause a campaign, PMax asset group, ad group, ad, or keyword. Sp
 |---|---|---|---|
 | `entity_type` | string | yes | — |
 | `entity_id` | string | yes | — |
+| `customer_id` | string | no | — |
+
+### `promote_pmax_url_experiment`
+
+Stage permanent promotion of treatment settings for an enabled PMax URL experiment that has started and has not passed its end date in account time. Promotion must be NOT_STARTED. Dedicated provider validate-only precedes the plan; preview, confirm_and_apply and irreversible acknowledgement are required. Rechecks complete state before one real action. Pending submission is not application; retain operation_name for later observation. Application requires verified completion and both treatment settings enabled. Configured account only.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `experiment_id` | string | yes | — |
 | `customer_id` | string | no | — |
 
 ### `remove_asset_group_signals`

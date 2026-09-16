@@ -85,10 +85,10 @@ def _text(value, *, empty=False):
     return value
 
 
-def _enum(message, field):
+def _enum(message, field, *, allow_unknown=False):
     raw = message._pb
     value = raw.DESCRIPTOR.fields_by_name[field].enum_type.values_by_number.get(getattr(raw, field))
-    if value is None or value.name == "UNKNOWN":
+    if value is None or (value.name == "UNKNOWN" and not allow_unknown):
         _unverified()
     return value.name
 
@@ -156,9 +156,10 @@ def account(ctx, cid):
     return {key: value for key, value in result.items() if key != "resource_name"}
 
 
-def _experiment(message, cid):
+def _experiment(message, cid, *, observe_promotion=False):
     ident = numeric_id(str(message.experiment_id), "provider experiment ID")
-    kind, status, promote = (_enum(message, field) for field in ("type_", "status", "promote_status"))
+    kind, status = (_enum(message, field) for field in ("type_", "status"))
+    promote = _enum(message, "promote_status", allow_unknown=observe_promotion)
     if (message.resource_name != resource(cid, "experiments", ident)
             or kind != EXPERIMENT_TYPE or status == "UNSPECIFIED"):
         _unverified()
@@ -228,9 +229,10 @@ def _graph(ctx, cid, experiment):
     return _bounded({"experiment": experiment, "arms": arms, "campaign": campaign(ctx, cid, ident)})
 
 
-def detail(ctx, cid, ident):
+def detail(ctx, cid, ident, *, observe_promotion=False):
     experiment = _one(ctx, cid, "experiment", EXPERIMENT_FIELDS,
-                      f"experiment.experiment_id = {ident}", lambda message: _experiment(message, cid))
+                      f"experiment.experiment_id = {ident}",
+                      lambda message: _experiment(message, cid, observe_promotion=observe_promotion))
     if experiment["experiment_id"] != ident:
         _unverified()
     return _graph(ctx, cid, experiment)

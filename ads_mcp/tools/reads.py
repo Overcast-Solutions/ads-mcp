@@ -51,6 +51,28 @@ def register(server, ctx):
     cfg = ctx.config
 
     @server.tool(
+        name="get_pmax_url_experiment_operation",
+        description=_spec(
+            "get_pmax_url_experiment_operation",
+            "Observe the latest promotion operation of a supported same-campaign PMax URL "
+            "experiment in an accessible account. Supply the exact opaque operation_name; "
+            "it is authenticated through the original Ads transport, never fetched as a URL. "
+            "Verifies account, arms, latest handle and typed metadata. Separates pending, "
+            "failed and completed operations from verified treatment application. Error "
+            "details are redacted and bounded to 10 pages, 1000 statuses and 16 MiB; "
+            "partial collection is explicit. Safe to use after a server restart.",
+        ),
+    )
+    def get_pmax_url_experiment_operation(
+        experiment_id: StrictStr, operation_name: StrictStr, customer_id: StrictStr | None = None,
+    ) -> dict:
+        from ads_mcp import pmax_experiment_lifecycle
+
+        return guarded(ctx, pmax_experiment_lifecycle.observe, name="get_pmax_url_experiment_operation")(
+            ctx=ctx, experiment_id=experiment_id, operation_name=operation_name, customer_id=customer_id,
+        )
+
+    @server.tool(
         name="list_pmax_url_experiments",
         description=_spec(
             "list_pmax_url_experiments",
