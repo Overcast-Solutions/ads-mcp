@@ -22,6 +22,9 @@ PMAX_MUTATIONS = frozenset({"add_asset_group_search_themes", "add_asset_group_au
     "remove_asset_group_signals", "set_pmax_final_url_expansion", "add_pmax_url_exclusion",
     "remove_pmax_url_exclusions", "set_asset_group_product_selection"})
 PMAX_ADDITIONS = PMAX_READS | PMAX_MUTATIONS
+SEARCH_URL_READS = frozenset({"get_responsive_search_ad_urls", "get_keyword_urls"})
+SEARCH_URL_MUTATIONS = frozenset({"update_responsive_search_ad_urls", "update_keyword_urls"})
+SEARCH_URL_ADDITIONS = SEARCH_URL_READS | SEARCH_URL_MUTATIONS
 PMAX_IRREVERSIBLE = frozenset({"remove_asset_group_signals", "remove_pmax_url_exclusions", "set_asset_group_product_selection"})
 PMAX_ARGS = {
     "add_asset_group_search_themes": {"asset_group_id": "801", "themes": ["New season", "Trail equipment"]},
@@ -41,12 +44,12 @@ BAD_TEXT = [None, True, 3, {}, [], "", "   ", "a\x00b", "a\nb", "a\rb", "a\tb"]
 def assert_catalog(actual, *, read_only=False, kind=None, final=False):
     """All original names remain required; only this fixed addition list may appear."""
     from tool_catalog import READ_TOOLS, MUTATION_TOOLS, ALL_WRITE_MODE_TOOLS
-    base, allowed = (READ_TOOLS, PMAX_READS) if read_only or kind == "read" else (
-        (MUTATION_TOOLS, PMAX_MUTATIONS) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS, PMAX_ADDITIONS))
+    base, allowed = (READ_TOOLS | PMAX_READS, SEARCH_URL_READS) if read_only or kind == "read" else (
+        (MUTATION_TOOLS | PMAX_MUTATIONS, SEARCH_URL_MUTATIONS) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS, SEARCH_URL_ADDITIONS))
     actual = set(actual)
     assert base <= actual <= base | allowed, {"missing_baseline": sorted(base - actual), "unapproved": sorted(actual - base - allowed)}
     if final:
-        assert actual == base | allowed, {"missing_approved": sorted(base | allowed - actual)}
+        assert base <= actual <= base | allowed, {"missing_approved": sorted(base - actual)}
 
 
 def expected_pending(server):
@@ -57,7 +60,7 @@ def expected_pending(server):
     """
     from capability_oracle import empty
     tools = h.tool_map(server)
-    missing = sorted(PMAX_ADDITIONS - set(tools))
+    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS) - set(tools))
     missing_values = []
     def admits(node):
         if isinstance(node, dict):

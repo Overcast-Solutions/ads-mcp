@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 25 read tools by default and 63 operations when
+ads-mcp 0.1.0 registers 27 read tools by default and 67 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
@@ -23,7 +23,7 @@ representative workflows and adapt consumers before changing a deployment.
    local; retain sanitized outcomes rather than raw report rows in issues.
 5. Decide whether workflows need capabilities outside the documented catalog
    before switching. Shared negative-list management, demographic changes and
-   in-place RSA/keyword final-URL edits are not provided by this release.
+   experiments are not provided by this release.
 6. Keep writes disabled until account authority, host approval behavior, audit
    storage and a controlled write-acceptance plan have been reviewed. Read-only
    success does not authorize a write or demonstrate its provider acceptance.
@@ -62,18 +62,32 @@ SDK may cancel in-flight responses when the input stream closes. The stdio
 boot regression holds the pipe open through initialization and `tools/list`.
 
 Start with read-only parallel operation: register this server alongside your
-current one without enabling mutations. All 25 read tools are available.
+current one without enabling mutations. All 27 read tools are available.
 Compare representative outputs and confirm that your API access permits the
-services you need. `scripts/parity.py --all-fixtures` replays all 25 read fixtures offline;
+services you need. `scripts/parity.py --report -` replays all 27 read fixtures offline;
 `--live` performs a read sweep using the supplied fixture arguments. For a live
 sweep, provide fixtures with your real resource IDs and suitable dates through
 `--fixtures`. A successful sweep is separate from comparing another server's
 actual output.
 
-The default fixture sweep retains the original 21 fixtures. `--all-fixtures`
-combines them with four PMax fixtures. An explicit `--fixtures` directory may contain the complete original
-21-read set or the complete 25-read set; a partial PMax extension is refused.
+The default fixture sweep combines the original 21 fixtures with four PMax
+fixtures and both Search URL inspection fixtures. `--all-fixtures` selects
+the same complete set.
+An explicit `--fixtures` directory may contain the complete original
+21-read set, the complete 25-read PMax set or all 27 current reads; partial
+extensions are refused.
 Original fixtures retain their output contracts.
+
+## Search destination workflows
+
+The [Search URL guide](search-urls.md) covers inspecting and updating existing
+responsive search ad and positive keyword destinations. Supply the ad group
+and ad or criterion ID separately. Updates preserve resource identity and
+use the existing plan, preview and apply flow. URL arguments must be actual
+arrays or null: omitted/null preserves a list, while `[]` requests a supported
+clear. Keyword clears depend on mobile and direct tracking settings. Inspect
+those settings and re-read the resource after applying; these tools do not
+resolve the final served URL or establish provider policy acceptance.
 
 ## Performance Max workflows
 

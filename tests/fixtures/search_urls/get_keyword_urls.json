@@ -1,0 +1,147 @@
+{
+  "tool": "get_keyword_urls",
+  "args": {
+    "ad_group_id": "801",
+    "criterion_id": "601"
+  },
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        }
+      }
+    ],
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Search campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH"
+        }
+      }
+    ],
+    "ad_group": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Search campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH"
+        },
+        "ad_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/adGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Search group 801",
+          "status": "ENABLED",
+          "type_": "SEARCH_STANDARD",
+          "cpc_bid_micros": 1200000
+        }
+      }
+    ],
+    "ad_group_criterion": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Search campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH"
+        },
+        "ad_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/adGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Search group 801",
+          "status": "ENABLED",
+          "type_": "SEARCH_STANDARD",
+          "cpc_bid_micros": 1200000
+        },
+        "ad_group_criterion": {
+          "criterion_id": 601,
+          "resource_name": "customers/9876543210/adGroupCriteria/801~601",
+          "ad_group": "customers/9876543210/adGroups/801",
+          "status": "ENABLED",
+          "type_": "KEYWORD",
+          "negative": false,
+          "keyword": {
+            "text": "trail equipment",
+            "match_type": "PHRASE"
+          },
+          "cpc_bid_micros": 900000,
+          "final_urls": [
+            "https://example.invalid/Original?edition=One#Details"
+          ],
+          "final_mobile_urls": [
+            "https://m.example.invalid/Original"
+          ],
+          "tracking_url_template": "https://track.example.invalid/click?u={lpurl}&v={_edition}",
+          "final_url_suffix": "edition=one&source=search",
+          "url_custom_parameters": [
+            {
+              "key": "edition",
+              "value": "One"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign": {
+      "campaign_id": "701",
+      "resource_name": "customers/9876543210/campaigns/701",
+      "status": "ENABLED",
+      "advertising_channel_type": "SEARCH"
+    },
+    "ad_group": {
+      "ad_group_id": "801",
+      "resource_name": "customers/9876543210/adGroups/801",
+      "campaign_id": "701",
+      "status": "ENABLED",
+      "type": "SEARCH_STANDARD"
+    },
+    "keyword": {
+      "criterion_id": "601",
+      "resource_name": "customers/9876543210/adGroupCriteria/801~601",
+      "status": "ENABLED",
+      "type": "KEYWORD",
+      "negative": false,
+      "text": "trail equipment",
+      "match_type": "PHRASE",
+      "final_urls": [
+        "https://example.invalid/Original?edition=One#Details"
+      ],
+      "final_mobile_urls": [
+        "https://m.example.invalid/Original"
+      ],
+      "tracking_url_template": "https://track.example.invalid/click?u={lpurl}&v={_edition}",
+      "final_url_suffix": "edition=one&source=search",
+      "url_custom_parameters": [
+        {
+          "key": "edition",
+          "value": "One"
+        }
+      ]
+    },
+    "destination_note": "Empty keyword final URLs use the ad destination. Direct settings do not resolve the served URL or inherited tracking."
+  }
+}

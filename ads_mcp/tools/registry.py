@@ -89,6 +89,39 @@ class _PrivateValidationMetadata(FuncMetadata):
             raise ValueError(self._scrub(str(exc))) from None
 
 
+class _SearchURLMetadata(_PrivateValidationMetadata):
+    """Preserve the caller's explicit account selection for URL inspection."""
+
+    def pre_parse_json(self, data):
+        if "customer_id" not in data:
+            return super().pre_parse_json(data)
+        remaining = {key: value for key, value in data.items() if key != "customer_id"}
+        return {**super().pre_parse_json(remaining), "customer_id": data["customer_id"]}
+
+
+class _URLListMetadata(_SearchURLMetadata):
+    """Validate destination lists against their original caller types."""
+
+    _record_refusal: Callable[[], bool] = PrivateAttr()
+
+    def validate_arguments(self, arguments_to_validate):
+        try:
+            return super().validate_arguments(arguments_to_validate)
+        except ValidationError:
+            # Admission happens before the mutation guard. Record only the
+            # refusal category here, never caller values or parser diagnostics.
+            self._record_refusal()
+            raise
+
+    def pre_parse_json(self, data):
+        # An encoded array or null string is not a supplied list or null.
+        # Keep these values intact for the ordinary, privacy-safe validator.
+        url_fields = {key: value for key, value in data.items()
+                      if key in {"final_urls", "final_mobile_urls"}}
+        remaining = {key: value for key, value in data.items() if key not in url_fields}
+        return {**super().pre_parse_json(remaining), **url_fields}
+
+
 class _CampaignFilterMetadata(_PrivateValidationMetadata):
     """Leave decimal filter strings to the domain's identifier validation."""
 
@@ -190,6 +223,8 @@ def register_tools(server, ctx):
             tool.fn_metadata._queues = read_queues
         elif field is not None and field.annotation == str | None:
             tool.fn_metadata = _CampaignFilterMetadata(**dict(tool.fn_metadata))
+        elif tool.name in {"get_responsive_search_ad_urls", "get_keyword_urls"}:
+            tool.fn_metadata = _SearchURLMetadata(**dict(tool.fn_metadata))
 
     if not ctx.config.read_only:
         from ads_mcp.tools import mutations
@@ -197,6 +232,14 @@ def register_tools(server, ctx):
         mutations.register(server, ctx)
         tool = server._tool_manager.get_tool("confirm_and_apply")
         tool.fn_metadata = _ConfirmationMetadata(**dict(tool.fn_metadata))
+        for name in ("update_responsive_search_ad_urls", "update_keyword_urls"):
+            tool = server._tool_manager.get_tool(name)
+            tool.fn_metadata = _URLListMetadata(**dict(tool.fn_metadata))
+            tool.fn_metadata._record_refusal = functools.partial(ctx.observe_audit, {
+                "event": "refused", "tool": tool.name,
+                "customer_id": ctx.config.customer_id, "outcome": "INVALID_ARGUMENT",
+                "message": "Destination update arguments do not match the declared schema",
+            })
 
     # MCP's generated models otherwise discard undeclared inputs. Enforce the
     # signature before dispatch (including confirmation), and advertise the

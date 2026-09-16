@@ -60,7 +60,15 @@ def test_every_registry_read_tool_has_a_contract_fixture():
     assert_catalog(registry_reads, read_only=True)
     approved_fixtures = {harness.load_contract_fixture(p)["tool"] for p in PMAX_FIXTURES.glob("*.json")}
     assert approved_fixtures == PMAX_READS
-    assert registry_reads <= fixture_tools | approved_fixtures
+    search_url_fixtures = {
+        path.name: harness.load_contract_fixture(path)["tool"]
+        for path in (REPO / "tests" / "fixtures" / "search_urls").glob("*.json")
+    }
+    assert search_url_fixtures == {
+        "get_responsive_search_ad_urls.json": "get_responsive_search_ad_urls",
+        "get_keyword_urls.json": "get_keyword_urls",
+    }
+    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values())
     assert fixture_tools == READ_TOOLS, (
         f"registry reads: {sorted(registry_reads)}\n"
         f"fixtures:       {sorted(fixture_tools)}"

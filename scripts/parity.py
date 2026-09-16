@@ -24,14 +24,20 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "tests"))
 
+SEARCH_URL_READS = frozenset({"get_responsive_search_ad_urls", "get_keyword_urls"})
+
 
 def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
-    """Keep original goldens intact; None selects both owned fixture sets."""
+    """Select an explicit inventory or all 27 authored read fixtures."""
     directories = ([fixtures_dir] if fixtures_dir is not None else
                    [REPO / "tests/fixtures/contract", REPO / "tests/fixtures/pmax"])
     if any(not directory.is_dir() for directory in directories):
         raise ValueError("fixture directory does not exist or is not a directory")
-    return sorted(path for directory in directories for path in directory.glob("*.json"))
+    paths = [path for directory in directories for path in directory.glob("*.json")]
+    if fixtures_dir is None:
+        paths.extend(REPO / "tests/fixtures/search_urls" / (name + ".json")
+                     for name in sorted(SEARCH_URL_READS))
+    return sorted(paths)
 
 
 def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
@@ -49,14 +55,16 @@ def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
         except (OSError, ValueError):
             raise ValueError("fixture inventory contains unreadable or invalid JSON") from None
         tool = fixture.get("tool") if isinstance(fixture, dict) else None
-        if not isinstance(tool, str) or tool not in READ_TOOLS | PMAX_READS:
+        if not isinstance(tool, str) or tool not in READ_TOOLS | PMAX_READS | SEARCH_URL_READS:
             raise ValueError("fixture inventory contains an unknown or missing tool identity")
         if tool in seen:
             raise ValueError(f"fixture inventory contains duplicate tool: {tool}")
         seen.add(tool)
-    # Baseline directories remain usable. An all-fixtures run or any PMax
-    # fixture requires every approved addition, never a partial extension.
-    required = READ_TOOLS | PMAX_READS if fixtures_dir is None or seen & PMAX_READS else READ_TOOLS
+    required = READ_TOOLS
+    if fixtures_dir is None or seen & (PMAX_READS | SEARCH_URL_READS):
+        required = required | PMAX_READS
+    if fixtures_dir is None or seen & SEARCH_URL_READS:
+        required = required | SEARCH_URL_READS
     missing = required - seen
     if missing:
         raise ValueError("fixture inventory is missing tools: " + ", ".join(sorted(missing)))
@@ -141,13 +149,12 @@ def main(argv=None) -> int:
     inventory = parser.add_mutually_exclusive_group()
     inventory.add_argument(
         "--fixtures",
-        default=str(REPO / "tests/fixtures/contract"),
-        help="directory containing the complete 21-read baseline or all 25 read "
-        "fixtures; default is the original 21-read contract directory",
+        help="directory containing the complete 21-read baseline, 25-read PMax inventory "
+        "or all 27 read fixtures; default combines all project read fixtures",
     )
     inventory.add_argument(
         "--all-fixtures", action="store_true",
-        help="combine the owned contract and PMax directories for all 25 reads",
+        help="combine all 27 contract, PMax and Search URL fixtures (the default)",
     )
     parser.add_argument(
         "--report", default="-", help="report path, or - for stdout"
@@ -160,7 +167,7 @@ def main(argv=None) -> int:
         "spends API quota (reads only). Operator-run.",
     )
     args = parser.parse_args(argv)
-    fixtures_dir = None if args.all_fixtures else Path(args.fixtures)
+    fixtures_dir = Path(args.fixtures) if args.fixtures is not None else None
     try:
         validate_fixture_inventory(fixtures_dir)
     except (OSError, ValueError) as exc:

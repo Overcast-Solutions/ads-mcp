@@ -31,7 +31,17 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/fixtures/pmax/get_asset_groups.json",
                    "tests/fixtures/pmax/get_asset_group_signals.json",
                    "tests/fixtures/pmax/list_audiences.json",
-                   "tests/fixtures/pmax/get_pmax_url_settings.json")
+                   "tests/fixtures/pmax/get_pmax_url_settings.json",
+                   "tests/search_url_oracle.py",
+                   "tests/test_search_ad_urls_contract.py",
+                   "tests/test_keyword_urls_contract.py",
+                   "tests/test_search_url_workflow_contract.py",
+                   "tests/test_search_url_oracle_controls.py",
+                   "tests/test_search_url_enum_output_contract.py",
+                   "tests/fixtures/search_url_provider_fields_v25.json",
+                   "tests/fixtures/search_urls/get_responsive_search_ad_urls.json",
+                   "tests/fixtures/search_urls/get_keyword_urls.json",
+                   "docs/search-urls.md")
 
 
 def check_inventory(paths, *, source_archive=False):

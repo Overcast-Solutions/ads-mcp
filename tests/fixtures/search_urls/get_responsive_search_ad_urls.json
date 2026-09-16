@@ -1,0 +1,194 @@
+{
+  "tool": "get_responsive_search_ad_urls",
+  "args": {
+    "ad_group_id": "801",
+    "ad_id": "601"
+  },
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        }
+      }
+    ],
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Search campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH"
+        }
+      }
+    ],
+    "ad_group": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Search campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH"
+        },
+        "ad_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/adGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Search group 801",
+          "status": "ENABLED",
+          "type_": "SEARCH_STANDARD",
+          "cpc_bid_micros": 1200000
+        }
+      }
+    ],
+    "ad_group_ad": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "currency_code": "USD"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Search campaign 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "SEARCH"
+        },
+        "ad_group": {
+          "id": 801,
+          "resource_name": "customers/9876543210/adGroups/801",
+          "campaign": "customers/9876543210/campaigns/701",
+          "name": "Search group 801",
+          "status": "ENABLED",
+          "type_": "SEARCH_STANDARD",
+          "cpc_bid_micros": 1200000
+        },
+        "ad_group_ad": {
+          "resource_name": "customers/9876543210/adGroupAds/801~601",
+          "ad_group": "customers/9876543210/adGroups/801",
+          "status": "ENABLED",
+          "ad": {
+            "id": 601,
+            "resource_name": "customers/9876543210/ads/601",
+            "type_": "RESPONSIVE_SEARCH_AD",
+            "final_urls": [
+              "https://example.invalid/Original?edition=One#Details"
+            ],
+            "final_mobile_urls": [
+              "https://m.example.invalid/Original"
+            ],
+            "tracking_url_template": "https://track.example.invalid/click?u={lpurl}&v={_edition}",
+            "final_url_suffix": "edition=one&source=search",
+            "url_custom_parameters": [
+              {
+                "key": "edition",
+                "value": "One"
+              }
+            ],
+            "responsive_search_ad": {
+              "headlines": [
+                {
+                  "text": "Trail equipment",
+                  "pinned_field": "HEADLINE_1"
+                },
+                {
+                  "text": "Explore the collection"
+                },
+                {
+                  "text": "Prepare for the outdoors"
+                }
+              ],
+              "descriptions": [
+                {
+                  "text": "Browse durable equipment for your next trail.",
+                  "pinned_field": "DESCRIPTION_1"
+                },
+                {
+                  "text": "Explore the seasonal collection online."
+                }
+              ],
+              "path1": "trail",
+              "path2": "equipment"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "campaign": {
+      "campaign_id": "701",
+      "resource_name": "customers/9876543210/campaigns/701",
+      "status": "ENABLED",
+      "advertising_channel_type": "SEARCH"
+    },
+    "ad_group": {
+      "ad_group_id": "801",
+      "resource_name": "customers/9876543210/adGroups/801",
+      "campaign_id": "701",
+      "status": "ENABLED",
+      "type": "SEARCH_STANDARD"
+    },
+    "ad": {
+      "ad_id": "601",
+      "resource_name": "customers/9876543210/ads/601",
+      "association_resource_name": "customers/9876543210/adGroupAds/801~601",
+      "status": "ENABLED",
+      "type": "RESPONSIVE_SEARCH_AD",
+      "final_urls": [
+        "https://example.invalid/Original?edition=One#Details"
+      ],
+      "final_mobile_urls": [
+        "https://m.example.invalid/Original"
+      ],
+      "tracking_url_template": "https://track.example.invalid/click?u={lpurl}&v={_edition}",
+      "final_url_suffix": "edition=one&source=search",
+      "url_custom_parameters": [
+        {
+          "key": "edition",
+          "value": "One"
+        }
+      ],
+      "responsive_search_ad": {
+        "headlines": [
+          {
+            "text": "Trail equipment",
+            "pinned_field": "HEADLINE_1"
+          },
+          {
+            "text": "Explore the collection",
+            "pinned_field": "UNSPECIFIED"
+          },
+          {
+            "text": "Prepare for the outdoors",
+            "pinned_field": "UNSPECIFIED"
+          }
+        ],
+        "descriptions": [
+          {
+            "text": "Browse durable equipment for your next trail.",
+            "pinned_field": "DESCRIPTION_1"
+          },
+          {
+            "text": "Explore the seasonal collection online.",
+            "pinned_field": "UNSPECIFIED"
+          }
+        ],
+        "path1": "trail",
+        "path2": "equipment"
+      }
+    }
+  }
+}

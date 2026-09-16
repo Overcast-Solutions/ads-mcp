@@ -2,15 +2,21 @@
 
 ## 0.1.0 — unreleased
 
+- Inspect and edit final and mobile URLs on existing responsive search ads
+  and positive keywords in supported Search ad groups. Plans preserve creative,
+  tracking, bids and status, verify relevant state before applying, and update
+  the existing resource. The Search URL guide covers clearing, tracking
+  dependencies, local input bounds and uncertain outcomes.
 - PMax management: inspect asset groups, signals, existing audiences and URL
   settings; stage asset-group pause/enable, search themes, audience signals,
   URL expansion/exclusions and complete flat Item-ID product selection.
   Relevant state is checked again before apply; removals and tree replacement
   require irreversible acknowledgement. The PMax guide documents local limits,
   provider documentation conflicts and delivery effects.
-- 63 total operations in write mode, including 25 reads. Offline fixture
-  replay includes four PMax goldens alongside the preserved original 21;
-  source archive checks require the PMax contracts, fixtures and guide.
+- 67 total operations in write mode, including 27 reads. Default offline
+  fixture replay covers the original 21, four PMax and two Search URL reads.
+  Installed archive checks require exact tool identities; source archives
+  must include the PMax and Search URL contracts, fixtures and guides.
 - Adopt Apache License 2.0 for the current source and distribution metadata.
   Earlier MIT-licensed source remains available under its original license.
 
@@ -32,8 +38,9 @@
 - Cloud-project API access following the September 9, 2026 developer-token
   sunset: legacy configuration is optional and never transmitted. Requires
   Google Ads SDK 31.4.0+, with named production-project approval guidance.
-- 25 read tools for account discovery, GAQL, reporting, policy issues,
-  recommendations, PMax and shopping data, and nonpersistent Keyword Planner requests.
+- 27 read tools for account discovery, GAQL, reporting, policy issues,
+  recommendations, PMax, Search destinations and shopping data, and
+  nonpersistent Keyword Planner requests.
 - Account selection and campaign scoping on applicable reads, typed money,
   explicit pagination, supported report-field selections and preserved listing
   dimension values.

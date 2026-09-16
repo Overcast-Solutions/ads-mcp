@@ -86,7 +86,8 @@ def render() -> str:
         "`python scripts/gen_tools_md.py`.",
         "",
         "Mutation tools never execute: each returns a **plan** that "
-        "`confirm_and_apply` alone can carry out, after a dry-run preview.",
+        "`confirm_and_apply` alone can carry out. A dry-run preview is required "
+        "by default; operators configure this with `ADS_MCP_REQUIRE_DRY_RUN`.",
         "",
     ]
     for kind in ("read", "mutation", "apply"):
