@@ -1,4 +1,10 @@
-# Preparing a source release
+# Preparing distribution artifacts
+
+The project has already been released as public source on GitHub. PyPI packages
+and version tags have not been published. This guide covers reproducible
+distribution artifacts and checks for future package releases. See the
+[installation and validation guide](installation-validation.md) for a pinned
+source installation and operator validation checklist.
 
 The installed command exports an **explicit committed tree**, independent of
 staged, unstaged and untracked files:
@@ -116,17 +122,22 @@ evidence directory. Full tests run separately in each clean matrix environment;
 installed smoke checks are not a replacement for them. Run release builds from
 the reviewed clean source snapshot to avoid local build inputs.
 
+For an artifact handoff, retain a checksum inventory covering the source manifest,
+wheel and sdist, plus their resolved commit/tree and version metadata. Bind the
+independent source disposition to the manifest hash. Link the independent
+installed review, rendered documentation checks, hosted checks and advisory scan
+to that same final commit; keep the evidence outside the exported source tree.
+
 The security job resolves a fresh runtime independently of pip-audit tooling,
 then `scripts/scan_dependencies.py` scans its exact package inventory and
 requires complete advisory coverage. It retains JSON and requirements even on
 failure; failed/unavailable scans must never be reported as clean. See the
 [maintenance policy](../SECURITY.md) for cadence, ownership and exception rules.
 Package metadata links to [Overcast-Solutions/ads-mcp](https://github.com/Overcast-Solutions/ads-mcp).
-Before publication, verify those links from an outside account and enable and
-verify the private reporting form described in [SECURITY.md](../SECURITY.md).
-GitHub private vulnerability reporting requires a public repository; do not
-claim the route works during private preparation. Confirm maintainer security
-notifications as part of activation.
+Before a package release, verify those links from an outside account and check
+the private reporting form described in [SECURITY.md](../SECURITY.md).
+Private vulnerability reporting is already enabled for this public repository;
+maintainers must also check outside-account form access and notification delivery.
 
 ## Repository controls and public history
 

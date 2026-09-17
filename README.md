@@ -3,7 +3,8 @@
 A Google Ads MCP server for agents. Query accounts and reports, or stage
 changes for review before applying them. **Read-only by default.**
 
-Version 0.1.0 is unreleased and is not published to PyPI. Write support is
+The source is publicly available under Apache License 2.0. Install from source;
+the package is not published to PyPI. Write support is
 experimental. Supports CPython 3.12–3.14 on Linux and macOS; native Windows
 is unsupported. Requires Google Ads SDK 31.4.0 or later within major 31.
 
@@ -25,6 +26,9 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install .
 .venv/bin/ads-mcp --version
 ```
+
+For commit-pinned installation and read-only-first validation, follow the
+[installation and validation guide](docs/installation-validation.md).
 
 ## OAuth setup (one-time)
 

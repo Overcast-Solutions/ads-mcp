@@ -8,11 +8,15 @@ and audit into an ``mcp.server.mcpserver.MCPServer`` on stdio. ``client``,
 from __future__ import annotations
 
 import importlib.metadata
+import json
 import os
 import sys
 import time
+from contextlib import asynccontextmanager
 
+import anyio
 from anyio.abc import ObjectReceiveStream
+from mcp.server import stdio as sdk_stdio
 from mcp.server.mcpserver import MCPServer
 from mcp.server.stdio import stdio_server
 from mcp.shared.message import SessionMessage
@@ -22,6 +26,51 @@ from ads_mcp import auth
 from ads_mcp.config import Config, ConfigError, load_config
 from ads_mcp.context import ServerContext
 from ads_mcp.tools import registry
+
+
+class _RequestIdInput:
+    """Inspect original ID types before the SDK can choose a notification."""
+
+    def __init__(self, incoming):
+        self.incoming = incoming
+
+    async def __aiter__(self):
+        async for line in self.incoming:
+            try:
+                # Only token types matter here. Avoid converting integer tokens
+                # or imposing Python's decimal conversion limit on SDK input.
+                envelope = json.loads(line, parse_int=lambda _: 0,
+                                      parse_float=lambda _: 0.0)
+            except (ValueError, RecursionError):
+                # The SDK parser and refusal stream handle malformed JSON.
+                yield line
+                continue
+            if (isinstance(envelope, dict) and "method" in envelope
+                    and "id" in envelope
+                    and type(envelope["id"]) not in (str, int)):
+                # An invalid envelope reaches the existing generic refusal path.
+                # Never forward the untrusted ID or turn it into a notification.
+                yield "{}\n"
+            else:
+                yield line
+
+
+@asynccontextmanager
+async def _request_id_input():
+    # The SDK has no raw-envelope hook. Reuse its input claim and non-owning
+    # wrapper so this preflight keeps descriptor diversion and restoration.
+    # stdio_server still owns its normal output claim and serialized writer.
+    buffer, release = sdk_stdio._claim_fd(
+        0, sys.stdin, "rb", sdk_stdio._open_stdin_diversion,
+    )
+    try:
+        incoming = anyio.wrap_file(sdk_stdio._UnownedTextWrapper(
+            buffer, encoding="utf-8", errors="replace",
+        ))
+        yield _RequestIdInput(incoming)
+    finally:
+        if release is not None:
+            release()
 
 
 class _ProtocolReadStream(ObjectReceiveStream):
@@ -54,7 +103,8 @@ class _ProtocolReadStream(ObjectReceiveStream):
 class _StdioServer(MCPServer):
     async def run_stdio_async(self):
         # Retain the SDK transport's stream ownership and serialized output.
-        async with stdio_server() as (incoming, outgoing):
+        async with _request_id_input() as stdin, stdio_server(stdin=stdin) as streams:
+            incoming, outgoing = streams
             await self._lowlevel_server.run(
                 _ProtocolReadStream(incoming, outgoing), outgoing,
                 self._lowlevel_server.create_initialization_options(),
