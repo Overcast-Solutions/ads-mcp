@@ -207,6 +207,12 @@ def plan(ctx, *, campaign_id, name, date_start, date_end, customer_id=None):
         result = {"submitted": True, "applied": False, "experiment_id": created_id,
                   "resource_name": identity, "verification": "unknown",
                   "recovery": "Inspect the returned experiment identity and campaign settings; do not repeat creation."}
+        if response.partial_failure_error.code != 0:
+            result["observation_error"] = (
+                "The creation receipt contains contradictory status and resource "
+                "results; application is possible but cannot be confirmed."
+            )
+            return result
         try:
             observed = reads._verified(current, lambda: reads.detail(current, cid, created_id))
             experiment = observed["experiment"]

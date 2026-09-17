@@ -250,6 +250,10 @@ means progress is unknown, not that the experiment failed.
 - **Creation readback failure or mismatch:** accepted identity remains visible;
   `applied` is false and verification is unknown or failed. Inspect configuration
   and campaign settings in Google Ads and through the read tools.
+- **Contradictory creation receipt:** a provider error status alongside resource
+  results cannot establish verified application. The submitted action and any
+  verified account-bound identity remain visible. Inspect that experiment and
+  campaign settings; do not repeat creation to resolve the uncertainty.
 - **Lost lifecycle response or unverified promotion receipt:** retain the
   experiment ID and inspect its latest operation before another action. An
   uncertain response is never a safe invitation to retry the write.

@@ -2978,7 +2978,6 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                         f"plan {entry.id} was staged for customer "
                         f"{entry.customer_id}, not {ctx.config.customer_id}",
                     )
-                ctx.plan_store.mark_previewed(plan_id)
                 if ctx.audit is not None:
                     ctx.audit.write(
                         {
@@ -2989,8 +2988,9 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                             "plan_id": entry.id,
                             "operations": entry.operations,
                         },
-                        critical=False,
+                        critical=True,
                     )
+                ctx.plan_store.mark_previewed(plan_id)
                 return {"applied": False, "plan": entry.payload()}
 
             def validate(entry):
