@@ -8,6 +8,10 @@ and the [write flow and limits](writes.md#plan-preview-apply) before enabling
 writes. All writes target the configured account; reads can take an explicit
 `customer_id` for another accessible account.
 
+For a controlled same-campaign 50/50 test of text customization and final URL
+expansion, use the [PMax experiment guide](pmax-experiments.md). It covers
+creation, direct arm reporting, ending and asynchronous promotion observation.
+
 The examples below are MCP `tools/call` parameter objects. Replace synthetic
 IDs, URLs and Item IDs with values you have inspected in your account. A call
 to a staging tool returns a plan; it does not apply the change.

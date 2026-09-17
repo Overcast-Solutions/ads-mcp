@@ -22,15 +22,20 @@ import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "tests"))
 
 SEARCH_URL_READS = frozenset({"get_responsive_search_ad_urls", "get_keyword_urls"})
 SHARED_READS = frozenset({"list_shared_negative_keyword_lists", "get_shared_negative_keyword_list"})
 DEMO_READS = frozenset({"get_demographic_targeting"})
+EXPERIMENT_READS = frozenset({
+    "list_pmax_url_experiments", "get_pmax_url_experiment", "get_pmax_url_experiment_results",
+    "get_pmax_url_experiment_operation",
+})
 
 
 def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
-    """Select an explicit inventory or all 30 authored read fixtures."""
+    """Select an explicit inventory or all 34 authored read fixtures."""
     directories = ([fixtures_dir] if fixtures_dir is not None else
                    [REPO / "tests/fixtures/contract", REPO / "tests/fixtures/pmax"])
     if any(not directory.is_dir() for directory in directories):
@@ -41,6 +46,8 @@ def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
                      for name in sorted(SEARCH_URL_READS))
         paths.extend(REPO / "tests/fixtures/shared_targeting" / (name + ".json")
                      for name in sorted(SHARED_READS | DEMO_READS))
+        paths.extend(REPO / "tests/fixtures/pmax_experiments" / (name + ".json")
+                     for name in sorted(EXPERIMENT_READS))
     return sorted(paths)
 
 
@@ -59,23 +66,55 @@ def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
         except (OSError, ValueError):
             raise ValueError("fixture inventory contains unreadable or invalid JSON") from None
         tool = fixture.get("tool") if isinstance(fixture, dict) else None
-        if not isinstance(tool, str) or tool not in READ_TOOLS | PMAX_READS | SEARCH_URL_READS | SHARED_READS | DEMO_READS:
+        allowed = READ_TOOLS | PMAX_READS | SEARCH_URL_READS | SHARED_READS | DEMO_READS | EXPERIMENT_READS
+        if not isinstance(tool, str) or tool not in allowed:
             raise ValueError("fixture inventory contains an unknown or missing tool identity")
         if tool in seen:
             raise ValueError(f"fixture inventory contains duplicate tool: {tool}")
         seen.add(tool)
     required = READ_TOOLS
-    if fixtures_dir is None or seen & (PMAX_READS | SEARCH_URL_READS | SHARED_READS | DEMO_READS):
+    if fixtures_dir is None or seen & (PMAX_READS | SEARCH_URL_READS | SHARED_READS | DEMO_READS | EXPERIMENT_READS):
         required = required | PMAX_READS
-    if fixtures_dir is None or seen & (SEARCH_URL_READS | SHARED_READS | DEMO_READS):
+    if fixtures_dir is None or seen & (SEARCH_URL_READS | SHARED_READS | DEMO_READS | EXPERIMENT_READS):
         required = required | SEARCH_URL_READS
-    if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS):
+    if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS | EXPERIMENT_READS):
         required = required | SHARED_READS
-    if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS):
+    if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS | EXPERIMENT_READS):
         required = required | DEMO_READS
+    if fixtures_dir is None or seen & EXPERIMENT_READS:
+        required = required | EXPERIMENT_READS
     missing = required - seen
     if missing:
         raise ValueError("fixture inventory is missing tools: " + ", ".join(sorted(missing)))
+
+
+def _fixture_client(harness, fixture):
+    """Replay a recorded operation through the same service lookup as Ads."""
+    recorded = fixture.get("experiment_operation")
+    if recorded is None:
+        return harness.FakeGoogleAdsClient()
+
+    from types import SimpleNamespace
+
+    from google.ads.googleads.v25.services.types import PromoteExperimentMetadata
+    from google.longrunning import operations_pb2
+
+    operation = operations_pb2.Operation(name=recorded["name"], done=recorded["done"])
+    operation.metadata.Pack(PromoteExperimentMetadata(experiment=recorded["metadata_experiment"])._pb)
+
+    def get_operation(*, name, retry, timeout):
+        if name != operation.name or retry is not None or not 0 < timeout <= 120:
+            raise ValueError("Recorded operation request does not match")
+        return operation
+
+    class FixtureClient(harness.FakeGoogleAdsClient):
+        def get_service(self, name, version=None):
+            if name == "ExperimentService":
+                return SimpleNamespace(transport=SimpleNamespace(
+                    operations_client=SimpleNamespace(get_operation=get_operation)))
+            return super().get_service(name, version=version)
+
+    return FixtureClient()
 
 
 def offline_report(fixtures_dir: Path | None, out) -> int:
@@ -85,7 +124,7 @@ def offline_report(fixtures_dir: Path | None, out) -> int:
     with tempfile.TemporaryDirectory() as tmp:
         for path in fixture_paths(fixtures_dir):
             fixture = harness.load_contract_fixture(path)
-            client = harness.FakeGoogleAdsClient()
+            client = _fixture_client(harness, fixture)
             for resource, rows in fixture["gaql"].items():
                 client.stub(resource, rows)
             for method, response in fixture.get("planner", {}).items():
@@ -158,11 +197,12 @@ def main(argv=None) -> int:
     inventory.add_argument(
         "--fixtures",
         help="directory containing the complete 21-read baseline, 25-read PMax inventory "
-        "or the 27-read Search URL or 30-read targeting inventory; default combines all project read fixtures",
+        "or the 27-read Search URL, 30-read targeting or 34-read experiment inventory; "
+        "default combines all project read fixtures",
     )
     inventory.add_argument(
         "--all-fixtures", action="store_true",
-        help="combine all 30 contract, PMax, Search URL and targeting fixtures (the default)",
+        help="combine all 34 contract, PMax, Search URL, targeting and experiment fixtures (the default)",
     )
     parser.add_argument(
         "--report", default="-", help="report path, or - for stdout"

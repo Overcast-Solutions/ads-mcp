@@ -2,8 +2,9 @@
 
 Inspect reusable negative-keyword lists and explicit demographic criteria, then
 review a plan before changing them. Read-only is the default. Experimental write
-mode adds six staging tools to these three reads; the complete server has 76
-operations, including 30 reads. Experiments remain future work.
+mode adds six staging tools to these three reads; the complete server has 83
+operations, including 34 reads. See the separate [PMax experiment guide](pmax-experiments.md)
+for URL expansion experiments.
 
 ## Set up your account
 

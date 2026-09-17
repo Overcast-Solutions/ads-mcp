@@ -1047,6 +1047,31 @@
         }
       ]
     }
+    ,{
+      "id": "pmax_experiment_inspection",
+      "purpose": "Inspect verified PMax URL experiments and compare direct control and treatment measurements.",
+      "tools": [
+        {"name":"list_pmax_url_experiments","parameters":["customer_id"],"required":[],"values":{}},
+        {"name":"get_pmax_url_experiment","parameters":["experiment_id","customer_id"],"required":["experiment_id"],"values":{}},
+        {"name":"get_pmax_url_experiment_results","parameters":["experiment_id","date_start","date_end","customer_id"],"required":["experiment_id","date_start","date_end"],"values":{}}
+      ]
+    },
+    {
+      "id": "pmax_experiment_creation",
+      "purpose": "Stage a provider-validated same-campaign experiment and verify its accepted configuration after submission.",
+      "tools": [
+        {"name":"create_pmax_url_experiment","parameters":["campaign_id","name","date_start","date_end","customer_id"],"required":["campaign_id","name","date_start","date_end"],"values":{}}
+      ]
+    },
+    {
+      "id": "pmax_experiment_lifecycle",
+      "purpose": "Review experiment end or promotion and observe asynchronous completion separately from verified application.",
+      "tools": [
+        {"name":"end_pmax_url_experiment","parameters":["experiment_id","customer_id"],"required":["experiment_id"],"values":{}},
+        {"name":"promote_pmax_url_experiment","parameters":["experiment_id","customer_id"],"required":["experiment_id"],"values":{}},
+        {"name":"get_pmax_url_experiment_operation","parameters":["experiment_id","operation_name","customer_id"],"required":["experiment_id","operation_name"],"values":{}}
+      ]
+    }
   ],
   "forbidden_parameters": [
     "bypass_require_dry_run",

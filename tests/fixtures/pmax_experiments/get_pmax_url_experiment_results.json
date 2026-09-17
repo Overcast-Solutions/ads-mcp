@@ -1,0 +1,190 @@
+{
+  "tool": "get_pmax_url_experiment_results",
+  "args": {
+    "experiment_id": "301",
+    "date_start": "2026-09-01",
+    "date_end": "2026-09-15"
+  },
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        }
+      }
+    ],
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "start_date_time": "2020-01-01 00:00:00",
+          "end_date_time": "2037-12-31 23:59:59",
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_OUT"
+            }
+          ]
+        }
+      }
+    ],
+    "experiment": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "experiment": {
+          "experiment_id": 301,
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "type_": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7"
+        },
+        "metrics": {
+          "clicks": 0,
+          "control_clicks": 11,
+          "impressions": 200,
+          "control_impressions": 210,
+          "cost_micros": 9007199254740993,
+          "control_cost_micros": 0,
+          "conversions": -0.5,
+          "control_conversions": 1.25,
+          "conversions_value": -7.5,
+          "control_conversion_value": 2.0,
+          "clicks_point_estimate": -0.2,
+          "clicks_margin_of_error": 0.1,
+          "clicks_p_value": 1.0,
+          "conversions_absolute_change_point_estimate": -1.75,
+          "conversions_absolute_change_margin_of_error": 0.25,
+          "conversions_absolute_change_p_value": 0.0
+        }
+      }
+    ],
+    "experiment_arm": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "experiment": {
+          "experiment_id": 301,
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "type_": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7"
+        },
+        "experiment_arm": {
+          "resource_name": "customers/9876543210/experimentArms/301~1",
+          "experiment": "customers/9876543210/experiments/301",
+          "name": "Control",
+          "control": true,
+          "traffic_split": 50,
+          "campaigns": [
+            "customers/9876543210/campaigns/701"
+          ]
+        }
+      },
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "experiment": {
+          "experiment_id": 301,
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "type_": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7"
+        },
+        "experiment_arm": {
+          "resource_name": "customers/9876543210/experimentArms/301~2",
+          "experiment": "customers/9876543210/experiments/301",
+          "name": "Treatment",
+          "control": false,
+          "traffic_split": 50,
+          "campaigns": [
+            "customers/9876543210/campaigns/701"
+          ]
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "currency": "USD",
+    "time_zone": "America/Denver",
+    "experiment_id": "301",
+    "resource_name": "customers/9876543210/experiments/301",
+    "date_start": "2026-09-01",
+    "date_end": "2026-09-15",
+    "no_data": false,
+    "treatment": {
+      "clicks": 0,
+      "impressions": 200,
+      "cost_micros": 9007199254740993,
+      "conversions": -0.5,
+      "conversions_value": -7.5
+    },
+    "control": {
+      "clicks": 11,
+      "impressions": 210,
+      "cost_micros": 0,
+      "conversions": 1.25,
+      "conversions_value": 2.0
+    },
+    "statistics": {
+      "clicks": {
+        "unit": "relative_change",
+        "clicks_point_estimate": -0.2,
+        "clicks_margin_of_error": 0.1,
+        "clicks_p_value": 1.0
+      },
+      "conversions": {
+        "unit": "absolute_treatment_minus_control",
+        "conversions_absolute_change_point_estimate": -1.75,
+        "conversions_absolute_change_margin_of_error": 0.25,
+        "conversions_absolute_change_p_value": 0.0
+      }
+    }
+  }
+}

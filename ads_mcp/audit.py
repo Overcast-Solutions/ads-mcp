@@ -91,12 +91,11 @@ class AuditLog:
         try:
             _append_private(self.path, (json.dumps(payload) + "\n").encode("utf-8"))
             return True
-        except OSError as exc:
+        except OSError:
             if critical:
                 raise ToolError(
                     "AUDIT_WRITE_FAILED",
-                    f"audit log {self.path} is not writable "
-                    f"({type(exc).__name__}); refusing to proceed with an "
-                    "unauditable mutation",
+                    "The audit log could not be written; restore secure audit "
+                    "storage before proceeding with this mutation.",
                 ) from None
             return False

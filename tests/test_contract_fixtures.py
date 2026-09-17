@@ -77,7 +77,10 @@ def test_every_registry_read_tool_has_a_contract_fixture():
         "get_shared_negative_keyword_list.json": "get_shared_negative_keyword_list",
         "get_demographic_targeting.json": "get_demographic_targeting",
     }
-    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values()) | set(targeting_fixtures.values())
+    from pmax_experiment_oracle import FIXTURES as EXPERIMENT_FIXTURES, READS as EXPERIMENT_READS
+    experiment_fixtures = {path.name: harness.load_contract_fixture(path)["tool"] for path in EXPERIMENT_FIXTURES.glob("*.json")}
+    assert experiment_fixtures == {name + ".json": name for name in EXPERIMENT_READS}
+    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values()) | set(targeting_fixtures.values()) | set(experiment_fixtures.values())
     assert fixture_tools == READ_TOOLS, (
         f"registry reads: {sorted(registry_reads)}\n"
         f"fixtures:       {sorted(fixture_tools)}"

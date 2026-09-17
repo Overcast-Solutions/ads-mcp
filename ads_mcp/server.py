@@ -12,12 +12,53 @@ import os
 import sys
 import time
 
+from anyio.abc import ObjectReceiveStream
 from mcp.server.mcpserver import MCPServer
+from mcp.server.stdio import stdio_server
+from mcp.shared.message import SessionMessage
+from mcp_types import ErrorData, JSONRPCError
 
 from ads_mcp import auth
 from ads_mcp.config import Config, ConfigError, load_config
 from ads_mcp.context import ServerContext
 from ads_mcp.tools import registry
+
+
+class _ProtocolReadStream(ObjectReceiveStream):
+    """Refuse malformed envelopes before session dispatch can log their input."""
+
+    def __init__(self, incoming, outgoing):
+        self.incoming = incoming
+        self.outgoing = outgoing
+
+    @property
+    def last_context(self):
+        return getattr(self.incoming, "last_context", None)
+
+    async def receive(self):
+        while True:
+            item = await self.incoming.receive()
+            if not isinstance(item, Exception):
+                return item
+            # The parser did not establish an envelope or trustworthy ID.
+            # Keep the original input and exception entirely off the wire.
+            await self.outgoing.send(SessionMessage(JSONRPCError(
+                jsonrpc="2.0", id=None,
+                error=ErrorData(code=-32600, message="Invalid JSON-RPC request"),
+            )))
+
+    async def aclose(self):
+        await self.incoming.aclose()
+
+
+class _StdioServer(MCPServer):
+    async def run_stdio_async(self):
+        # Retain the SDK transport's stream ownership and serialized output.
+        async with stdio_server() as (incoming, outgoing):
+            await self._lowlevel_server.run(
+                _ProtocolReadStream(incoming, outgoing), outgoing,
+                self._lowlevel_server.create_initialization_options(),
+            )
 
 
 def _package_version():
@@ -28,7 +69,7 @@ def _package_version():
 
 
 def create_server(config: Config, *, client=None, plan_store=None, clock=None):
-    server = MCPServer(
+    server = _StdioServer(
         name="ads-mcp",
         version=_package_version(),
         description=(

@@ -1,0 +1,198 @@
+{
+  "tool": "list_pmax_url_experiments",
+  "args": {},
+  "gaql": {
+    "customer": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        }
+      }
+    ],
+    "campaign": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "campaign": {
+          "id": 701,
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "start_date_time": "2020-01-01 00:00:00",
+          "end_date_time": "2037-12-31 23:59:59",
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            },
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_OUT"
+            }
+          ]
+        }
+      }
+    ],
+    "experiment": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "experiment": {
+          "experiment_id": 301,
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "type_": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7"
+        }
+      }
+    ],
+    "experiment_arm": [
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "experiment": {
+          "experiment_id": 301,
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "type_": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7"
+        },
+        "experiment_arm": {
+          "resource_name": "customers/9876543210/experimentArms/301~1",
+          "experiment": "customers/9876543210/experiments/301",
+          "name": "Control",
+          "control": true,
+          "traffic_split": 50,
+          "campaigns": [
+            "customers/9876543210/campaigns/701"
+          ]
+        }
+      },
+      {
+        "customer": {
+          "id": 9876543210,
+          "resource_name": "customers/9876543210",
+          "currency_code": "USD",
+          "time_zone": "America/Denver"
+        },
+        "experiment": {
+          "experiment_id": 301,
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "type_": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7"
+        },
+        "experiment_arm": {
+          "resource_name": "customers/9876543210/experimentArms/301~2",
+          "experiment": "customers/9876543210/experiments/301",
+          "name": "Treatment",
+          "control": false,
+          "traffic_split": 50,
+          "campaigns": [
+            "customers/9876543210/campaigns/701"
+          ]
+        }
+      }
+    ]
+  },
+  "golden": {
+    "customer_id": "9876543210",
+    "currency": "USD",
+    "time_zone": "America/Denver",
+    "experiments": [
+      {
+        "experiment": {
+          "experiment_id": "301",
+          "resource_name": "customers/9876543210/experiments/301",
+          "name": "Synthetic URL trial 301",
+          "status": "ENABLED",
+          "start_date": "2026-09-01",
+          "end_date": "2026-10-31",
+          "promote_status": "NOT_STARTED",
+          "long_running_operation": "opaque-region/operations/url-trial-A:7",
+          "type": "PMAX_TEXT_CUSTOMIZATION_FINAL_URL_EXPANSION"
+        },
+        "arms": [
+          {
+            "resource_name": "customers/9876543210/experimentArms/301~1",
+            "experiment": "customers/9876543210/experiments/301",
+            "name": "Control",
+            "control": true,
+            "traffic_split": 50,
+            "campaigns": [
+              "customers/9876543210/campaigns/701"
+            ],
+            "arm_id": "1"
+          },
+          {
+            "resource_name": "customers/9876543210/experimentArms/301~2",
+            "experiment": "customers/9876543210/experiments/301",
+            "name": "Treatment",
+            "control": false,
+            "traffic_split": 50,
+            "campaigns": [
+              "customers/9876543210/campaigns/701"
+            ],
+            "arm_id": "2"
+          }
+        ],
+        "campaign": {
+          "resource_name": "customers/9876543210/campaigns/701",
+          "name": "Synthetic retail 701",
+          "status": "ENABLED",
+          "advertising_channel_type": "PERFORMANCE_MAX",
+          "start_date_time": "2020-01-01 00:00:00",
+          "end_date_time": "2037-12-31 23:59:59",
+          "asset_automation_settings": [
+            {
+              "asset_automation_type": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "GENERATE_IMAGE_ENHANCEMENT",
+              "asset_automation_status": "OPTED_OUT"
+            },
+            {
+              "asset_automation_type": "TEXT_ASSET_AUTOMATION",
+              "asset_automation_status": "OPTED_IN"
+            }
+          ],
+          "campaign_id": "701"
+        }
+      }
+    ],
+    "complete": true
+  }
+}

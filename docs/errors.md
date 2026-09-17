@@ -5,6 +5,8 @@ transport and configuration failures.
 
 Tool-level application failures use `{"error": {"code": ..., "message": ...}}`.
 MCP protocol validation may reject malformed requests before a tool runs.
+Malformed JSON or invalid Unicode receives a generic protocol refusal without
+echoing the input. Correct the request; the stdio connection remains usable.
 The main application error codes are:
 
 | Code | Meaning |
@@ -23,6 +25,11 @@ The main application error codes are:
 | `PLAN_CUSTOMER_MISMATCH` | the call named an account this server is not configured to write to |
 | `MUTATION_TRANSPORT_FAILED` | the write was sent and the response was lost. **It is not retried and MAY have landed** — check the account and the audit log before re-planning |
 | `AUDIT_WRITE_FAILED` | the audit log could not be written; the mutation was refused, or (if the message says so) it landed and could not be recorded |
+
+A refused preview does not consume the plan or grant permission to apply it.
+Restore secure audit storage and obtain a successful preview before applying.
+A failure at the start of application still consumes the plan; inspect its
+outcome before staging another change.
 
 `ADS_CLOUD_PROJECT_NOT_APPROVED` identifies the explicit v25
 `CLOUD_PROJECT_NOT_APPROVED_FOR_PRODUCTION` authorization error.

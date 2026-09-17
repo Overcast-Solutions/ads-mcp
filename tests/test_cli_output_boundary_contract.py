@@ -229,7 +229,8 @@ def test_complete_default_fixture_report_still_runs_to_completion(tmp_path, dest
     }
     rows = re.findall(r"^(\w+)\s+(MATCH|DRIFT)$", text, re.M)
     from shared_targeting_oracle import READS as TARGETING_READS, assert_expansion
-    assert_expansion({name for name, _ in rows}, expected_reads, TARGETING_READS)
+    from pmax_experiment_oracle import READS as EXPERIMENT_READS
+    assert_expansion({name for name, _ in rows}, expected_reads | TARGETING_READS, EXPERIMENT_READS)
     assert len(rows) == len({name for name, _ in rows})
     assert f"across {len(rows)} read-tool fixtures" in text
     assert result.returncode == (1 if any(status == "DRIFT" for _, status in rows) else 0)

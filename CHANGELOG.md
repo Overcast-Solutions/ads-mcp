@@ -2,6 +2,15 @@
 
 ## 0.1.0 — unreleased
 
+- PMax final URL expansion experiments: inspect the catalog and both arms,
+  create a same-campaign 50/50 test, compare direct experiment metrics, end
+  the test or promote treatment settings. Staging uses provider validate-only
+  before the separate local preview; end and promotion require irreversible
+  acknowledgement. Restart-safe promotion observation distinguishes pending,
+  failed and completed operations from verified application. Unknown outcomes
+  and audit warnings retain submission context without automatic write retries.
+  The [experiment guide](docs/pmax-experiments.md) covers eligibility, local
+  limits, own-credential examples, reporting units and recovery.
 - Inspect, create and maintain same-account shared negative-keyword lists for
   supported Search and Shopping campaigns. Membership previews include all
   linked campaigns; removals and detachments require acknowledgement.
@@ -9,7 +18,7 @@
   Display. Immutable polarity changes remove and recreate criteria, refusing
   direct customization loss. Positive status-only updates preserve settings.
   The shared targeting guide explains defaults, inherited exclusions, local
-  limits and provider policy boundaries; experiments remain future work.
+  limits and provider policy boundaries.
 - Audit loss after a sent mutation remains visible in the structured result,
   without emitting the private audit-log path in a separate stderr diagnostic.
 - Inspect and edit final and mobile URLs on existing responsive search ads
@@ -23,11 +32,11 @@
   Relevant state is checked again before apply; removals and tree replacement
   require irreversible acknowledgement. The PMax guide documents local limits,
   provider documentation conflicts and delivery effects.
-- 76 total operations in write mode, including 30 reads. Default offline
+- 83 total operations in write mode, including 34 reads. Default offline
   fixture replay covers the original 21, four PMax, two Search URL and three
-  shared targeting reads.
+  shared targeting reads, plus four PMax experiment reads.
   Installed archive checks require exact tool identities; source archives
-  must include the PMax, Search URL and shared targeting contracts, fixtures
+  must include the PMax, Search URL, shared targeting and experiment contracts, fixtures
   and guides. Installed console workflows exercise synthetic provider state;
   these checks do not establish live Google acceptance.
 - Adopt Apache License 2.0 for the current source and distribution metadata.
@@ -51,8 +60,8 @@
 - Cloud-project API access following the September 9, 2026 developer-token
   sunset: legacy configuration is optional and never transmitted. Requires
   Google Ads SDK 31.4.0+, with named production-project approval guidance.
-- 30 read tools for account discovery, GAQL, reporting, policy issues,
-  recommendations, PMax, Search destinations, shared targeting and shopping data, and
+- 34 read tools for account discovery, GAQL, reporting, policy issues,
+  recommendations, PMax and its experiments, Search destinations, shared targeting and shopping data, and
   nonpersistent Keyword Planner requests.
 - Account selection and campaign scoping on applicable reads, typed money,
   explicit pagination, supported report-field selections and preserved listing
