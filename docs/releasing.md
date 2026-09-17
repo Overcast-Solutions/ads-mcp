@@ -1,5 +1,9 @@
 # Preparing a source release
 
+Version 0.1.0 remains an unpublished candidate. See the
+[candidate guide](release-candidate.md) for a pinned installation and operator
+validation checklist. Preparing artifacts does not publish a package or tag.
+
 The installed command exports an **explicit committed tree**, independent of
 staged, unstaged and untracked files:
 
@@ -115,6 +119,12 @@ Logs, archive hashes and exact resolved versions are retained in the selected
 evidence directory. Full tests run separately in each clean matrix environment;
 installed smoke checks are not a replacement for them. Run release builds from
 the reviewed clean source snapshot to avoid local build inputs.
+
+For a candidate handoff, retain a checksum inventory covering the source manifest,
+wheel and sdist, plus their resolved commit/tree and version metadata. Bind the
+independent source disposition to the manifest hash. Link the independent
+installed review, rendered documentation checks, hosted checks and advisory scan
+to that same final commit; keep the evidence outside the exported source tree.
 
 The security job resolves a fresh runtime independently of pip-audit tooling,
 then `scripts/scan_dependencies.py` scans its exact package inventory and

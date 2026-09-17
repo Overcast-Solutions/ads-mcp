@@ -26,6 +26,9 @@ python3.12 -m venv .venv
 .venv/bin/ads-mcp --version
 ```
 
+For a commit-pinned 0.1.0 candidate and read-only-first validation, follow the
+[release candidate guide](docs/release-candidate.md).
+
 ## OAuth setup (one-time)
 
 **Bring your own credentials.** Each installer must use a Google Cloud project

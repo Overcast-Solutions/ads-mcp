@@ -2,6 +2,12 @@
 
 ## 0.1.0 — unreleased
 
+- Prepare the unpublished 0.1.0 source release candidate; the
+  [candidate guide](docs/release-candidate.md) covers commit-pinned installation,
+  operator-owned live validation and separately approved experimental writes.
+- Refuse explicitly invalid MCP request IDs before dispatch with one generic
+  invalid-request error. Preserve exact string/integer correlation, response-free
+  notifications, SDK response handling and recovery on the same stdio connection.
 - PMax final URL expansion experiments: inspect the catalog and both arms,
   create a same-campaign 50/50 test, compare direct experiment metrics, end
   the test or promote treatment settings. Staging uses provider validate-only

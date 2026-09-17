@@ -175,7 +175,7 @@ controls. [MCP security guidance](https://modelcontextprotocol.io/docs/2025-11-2
 
 ## Licensing and unresolved review
 
-MIT licenses this software; it grants no rights to Google accounts or returned
+[Apache License 2.0](../LICENSE) licenses this software; it grants no rights to Google accounts or returned
 data. Retain applicable license notices for any dependencies or material you
 redistribute, and review the provenance of bundled assets. The Ads API
 agreement defines development/distribution as API use, so publishers cannot

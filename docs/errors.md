@@ -7,6 +7,14 @@ Tool-level application failures use `{"error": {"code": ..., "message": ...}}`.
 MCP protocol validation may reject malformed requests before a tool runs.
 Malformed JSON or invalid Unicode receives a generic protocol refusal without
 echoing the input. Correct the request; the stdio connection remains usable.
+Method-bearing requests require a string or integer ID. An explicitly present
+object, array, null, boolean or fractional-number ID receives exactly one
+`-32600` invalid-request error with a null ID, before any tool or provider access.
+IDs are never coerced; JSON `1.0` is not an integer ID. Empty strings, Unicode
+strings, zero, negative and large integers retain their exact correlation.
+Notifications omit the ID member entirely and receive no response. A null ID
+on an SDK error-response envelope is distinct from a null request ID.
+
 The main application error codes are:
 
 | Code | Meaning |
