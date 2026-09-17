@@ -1,31 +1,27 @@
 # Security and support
 
-The first release targets CPython 3.12, 3.13 and 3.14 on Linux and macOS.
+The public source supports CPython 3.12, 3.13 and 3.14 on Linux and macOS.
 Native Windows server operation, including read-only mode, mutation audit
 storage and the token helper, is unsupported. No Windows ACL implementation
 or successful native Windows validation is claimed. Writes remain experimental.
 
 The source repository is [Overcast-Solutions/ads-mcp](https://github.com/Overcast-Solutions/ads-mcp).
-The designated public-release reporting route is
+The designated reporting route is
 [GitHub private vulnerability reporting](https://github.com/Overcast-Solutions/ads-mcp/security/advisories/new).
 Use that private form for suspected vulnerabilities, not a public issue.
 Do not include live credentials or account data; provide a sanitized reproduction.
 
-**Before public release:** GitHub makes this feature available for public
-repositories. The release owner must enable private vulnerability reporting,
-verify that the form is available to an outside account, and confirm that
-maintainers receive security-report notifications. The route is not claimed
-operational while the repository remains private. Private-preview collaborators
-should contact the repository owner through their existing private invitation
-channel to arrange secure disclosure. If the form is unavailable, do not post
-exploitable details publicly. Ordinary sanitized bugs can use the
+Private vulnerability reporting is enabled for this public repository.
+Maintainers must check outside-account form access and security-report
+notification delivery as part of maintaining that route. If the form is
+unavailable, do not post exploitable details publicly. Ordinary sanitized bugs can use the
 [issue tracker](https://github.com/Overcast-Solutions/ads-mcp/issues).
 
 The release maintainer owns advisory triage, affected-version assessment,
 remediation, coordinated disclosure and release decisions. Review incoming
 security reports promptly, prioritize credential exposure and unsafe writes,
-and provide an initial response target of three business days once a reporting
-route is operational. Deployment operators own revocation, containment, Google
+and target an initial response within three business days. Deployment operators
+own revocation, containment, Google
 notifications and their data; see the [operator guide](docs/operator-guide.md).
 
 The software ships no shared Google credentials or authentication service.
@@ -38,8 +34,8 @@ as part of setup, support or a vulnerability report.
 CI scans resolved runtime versions on changes and weekly on Monday, retains
 machine-readable package and advisory results, and fails on advisories,
 unavailable scans or incomplete coverage. Scanner tooling is isolated from
-the runtime environment. No advisory is silently ignored. The unpublished
-project is reviewed as source; pip/setuptools are installation tools rather
+the runtime environment. No advisory is silently ignored. The project is
+reviewed as source; pip/setuptools are installation tools rather
 than runtime inputs to this scan.
 
 Maintainers review dependencies weekly, evaluate compatible updates at least

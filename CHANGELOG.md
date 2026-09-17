@@ -1,13 +1,19 @@
 # Changelog
 
-## 0.1.0 — unreleased
+## Unreleased changes
 
-- Prepare the unpublished 0.1.0 source release candidate; the
-  [candidate guide](docs/release-candidate.md) covers commit-pinned installation,
+- Add an [installation and validation guide](docs/installation-validation.md)
+  for the public source, covering commit-pinned installation,
   operator-owned live validation and separately approved experimental writes.
 - Refuse explicitly invalid MCP request IDs before dispatch with one generic
   invalid-request error. Preserve exact string/integer correlation, response-free
   notifications, SDK response handling and recovery on the same stdio connection.
+
+## Public source history — 0.1.0
+
+The project is available as public source. These changes are already on the
+default branch; 0.1.0 is the package version, not a published PyPI release or tag.
+
 - PMax final URL expansion experiments: inspect the catalog and both arms,
   create a same-campaign 50/50 test, compare direct experiment metrics, end
   the test or promote treatment settings. Staging uses provider validate-only
@@ -49,7 +55,7 @@
   Earlier MIT-licensed source remains available under its original license.
 
 - Explicit operator-owned OAuth onboarding, repository metadata and a designated
-  private vulnerability-reporting route with public-release activation steps.
+  private vulnerability-reporting route.
 - CI actions pinned to supported Node.js 24 releases, with pull-request checks
   and default-branch validation without duplicate topic-branch push matrices.
 - Source export preserves whitespace in Git repository identities, rejects

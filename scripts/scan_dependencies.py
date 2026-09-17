@@ -10,7 +10,7 @@ def main():
     packages = json.loads(Path(sys.argv[1]).read_text())
     output = Path(sys.argv[2])
     requirements = output.with_suffix(".requirements.txt")
-    # The unpublished project is reviewed as source. pip/setuptools are
+    # The project is reviewed as source. pip/setuptools are
     # installer tools; all other packages in the clean runtime are scanned.
     runtime = sorted((p["name"], p["version"]) for p in packages
                      if p["name"].lower() not in {"ads-mcp", "pip", "setuptools"})
