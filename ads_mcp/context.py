@@ -138,7 +138,8 @@ class ServerContext:
                 ) from None
             raise
 
-    def audit_step(self, *, service: str, method: str, operations: int) -> None:
+    def audit_step(self, *, service: str, method: str, operations: int,
+                   receipts: dict | None = None) -> None:
         """Record a mutate request that actually reached the API.
 
         Written per step, so a multi-step apply whose later step fails still
@@ -147,7 +148,7 @@ class ServerContext:
         """
         if self.audit is None:
             return
-        wrote = self.audit.write(
+        wrote = self.observe_audit(
             {
                 "event": "step_applied",
                 "tool": self.current_tool or "unknown",
@@ -157,8 +158,8 @@ class ServerContext:
                 "service": service,
                 "method": method,
                 "operations": operations,
+                **(receipts or {"created": [], "updated": []}),
             },
-            critical=False,
         )
         if not wrote:
             # Confirmation surfaces this loss in its structured result, even
@@ -171,6 +172,14 @@ class ServerContext:
 
     def clear_audit_loss(self) -> None:
         self._local.audit_loss = False
+
+    @property
+    def receipts(self):
+        return getattr(self._local, "receipts", None)
+
+    @receipts.setter
+    def receipts(self, value):
+        self._local.receipts = value
 
     def login_header_customer_id(self) -> str | None:
         """The login-customer id sent with cross-account reads under an MCC.

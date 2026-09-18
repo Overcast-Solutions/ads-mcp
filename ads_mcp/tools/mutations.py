@@ -22,6 +22,7 @@ from pydantic import Field, StrictBool, StrictStr
 
 from ads_mcp import executors, guardrails
 from ads_mcp.errors import ToolError, classify_exception
+from ads_mcp.receipts import ApplyReceipts
 from ads_mcp.gaql import extract_field
 from ads_mcp.insights import recommendation_resource_name
 from ads_mcp.reporting import money
@@ -3081,26 +3082,31 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                     },
                     critical=True,
                 )
+            ctx.receipts = ApplyReceipts()
             try:
                 execution_result = entry.execute(ctx)
             except BaseException as exc:  # noqa: BLE001 — recorded, re-raised
+                ctx.receipts.complete = False
+                error = classify_exception(exc, scrub=ctx.scrub)
                 if ctx.audit is not None:
-                    ctx.audit.write(
+                    wrote = ctx.observe_audit(
                         {
                             "event": "apply_failed",
                             "tool": entry.tool,
                             "customer_id": ctx.config.customer_id,
-                            "outcome": type(exc).__name__,
+                            "outcome": error.code,
                             "plan_id": entry.id,
-                            "message": ctx.scrub(str(exc))[:500],
+                            "message": "The application did not complete; reconcile confirmed receipts and account state.",
                             # A multi-step flow can fail after earlier steps
                             # landed; every step that reached the API has its
                             # own step_applied record above this one. Read
                             # them before assuming nothing changed.
                             "partial_changes_possible": True,
+                            **ctx.receipts.payload(),
                         },
-                        critical=False,
                     )
+                    if not wrote:
+                        ctx._local.audit_loss = True
                 if ctx.audit_loss:
                     raise ToolError(
                         "AUDIT_WRITE_FAILED",
@@ -3112,7 +3118,7 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                     ) from None
                 raise
             ctx.current_tool = applying_tool
-            result = {"applied": True, "plan": entry.payload()}
+            result = {"applied": True, "plan": entry.payload(), **ctx.receipts.payload()}
             experiment_action = entry.tool in {
                 "create_pmax_url_experiment", "end_pmax_url_experiment", "promote_pmax_url_experiment",
             }
@@ -3120,7 +3126,7 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                 result.update(execution_result)
             if ctx.audit is not None:
                 # Experiment receipt and readback have separate outcomes.
-                wrote = ctx.audit.write(
+                wrote = ctx.observe_audit(
                     {
                         "event": "applied" if result["applied"] else "submitted",
                         "tool": entry.tool,
@@ -3129,8 +3135,8 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                         "plan_id": entry.id,
                         "summary": entry.summary,
                         "operations": entry.operations,
+                        **ctx.receipts.payload(),
                     },
-                    critical=False,
                 )
                 if not wrote or ctx.audit_loss:
                     # The change landed; we simply could not record it. Say so
