@@ -122,7 +122,7 @@ def test_network_updates_preserve_exact_supplied_leaf_masks(tmp_path, field, val
     assert list(operation.update_mask.paths) == ['network_settings.' + field]
     assert getattr(operation.update.network_settings, field) is value
     assert operation.update.network_settings._pb.HasField(field)
-    assert not operation.update._pb.HasField('status')
+    assert 'status' not in {descriptor.name for descriptor, _ in operation.update._pb.ListFields()}
     assert all(call.customer_id == h.CUSTOMER_ID for call in provider.searches)
     assert len(provider.searches) >= 2
 
