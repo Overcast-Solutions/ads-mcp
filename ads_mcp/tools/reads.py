@@ -385,7 +385,9 @@ def register(server, ctx):
             "get_campaign_performance",
             "Campaign metrics for a date window (explicit range or "
             "last_n_days), with budget, bidding strategy incl. targets, and "
-            "the serving/primary status trio. Money is decimal with currency. "
+            "the serving/primary status trio. Network settings preserve explicit false "
+            "and report absent optional values as null, including non-Search campaigns. "
+            "Money is decimal with currency. "
             "enabled_only=true filters server-side.",
         ),
     )

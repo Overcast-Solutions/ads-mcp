@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+- Add explicit Search network defaults and guarded `set_campaign_networks`
+  updates with exact leaf masks and fresh state checks. Campaign reports retain
+  optional network values. See the [network guide](docs/campaign-networks.md).
+
 - Add an [installation and validation guide](docs/installation-validation.md)
   for the public source, covering commit-pinned installation,
   operator-owned live validation and separately approved experimental writes.

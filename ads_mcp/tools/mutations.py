@@ -1653,6 +1653,7 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                     target_roas=args["target_roas"],
                     status=args["status"],
                     contains_eu_political_advertising=args["contains_eu_political_advertising"],
+                    network_settings=args.get("network_settings"),
                 )
             return _plan_payload(
                 ctx,
@@ -1692,7 +1693,9 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
             "creates a campaign shell with no asset group or serving creative and rejects "
             "ad-group/keyword children; use create_pmax_campaign for complete non-retail "
             "creation. Provider/account eligibility and strategy compatibility still apply; "
-            "a supported shell does not establish serving readiness.",
+            "a supported shell does not establish serving readiness. Search defaults to "
+            "Google Search only; null network options use defaults. Search Partners "
+            "requires Google Search. Restricted partner targeting is provider/account-dependent.",
         ),
     )
     def draft_campaign(
@@ -1709,11 +1712,23 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
         target_roas: float | None = None,
         status: LifecycleStatus | None = "PAUSED",
         contains_eu_political_advertising: StrictBool | None = None,
+        target_google_search: StrictBool | None = None,
+        target_search_network: StrictBool | None = None,
+        target_partner_search_network: StrictBool | None = None,
+        target_content_network: StrictBool | None = None,
     ) -> dict:
         def impl(**_kw):
+            from ads_mcp.campaign_networks import creation_settings
+
             _check_customer(ctx, customer_id)
             declaration = _political_declaration(contains_eu_political_advertising)
             channel = _enum_choice(channel_type, CHANNEL_TYPES, "channel_type")
+            networks = creation_settings(
+                channel, target_google_search=target_google_search,
+                target_search_network=target_search_network,
+                target_partner_search_network=target_partner_search_network,
+                target_content_network=target_content_network,
+            )
             if channel not in DRAFT_CAMPAIGN_CHANNELS:
                 raise ToolError(
                     "UNSUPPORTED_CREATION_CHANNEL",
@@ -1742,6 +1757,7 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
                     "ad_group_name": ad_group_name,
                     "keywords": _keywords(keywords or []),
                     "channel_type": channel,
+                    **({"network_settings": networks} if networks is not None else {}),
                     "contains_eu_political_advertising": declaration,
                     "target_cpa": target_cpa,
                     "target_roas": target_roas,
@@ -1750,6 +1766,39 @@ def register(server, ctx):  # noqa: C901 — one tool per block, deliberately fl
             )
 
         return _guarded_mutation(ctx, "draft_campaign", impl)()
+
+    @server.tool(
+        name="set_campaign_networks",
+        description=_spec(
+            "set_campaign_networks",
+            "Stage exact network changes for an enabled or paused standard Search campaign. "
+            "Supply at least one boolean; null omits a field. Search Partners requires "
+            "Google Search. Restricted partner targeting is provider/account-dependent. "
+            "Preview shows before/after values and only supplied network leaf masks. "
+            "Complete campaign state is rechecked before confirm_and_apply. Enabling "
+            "networks may change serving and spend; provider eligibility remains authoritative.",
+        ),
+    )
+    def set_campaign_networks(
+        campaign_id: StrictStr,
+        target_google_search: StrictBool | None = None,
+        target_search_network: StrictBool | None = None,
+        target_partner_search_network: StrictBool | None = None,
+        target_content_network: StrictBool | None = None,
+        customer_id: str | None = None,
+    ) -> dict:
+        def impl(**_kw):
+            from ads_mcp.campaign_networks import network_plan
+
+            _check_customer(ctx, customer_id)
+            return _plan_payload(ctx, **network_plan(
+                ctx, campaign_id=campaign_id, target_google_search=target_google_search,
+                target_search_network=target_search_network,
+                target_partner_search_network=target_partner_search_network,
+                target_content_network=target_content_network,
+            ))
+
+        return _guarded_mutation(ctx, "set_campaign_networks", impl)()
 
     pmax_build = _creation_tool("create_pmax_campaign")
 

@@ -4,6 +4,11 @@ Curated reports provide typed metrics and bounded responses. Raw GAQL preserves 
 
 Metric reports require an explicit date window or `last_n_days`; see [window and migration semantics](migration.md) and the [tool catalog](tools.md) for individual parameters.
 
+`get_campaign_performance` includes all four optional `network_settings`
+booleans for Search and non-Search campaigns. Explicit provider `false` remains
+`false`; an absent value is `null`. Metrics and pagination are unchanged. See
+[campaign networks](campaign-networks.md) for field meanings and guarded updates.
+
 ## Campaign filters
 
 Report `campaign_id` filters use one numeric ID, normalized consistently in

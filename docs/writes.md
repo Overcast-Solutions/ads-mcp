@@ -88,6 +88,9 @@ Spend guardrails apply at plan creation and again at application:
 
 ## Campaign creation
 
+For explicit Search network defaults and partial updates, see the
+[campaign network guide](campaign-networks.md).
+
 Generic `draft_campaign` creation supports only `SEARCH`, `DISPLAY` and the
 `PERFORMANCE_MAX` shell. Other known channel enum values refuse with
 `UNSUPPORTED_CREATION_CHANNEL` before account calls because this tool cannot

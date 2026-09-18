@@ -86,7 +86,7 @@ def create_campaign(*, name, daily_budget, bidding_strategy, channel_type,
                     geo_target_ids=(), language_ids=(), final_urls=(),
                     ad_group_name=None, keywords=(), target_cpa=None,
                     target_roas=None, status="PAUSED",
-                    contains_eu_political_advertising):
+                    contains_eu_political_advertising, network_settings=None):
     def _run(ctx):
         client = ctx.client()
 
@@ -111,6 +111,9 @@ def create_campaign(*, name, daily_budget, bidding_strategy, channel_type,
             client.enums.AdvertisingChannelTypeEnum, channel_type
         )
         _campaign_declaration(client, campaign_op.create, contains_eu_political_advertising)
+        if network_settings is not None:
+            for field, value in network_settings.items():
+                setattr(campaign_op.create.network_settings, field, value)
         if channel_type == "PERFORMANCE_MAX":
             campaign_op.create.brand_guidelines_enabled = False
         strategy = str(bidding_strategy).strip().upper()

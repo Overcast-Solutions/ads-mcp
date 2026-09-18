@@ -89,7 +89,7 @@ For a read-only rollout alongside an existing server, follow the
 
 ## Experimental writes
 
-Enabling writes exposes 83 operations. Read the [write guide](docs/writes.md)
+Enabling writes exposes 84 operations. Read the [write guide](docs/writes.md)
 before opting in. Writes require audit
 storage and the appropriate caps; the default flow is plan → dry-run preview →
 `confirm_and_apply`. Irreversible changes require an additional acknowledgement.
@@ -106,6 +106,7 @@ Use independent account controls and review the guide's full limit scope.
 | [Configuration](docs/configuration.md) | Environment variables, defaults and audit storage |
 | [Reporting](docs/reporting.md) | GAQL, pagination, date windows, history and forecasts |
 | [Writes](docs/writes.md) | Plans, spend limits, creation requirements and validation |
+| [Campaign networks](docs/campaign-networks.md) | Search defaults, precise updates and network reporting |
 | [Search URLs](docs/search-urls.md) | Inspect and update existing ad and keyword destinations |
 | [Shared targeting](docs/shared-targeting.md) | Shared negative lists and explicit ad-group demographics |
 | [Performance Max](docs/pmax.md) | Asset groups, signals, URL controls and Item-ID selection |

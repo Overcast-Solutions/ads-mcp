@@ -253,6 +253,7 @@ def register_tools(server, ctx):
     # same closed shape. Inherit aliases, defaults and the SDK's dump behavior.
     for tool in server._tool_manager.list_tools():
         if tool.name in {
+            "draft_campaign", "set_campaign_networks",
             "list_pmax_url_experiments", "get_pmax_url_experiment", "get_pmax_url_experiment_results",
             "create_pmax_url_experiment",
             "end_pmax_url_experiment", "promote_pmax_url_experiment", "get_pmax_url_experiment_operation",

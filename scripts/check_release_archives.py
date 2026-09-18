@@ -63,7 +63,14 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/fixtures/pmax_experiments/get_pmax_url_experiment.json",
                    "tests/fixtures/pmax_experiments/get_pmax_url_experiment_results.json",
                    "tests/fixtures/pmax_experiments/get_pmax_url_experiment_operation.json",
-                   "docs/pmax-experiments.md")
+                   "docs/pmax-experiments.md",
+                   "tests/test_campaign_networks_contract.py",
+                   "tests/test_mutation_receipts_contract.py",
+                   "tests/campaign_networks_oracle.py",
+                   "tests/mutation_receipts_oracle.py",
+                   "tests/mutation_response_oracle.py",
+                   "tests/test_mutation_response_oracle_controls.py",
+                   "docs/campaign-networks.md")
 
 REQUIRED_PACKAGE_SOURCE = ("ads_mcp/pmax_experiments.py",
                            "ads_mcp/pmax_experiment_create.py",

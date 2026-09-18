@@ -109,6 +109,10 @@ CAMPAIGN_QUERY = (
     "SELECT campaign.id, campaign.name, campaign.status, "
     "campaign.serving_status, campaign.primary_status, "
     "campaign.primary_status_reasons, campaign.advertising_channel_type, "
+    "campaign.network_settings.target_google_search, "
+    "campaign.network_settings.target_search_network, "
+    "campaign.network_settings.target_partner_search_network, "
+    "campaign.network_settings.target_content_network, "
     "campaign.bidding_strategy_type, "
     "campaign.maximize_conversion_value.target_roas, "
     "campaign.maximize_conversions.target_cpa_micros, "
@@ -143,6 +147,8 @@ def _bidding_strategy(row, currency) -> dict:
 @retained("campaigns")
 def get_campaign_performance(ctx, *, window, enabled_only=False, page_token=None,
                              customer_id=None, campaign_id=None) -> dict:
+    from ads_mcp.campaign_networks import observed_settings
+
     campaign_id = normalize_campaign_id(campaign_id, optional=True)
     scope = campaign_clause(campaign_id)
     query = CAMPAIGN_QUERY.format(window=window_clause(window) + scope)
@@ -172,6 +178,7 @@ def get_campaign_performance(ctx, *, window, enabled_only=False, page_token=None
                         r.name for r in row.campaign.primary_status_reasons
                     ],
                     "channel_type": row.campaign.advertising_channel_type.name,
+                    "network_settings": observed_settings(row.campaign),
                     "daily_budget": money(row.campaign_budget.amount_micros, currency),
                     "bidding_strategy": _bidding_strategy(row, currency),
                     "impressions": int(row.metrics.impressions),

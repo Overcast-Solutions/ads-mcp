@@ -5,7 +5,7 @@ is **0.1.0**; PyPI packages and version tags have not been published. It support
 CPython 3.12, 3.13 and 3.14 on Linux and macOS; native Windows is unsupported.
 The source and package metadata use [Apache License 2.0](../LICENSE).
 
-The server provides 83 operations, including 34 reads. Read-only mode is the
+The server provides 84 operations, including 34 reads. Read-only mode is the
 default; write support remains experimental. The [changelog](../CHANGELOG.md)
 describes the workflows and protocol repair. Invalid request IDs now receive a
 generic refusal before dispatch, and the same connection accepts valid requests
