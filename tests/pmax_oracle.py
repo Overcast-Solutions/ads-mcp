@@ -16,6 +16,7 @@ import harness as h
 from shared_targeting_oracle import ADDITIONS as TARGETING_ADDITIONS, READS as TARGETING_READS, WRITES as TARGETING_WRITES
 from pmax_experiment_oracle import ADDITIONS as EXPERIMENT_ADDITIONS, READS as EXPERIMENT_READS, WRITES as EXPERIMENT_WRITES
 from offline_contract import project, selected, refusal
+from campaign_networks_oracle import TOOL as NETWORK_TOOL
 
 ROOT = Path(__file__).resolve().parents[1]
 PMAX_FIXTURES = ROOT / "tests/fixtures/pmax"
@@ -47,7 +48,7 @@ def assert_catalog(actual, *, read_only=False, kind=None, final=False):
     """All original names remain required; only this fixed addition list may appear."""
     from tool_catalog import READ_TOOLS, MUTATION_TOOLS, ALL_WRITE_MODE_TOOLS
     base, allowed = (READ_TOOLS | PMAX_READS | SEARCH_URL_READS | TARGETING_READS, EXPERIMENT_READS) if read_only or kind == "read" else (
-        (MUTATION_TOOLS | PMAX_MUTATIONS | SEARCH_URL_MUTATIONS | TARGETING_WRITES, EXPERIMENT_WRITES) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS))
+        (MUTATION_TOOLS | PMAX_MUTATIONS | SEARCH_URL_MUTATIONS | TARGETING_WRITES, EXPERIMENT_WRITES | {NETWORK_TOOL}) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS | {NETWORK_TOOL}))
     actual = set(actual)
     assert base <= actual <= base | allowed, {"missing_baseline": sorted(base - actual), "unapproved": sorted(actual - base - allowed)}
     if final:
@@ -62,7 +63,7 @@ def expected_pending(server):
     """
     from capability_oracle import empty
     tools = h.tool_map(server)
-    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS) - set(tools))
+    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}) - set(tools))
     missing_values = []
     def admits(node):
         if isinstance(node, dict):
@@ -71,7 +72,10 @@ def expected_pending(server):
     for name in ("pause_entity", "enable_entity"):
         if not admits(tools[name].input_schema["properties"]["entity_type"]):
             missing_values.append(name + '.entity_type="asset_group"')
-    return empty(missing_tools=missing, missing_values=sorted(missing_values))
+    return empty(missing_tools=missing, missing_values=sorted(missing_values),
+                 missing_parameters=sorted("draft_campaign." + field for field in
+                     ("target_google_search", "target_search_network", "target_partner_search_network", "target_content_network")
+                     if field not in tools["draft_campaign"].input_schema["properties"]))
 
 
 def rn(kind, ident, customer=h.CUSTOMER_ID):

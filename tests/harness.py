@@ -303,34 +303,9 @@ class FakeGoogleAdsClient:
                 validate_only=validate_only,
             )
         )
-        if service == "GoogleAdsService" and method == "mutate":
-            # Aggregate responses use a result oneof, not `.results`. Model
-            # the genuine SDK shape so campaign selection cannot accidentally
-            # return the budget or the final asset-link result.
-            response = get_ads_type("MutateGoogleAdsResponse")
-            paths = {"campaign_budget": "campaignBudgets", "campaign": "campaigns",
-                     "asset": "assets", "asset_group": "assetGroups",
-                     "asset_group_asset": "assetGroupAssets",
-                     "campaign_criterion": "campaignCriteria"}
-            for index, operation in enumerate(req.mutate_operations, 1):
-                field = operation._pb.WhichOneof("operation")
-                kind = field.removesuffix("_operation")
-                item = get_ads_type("MutateOperationResponse")
-                getattr(item, kind + "_result").resource_name = (
-                    f"customers/{req.customer_id}/{paths[kind]}/{1000 + index}"
-                )
-                response.mutate_operation_responses.append(item)
-            return response
-        n = 1
-        try:
-            n = max(1, len(req.operations))
-        except Exception:
-            pass
-        results = [
-            SimpleNamespace(resource_name=f"customers/{CUSTOMER_ID}/mocked/{i}")
-            for i in range(n)
-        ]
-        return SimpleNamespace(results=results, partial_failure_error=None)
+        from mutation_response_oracle import success_response
+        return success_response(self, service, method, req)
+
 
 
 def mutation_mask_paths(mutate_call: MutateCall) -> list[str]:

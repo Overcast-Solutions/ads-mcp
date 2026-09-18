@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 import pytest
 
 import harness as h
+from campaign_networks_oracle import TOOL as NETWORK_TOOL, NEW_SOURCE as NETWORK_SOURCE
 import test_auth_cause_contract as process
 from capability_oracle import DEFAULT,cli,empty,success
 from offline_contract import load_script
@@ -24,7 +25,7 @@ from pmax_experiment_oracle import (ROOT,FIXTURES,NEW_SOURCE,ADDITIONS,READS,WRI
 
 PRIOR_ALL=ALL_WRITE_MODE_TOOLS|PMAX_ADDITIONS|SEARCH_URL_ADDITIONS|TARGETING_ADDITIONS
 PRIOR_READS=READ_TOOLS|PMAX_READS|SEARCH_URL_READS|TARGETING_READS
-EXPECTED_ALL=PRIOR_ALL|ADDITIONS
+EXPECTED_ALL=PRIOR_ALL|ADDITIONS|{NETWORK_TOOL}
 EXPECTED_READS=PRIOR_READS|READS
 
 
@@ -32,10 +33,10 @@ def test_final_inventory_exactly_83_operations_and_34_reads_preserves_every_prio
     from ads_mcp.tools.registry import all_tool_specs
     server,_=setup(tmp_path,ADDITIONS)
     assert len(PRIOR_ALL)==76 and len(PRIOR_READS)==30
-    assert h.tool_names(server)==EXPECTED_ALL and len(EXPECTED_ALL)==83
+    assert h.tool_names(server)==EXPECTED_ALL and len(EXPECTED_ALL)==84
     readonly,_=setup(tmp_path,READS,read_only=True)
     assert h.tool_names(readonly)==EXPECTED_READS and len(EXPECTED_READS)==34
-    specs=all_tool_specs();assert len(specs)==len({s.name for s in specs})==83
+    specs=all_tool_specs();assert len(specs)==len({s.name for s in specs})==84
     assert {s.name for s in specs if s.kind=='read'}==EXPECTED_READS
     assert {s.name for s in specs if s.kind=='apply'}=={'confirm_and_apply'}
     for name,(parameters,required) in SIGNATURES.items():
@@ -47,7 +48,7 @@ def test_all_seven_independent_capability_records_require_exact_arguments(tmp_pa
     setup(tmp_path,ADDITIONS)
     records=[t for c in json.loads(DEFAULT.read_text())['capabilities'] for t in c['tools']]
     by_name={r['name']:r for r in records}
-    assert len(records)==len(by_name)==83 and set(by_name)==EXPECTED_ALL
+    assert len(records)==len(by_name)==84 and set(by_name)==EXPECTED_ALL
     for name,(parameters,required) in SIGNATURES.items():
         assert by_name[name]=={'name':name,'parameters':parameters,'required':required,'values':{}}
     result,_=cli(tmp_path,default=True);success(result,empty())
@@ -76,7 +77,7 @@ def test_new_oracle_facts_guides_and_goldens_are_required_in_source_archive(tmp_
     setup(tmp_path,ADDITIONS);checker=load_script('check_release_archives')
     from test_search_url_workflow_contract import REQUIRED_SOURCE
     from shared_targeting_oracle import NEW_SOURCE as TARGETING_SOURCE
-    expected=set(REQUIRED_SOURCE)|set(TARGETING_SOURCE)|set(NEW_SOURCE)
+    expected=set(REQUIRED_SOURCE)|set(TARGETING_SOURCE)|set(NEW_SOURCE)|set(NETWORK_SOURCE)
     assert expected<=set(checker.REQUIRED_SOURCE)
     checker.check_inventory(sorted(expected),source_archive=True)
     with pytest.raises(ValueError):checker.check_inventory(sorted(expected-{missing}),source_archive=True)
@@ -120,7 +121,7 @@ def confirm(process,tool,args):
 def test_installed_console_create_inspect_report_end_promote_and_observe(tmp_path,monkeypatch,customer):
     with installed(tmp_path,monkeypatch,customer=customer) as server:
         listing=server.receive(server.send('tools/list',{}))['result']['tools']
-        assert len(listing)==83 and {t['name'] for t in listing}==EXPECTED_ALL
+        assert len(listing)==84 and {t['name'] for t in listing}==EXPECTED_ALL
         today=datetime.now(ZoneInfo('America/Denver')).date()
         result=confirm(server,CREATE,{**CREATE_ARGS,'date_start':today.isoformat(),'date_end':(today+timedelta(days=30)).isoformat()})
         assert result['applied'] is True and result['resource_name']==rn('experiments',901,customer)
