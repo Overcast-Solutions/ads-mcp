@@ -127,8 +127,17 @@ def test_invalid_provider_receipts_are_uncertain_and_stop_dependent_writes(tmp_p
     provider.fault_at = len(provider.observed_responses)
     provider.receipt_fault_kind = fault
     result = apply(server, plan)
-    error = h.error_of(result)
-    assert re.fullmatch('[A-Z][A-Z0-9_]+', error['code']) and error['code'] != 'INTERNAL'
+    if tool == 'create_pmax_url_experiment':
+        h.expect_ok(result)
+        assert result.get('submitted') is True and result.get('applied') is False
+        assert result.get('verification') == 'unknown'
+        assert isinstance(result.get('observation_error'), str) and result['observation_error']
+        assert isinstance(result.get('recovery'), str) and result['recovery']
+        terminal_event = 'submitted'
+    else:
+        error = h.error_of(result)
+        assert re.fullmatch('[A-Z][A-Z0-9_]+', error['code']) and error['code'] != 'INTERNAL'
+        terminal_event = 'apply_failed'
     assert result.get('partial_changes_possible') is True
     assert result.get('receipts_complete') is False
     assert_receipts(result, {'created': [], 'updated': []})
@@ -145,7 +154,7 @@ def test_invalid_provider_receipts_are_uncertain_and_stop_dependent_writes(tmp_p
     assert not [record for record in records if record['event'] == 'step_applied'
                 and (record.get('created') or record.get('updated'))]
     h.assert_no_secrets(text)
-    assert any(record['event'] == 'apply_failed' and record.get('receipts_complete') is False
+    assert any(record['event'] == terminal_event and record.get('receipts_complete') is False
                and record.get('created') == [] and record.get('updated') == [] for record in records)
 
 
