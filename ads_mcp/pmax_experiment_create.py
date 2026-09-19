@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 from ads_mcp import pmax_experiments as reads
 from ads_mcp.errors import ToolError, classify_exception
+from ads_mcp.receipts import validate as validate_receipts
 from ads_mcp.search_urls import numeric_id, resource
 
 
@@ -189,10 +190,12 @@ def plan(ctx, *, campaign_id, name, date_start, date_end, customer_id=None):
 
     def execute(current):
         recovery = "Inspect experiments and campaign settings before considering another creation; do not retry blindly."
+        submission = request(current, False)
         try:
             response = current.client().get_service("GoogleAdsService").mutate(
-                request=request(current, False), retry=None)
+                request=submission, retry=None)
         except Exception as exc:
+            current.receipts.complete = False
             error = classify_exception(exc, scrub=current.scrub)
             current.audit_auth_failure(error)
             return {"submitted": True, "applied": False, "verification": "unknown",
@@ -201,6 +204,7 @@ def plan(ctx, *, campaign_id, name, date_start, date_end, customer_id=None):
         try:
             created_id, identity, arm_ids = _receipt(response, cid, campaign)
         except Exception:
+            current.receipts.complete = False
             return {"submitted": True, "applied": False, "verification": "unknown",
                     "observation_error": "The creation receipt could not be verified; application is possible.",
                     "recovery": recovery}
@@ -208,11 +212,22 @@ def plan(ctx, *, campaign_id, name, date_start, date_end, customer_id=None):
                   "resource_name": identity, "verification": "unknown",
                   "recovery": "Inspect the returned experiment identity and campaign settings; do not repeat creation."}
         if response.partial_failure_error.code != 0:
+            current.receipts.complete = False
             result["observation_error"] = (
                 "The creation receipt contains contradictory status and resource "
                 "results; application is possible but cannot be confirmed."
             )
             return result
+        try:
+            step = validate_receipts(submission, response)
+            current.receipts.accept(step)
+        except ToolError:
+            current.receipts.complete = False
+            return {"submitted": True, "applied": False, "verification": "unknown",
+                    "observation_error": "The creation receipt could not be verified; application is possible.",
+                    "recovery": recovery}
+        current.audit_step(service="GoogleAdsService", method="mutate",
+                           operations=len(submission.mutate_operations), receipts=step)
         try:
             observed = reads._verified(current, lambda: reads.detail(current, cid, created_id))
             experiment = observed["experiment"]

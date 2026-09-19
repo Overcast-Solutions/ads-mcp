@@ -1,6 +1,6 @@
 {
   "tests/harness.py": {
-    "sha256": "f6dcb50aa8388bc7c90a9f663bcda4b4ffc50f6dc64a0a16579307a5a9826e23",
+    "sha256": "879fedd58a59201c2b50e3cb683c9da103ee7f2bbefd7b8fcfd34c40c956fc36",
     "matches": [
       {
         "rule": "credential",

@@ -12,6 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 import harness as h
+from campaign_networks_oracle import TOOL as NETWORK_TOOL, NEW_SOURCE as NETWORK_SOURCE
 import test_auth_cause_contract as process
 from capability_oracle import DEFAULT,cli,empty,success
 from offline_contract import load_script
@@ -39,11 +40,11 @@ def test_final_exact_76_operations_and_30_reads_preserve_all_previous_names(tmp_
     server,_=final_server(tmp_path)
     assert len(PRIOR_ALL)==67 and len(PRIOR_READS)==27
     assert len(EXPECTED_ALL)==76 and len(EXPECTED_READS)==30
-    assert_expansion(h.tool_names(server),EXPECTED_ALL,EXPERIMENT_ADDITIONS)
+    assert_expansion(h.tool_names(server),EXPECTED_ALL,EXPERIMENT_ADDITIONS|{NETWORK_TOOL})
     readonly,_=setup(tmp_path,READS,read_only=True)
     assert_expansion(h.tool_names(readonly),EXPECTED_READS,EXPERIMENT_READS)
     specs=all_tool_specs()
-    assert 76<=len(specs)==len({s.name for s in specs})<=83
+    assert 76<=len(specs)==len({s.name for s in specs})<=84
     assert_expansion({s.name for s in specs if s.kind=='read'},EXPECTED_READS,EXPERIMENT_READS)
     assert {s.name for s in specs if s.kind=='apply'}=={'confirm_and_apply'}
     for name,(parameters,required) in SIGNATURES.items():
@@ -55,7 +56,7 @@ def test_default_capability_requirements_keep_exact_required_parameters(tmp_path
     final_server(tmp_path)
     records=[t for capability in json.loads(DEFAULT.read_text())['capabilities'] for t in capability['tools']]
     by_name={r['name']:r for r in records}
-    assert len(records)==len(by_name)==83 and set(by_name)==EXPECTED_ALL|EXPERIMENT_ADDITIONS
+    assert len(records)==len(by_name)==84 and set(by_name)==EXPECTED_ALL|EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
     for name,(parameters,required) in SIGNATURES.items():
         assert by_name[name]=={'name':name,'parameters':parameters,'required':required,'values':{}}
     result,_=cli(tmp_path,default=True);server,_=final_server(tmp_path);success(result,expected_pending(server))
@@ -92,6 +93,7 @@ def test_each_new_oracle_golden_helper_and_guide_is_mandatory_in_sdist(tmp_path,
     final_server(tmp_path);checker=load_script('check_release_archives')
     from test_search_url_workflow_contract import REQUIRED_SOURCE
     expected=set(REQUIRED_SOURCE)|set(NEW_SOURCE)
+    expected|={path for path in NETWORK_SOURCE if path in checker.REQUIRED_SOURCE}
     expected|={path for path in EXPERIMENT_SOURCE if path in checker.REQUIRED_SOURCE}
     assert set(NEW_SOURCE)<=set(checker.REQUIRED_SOURCE)
     checker.check_inventory(sorted(expected),source_archive=True)
@@ -104,7 +106,7 @@ def test_each_new_oracle_golden_helper_and_guide_is_mandatory_in_sdist(tmp_path,
 def test_installed_catalog_checker_rejects_false_inventory_equivalence(tmp_path,monkeypatch,read_only,mutation):
     final_server(tmp_path);module=load_script('check_installed')
     expected=set(module.EXPECTED_READS if read_only else module.EXPECTED_WRITE_MODE)
-    assert_expansion(expected,EXPECTED_READS if read_only else EXPECTED_ALL,EXPERIMENT_READS if read_only else EXPERIMENT_ADDITIONS)
+    assert_expansion(expected,EXPECTED_READS if read_only else EXPECTED_ALL,EXPERIMENT_READS if read_only else EXPERIMENT_ADDITIONS | {NETWORK_TOOL})
     names=sorted(expected)
     class CatalogClient:
         def __init__(self,server):pass
@@ -149,8 +151,8 @@ def installed_plan(installed,tool,args):
 def test_installed_shared_list_create_inspect_members_link_unlink_and_reread(tmp_path,monkeypatch,customer):
     with install(tmp_path,monkeypatch,customer=customer) as installed:
         listing=installed.receive(installed.send('tools/list',{}))['result']['tools']
-        assert 76<=len(listing)==len({t['name'] for t in listing})<=83
-        assert_expansion({t['name'] for t in listing},EXPECTED_ALL,EXPERIMENT_ADDITIONS)
+        assert 76<=len(listing)==len({t['name'] for t in listing})<=84
+        assert_expansion({t['name'] for t in listing},EXPECTED_ALL,EXPERIMENT_ADDITIONS|{NETWORK_TOOL})
         created=installed_plan(installed,'create_shared_negative_keyword_list',{'name':'Autumn test list'})
         assert created['proto']=='MutateSharedSetsRequest' and created['service']=='SharedSetService'
         assert created['request']['customer_id']==customer and created['request']['operations'][0]['create']['name']=='Autumn test list'
@@ -277,7 +279,7 @@ def test_public_guide_and_generated_reference_explain_local_scope_and_provider_l
     assert 'live' in lower and 'acceptance' in lower
     assert not re.search(r'google (?:always|universally) (?:forbids|prohibits).*undetermined',lower)
     for path in (ROOT/'README.md',ROOT/'docs/migration.md'):
-        content=path.read_text();assert any(total in content and reads in content for total,reads in (('76','30'),('79','33'),('80','33'),('83','34')))
+        content=path.read_text();assert any(total in content and reads in content for total,reads in (('76','30'),('79','33'),('80','33'),('83','34'),('84','34')))
     assert 'docs/shared-targeting.md' in (ROOT/'README.md').read_text()
     changelog=(ROOT/'CHANGELOG.md').read_text().lower()
     assert all(word in changelog for word in ('unreleased','shared','demographic'))

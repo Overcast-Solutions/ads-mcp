@@ -62,7 +62,7 @@ List existing asset groups for a verified Performance Max campaign, including st
 
 ### `get_campaign_performance`
 
-Campaign metrics for a date window (explicit range or last_n_days), with budget, bidding strategy incl. targets, and the serving/primary status trio. Money is decimal with currency. enabled_only=true filters server-side.
+Campaign metrics for a date window (explicit range or last_n_days), with budget, bidding strategy incl. targets, and the serving/primary status trio. Network settings preserve explicit false and report absent optional values as null, including non-Search campaigns. Money is decimal with currency. enabled_only=true filters server-side.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
@@ -565,7 +565,7 @@ Stage dismissing a Google recommendation (bare id or full resource name — both
 
 ### `draft_campaign`
 
-Stage a new campaign (status defaults to PAUSED): channel, name, budget, bidding strategy, geo and language targeting. Budget cap applies at plan time and again at apply. Optional ad_group_name and keywords ({text, match_type, optional cpc_bid_micros}) create an ad group with the campaign's status and enabled keywords under those parents; keyword bids use ADS_MCP_MAX_FIRST_BID at both gates. CPA/ROAS targets are uncapped. Creation supports only SEARCH, DISPLAY and PERFORMANCE_MAX; other channels need channel-specific settings this tool cannot supply. Creation status must be PAUSED or ENABLED; REMOVED is a lifecycle enum value, not a creation status. Requires an explicit contains_eu_political_advertising boolean. PERFORMANCE_MAX creates a campaign shell with no asset group or serving creative and rejects ad-group/keyword children; use create_pmax_campaign for complete non-retail creation. Provider/account eligibility and strategy compatibility still apply; a supported shell does not establish serving readiness.
+Stage a new campaign (status defaults to PAUSED): channel, name, budget, bidding strategy, geo and language targeting. Budget cap applies at plan time and again at apply. Optional ad_group_name and keywords ({text, match_type, optional cpc_bid_micros}) create an ad group with the campaign's status and enabled keywords under those parents; keyword bids use ADS_MCP_MAX_FIRST_BID at both gates. CPA/ROAS targets are uncapped. Creation supports only SEARCH, DISPLAY and PERFORMANCE_MAX; other channels need channel-specific settings this tool cannot supply. Creation status must be PAUSED or ENABLED; REMOVED is a lifecycle enum value, not a creation status. Requires an explicit contains_eu_political_advertising boolean. PERFORMANCE_MAX creates a campaign shell with no asset group or serving creative and rejects ad-group/keyword children; use create_pmax_campaign for complete non-retail creation. Provider/account eligibility and strategy compatibility still apply; a supported shell does not establish serving readiness. Search defaults to Google Search only; null network options use defaults. Search Partners requires Google Search. Restricted partner targeting is provider/account-dependent.
 
 | Parameter | Type | Required | Default |
 |---|---|---|---|
@@ -582,6 +582,10 @@ Stage a new campaign (status defaults to PAUSED): channel, name, budget, bidding
 | `target_roas` | number | no | — |
 | `status` | string | no | `PAUSED` |
 | `contains_eu_political_advertising` | boolean | no | — |
+| `target_google_search` | boolean | no | — |
+| `target_search_network` | boolean | no | — |
+| `target_partner_search_network` | boolean | no | — |
+| `target_content_network` | boolean | no | — |
 
 ### `draft_keywords`
 
@@ -755,6 +759,19 @@ Plan irreversible replacement of an existing feed-linked Performance Max asset g
 |---|---|---|---|
 | `asset_group_id` | string | yes | — |
 | `item_ids` | array&lt;string&gt; | yes | — |
+| `customer_id` | string | no | — |
+
+### `set_campaign_networks`
+
+Stage exact network changes for an enabled or paused standard Search campaign. Supply at least one boolean; null omits a field. Search Partners requires Google Search. Restricted partner targeting is provider/account-dependent. Preview shows before/after values and only supplied network leaf masks. Complete campaign state is rechecked before confirm_and_apply. Enabling networks may change serving and spend; provider eligibility remains authoritative.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `campaign_id` | string | yes | — |
+| `target_google_search` | boolean | no | — |
+| `target_search_network` | boolean | no | — |
+| `target_partner_search_network` | boolean | no | — |
+| `target_content_network` | boolean | no | — |
 | `customer_id` | string | no | — |
 
 ### `set_campaign_schedule`

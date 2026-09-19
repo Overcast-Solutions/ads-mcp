@@ -13,6 +13,7 @@ from __future__ import annotations
 from google.protobuf.field_mask_pb2 import FieldMask
 
 from ads_mcp.errors import ToolError
+from ads_mcp.receipts import validate as validate_receipts
 
 MICROS = 1_000_000
 CAMPAIGN_STRATEGY_FIELDS = {
@@ -45,11 +46,17 @@ def _mutate(ctx, service_name: str, method: str, request):
     """Send one mutate request, exactly once, and record that it landed."""
     service = ctx.client().get_service(service_name)
     result = ctx.mutate_once(lambda: getattr(service, method)(request=request))
+    receipts = ({"created": [], "updated": []}
+                if method in {"apply_recommendation", "dismiss_recommendation"}
+                else validate_receipts(request, result))
+    if ctx.receipts is not None:
+        ctx.receipts.accept(receipts)
     ctx.audit_step(
         service=service_name,
         method=method,
         operations=len(request.mutate_operations if "mutate_operations" in
                        request._pb.DESCRIPTOR.fields_by_name else request.operations),
+        receipts=receipts,
     )
     return result
 
@@ -86,7 +93,7 @@ def create_campaign(*, name, daily_budget, bidding_strategy, channel_type,
                     geo_target_ids=(), language_ids=(), final_urls=(),
                     ad_group_name=None, keywords=(), target_cpa=None,
                     target_roas=None, status="PAUSED",
-                    contains_eu_political_advertising):
+                    contains_eu_political_advertising, network_settings=None):
     def _run(ctx):
         client = ctx.client()
 
@@ -111,6 +118,9 @@ def create_campaign(*, name, daily_budget, bidding_strategy, channel_type,
             client.enums.AdvertisingChannelTypeEnum, channel_type
         )
         _campaign_declaration(client, campaign_op.create, contains_eu_political_advertising)
+        if network_settings is not None:
+            for field, value in network_settings.items():
+                setattr(campaign_op.create.network_settings, field, value)
         if channel_type == "PERFORMANCE_MAX":
             campaign_op.create.brand_guidelines_enabled = False
         strategy = str(bidding_strategy).strip().upper()

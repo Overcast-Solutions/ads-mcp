@@ -41,7 +41,7 @@ EXPECTED_WRITE_MODE = EXPECTED_READS | frozenset({
     "remove_asset_group_signals", "remove_entity", "remove_extension",
     "remove_geo_target", "remove_keywords", "remove_negative_keywords",
     "remove_pmax_url_exclusions", "set_asset_group_product_selection",
-    "set_campaign_schedule", "set_conversion_action_primary_status",
+    "set_campaign_schedule", "set_campaign_networks", "set_conversion_action_primary_status",
     "set_pmax_final_url_expansion", "update_ad_group", "update_campaign",
     "update_keyword_bid", "update_keyword_urls", "update_responsive_search_ad_urls",
     "upload_image_asset", "upload_text_asset",

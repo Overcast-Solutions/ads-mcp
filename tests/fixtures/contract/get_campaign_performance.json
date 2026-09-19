@@ -60,6 +60,12 @@
     "window": {"start": "2026-07-01", "end": "2026-07-31"},
     "campaigns": [
       {
+        "network_settings": {
+          "target_google_search": null,
+          "target_search_network": null,
+          "target_partner_search_network": null,
+          "target_content_network": null
+        },
         "campaign_id": "111",
         "name": "ACME - PMax - Retail",
         "status": "ENABLED",
@@ -82,6 +88,12 @@
         "average_cpc": "1.31 USD"
       },
       {
+        "network_settings": {
+          "target_google_search": null,
+          "target_search_network": null,
+          "target_partner_search_network": null,
+          "target_content_network": null
+        },
         "campaign_id": "222",
         "name": "Brand - Search",
         "status": "PAUSED",

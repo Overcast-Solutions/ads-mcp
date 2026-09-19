@@ -24,6 +24,36 @@ and writes are never retried automatically.
 Plan and execution events use an append-only JSONL audit log. Partial failures,
 uncertain transport outcomes and audit failures are surfaced to the caller.
 
+## Confirmed resource receipts
+
+An application returns `created` and `updated` lists containing provider-returned
+resource names in execution order. A campaign flow includes its budget, campaign
+and optional children; asset creation includes both assets and their links.
+Composite identifiers remain complete, such as
+`customers/1234567890/adGroupCriteria/201~901`. Removes and custom actions produce
+no create/update receipts. Preview never creates resources.
+
+The server validates each response against the submitted operations, resource
+kinds and configured account before using an identity in a dependent write.
+An invalid or missing receipt stops the sequence. Earlier confirmed names remain
+in the result alongside `receipts_complete=false` and
+`partial_changes_possible=true`. A rejected later step or an unknown transport
+outcome can leave partial changes; an empty list does not prove nothing changed.
+Inspect the account and audit log before staging another plan. Do not blindly
+retry: the attempted plan is consumed, and the server never retries writes.
+
+Per-step and final audit records retain the corresponding confirmed names.
+Post-write audit loss retains receipts and adds an `audit_warning`. Experiment
+creation also retains its separate submission/readback status; receipts confirm
+identities, not serving behavior or asynchronous completion. End and promotion
+continue to report their action state without invented resource creations.
+
+Using your own configured credentials, stage `upload_text_asset` with a synthetic
+asset name and text, preview its returned plan ID, then deliberately apply that
+same plan with `confirm_and_apply(plan_id, dry_run=false)`. Use the returned
+`created` resource name for subsequent inspection; never infer it from the asset
+name or treat this example as live account validation.
+
 ## Account scope
 
 `customer_id` is accepted on every write tool, but only to be **refused** if
@@ -87,6 +117,9 @@ Spend guardrails apply at plan creation and again at application:
   audit log. Apply those deliberately in the Google Ads UI.
 
 ## Campaign creation
+
+For explicit Search network defaults and partial updates, see the
+[campaign network guide](campaign-networks.md).
 
 Generic `draft_campaign` creation supports only `SEARCH`, `DISPLAY` and the
 `PERFORMANCE_MAX` shell. Other known channel enum values refuse with

@@ -10,6 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 import harness as h
+from campaign_networks_oracle import TOOL as NETWORK_TOOL, NEW_SOURCE as NETWORK_SOURCE
 from shared_targeting_oracle import ADDITIONS as TARGETING_ADDITIONS, READS as TARGETING_READS, WRITES as TARGETING_WRITES, FIXTURES as TARGETING_FIXTURES, NEW_SOURCE, assert_expansion
 from pmax_experiment_oracle import ADDITIONS as EXPERIMENT_ADDITIONS, READS as EXPERIMENT_READS, WRITES as EXPERIMENT_WRITES, FIXTURES as EXPERIMENT_FIXTURES, NEW_SOURCE as EXPERIMENT_SOURCE
 from pmax_oracle import expected_pending
@@ -55,13 +56,13 @@ def test_final_catalog_requires_all_67_operations_and_27_reads(tmp_path):
     from ads_mcp.tools.registry import all_tool_specs
     server, _ = final_server(tmp_path)
     assert len(EXPECTED_ALL) == 67 and len(EXPECTED_READS) == 27
-    assert_expansion(h.tool_names(server), EXPECTED_ALL | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS)
+    assert_expansion(h.tool_names(server), EXPECTED_ALL | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS | {NETWORK_TOOL})
     readonly, _ = setup(tmp_path, "ad", read_only=True)
     assert_expansion(h.tool_names(readonly), EXPECTED_READS | TARGETING_READS, EXPERIMENT_READS)
     specs = all_tool_specs()
-    assert 76 <= len(specs) == len({spec.name for spec in specs}) <= 83
+    assert 76 <= len(specs) == len({spec.name for spec in specs}) <= 84
     assert_expansion({spec.name for spec in specs if spec.kind == "read"}, EXPECTED_READS | TARGETING_READS, EXPERIMENT_READS)
-    assert_expansion({spec.name for spec in specs if spec.kind == "mutation"}, EXPECTED_WRITES | TARGETING_WRITES, EXPERIMENT_WRITES)
+    assert_expansion({spec.name for spec in specs if spec.kind == "mutation"}, EXPECTED_WRITES | TARGETING_WRITES, EXPERIMENT_WRITES | {NETWORK_TOOL})
     assert {spec.name for spec in specs if spec.kind == "apply"} == {"confirm_and_apply"}
     metadata = h.tool_map(server)
     for name, requirement in OBLIGATIONS.items():
@@ -75,7 +76,7 @@ def test_independent_requirements_are_complete_and_cli_has_no_pending_additions(
     final_server(tmp_path)
     tools = [tool for cap in json.loads(DEFAULT.read_text())["capabilities"] for tool in cap["tools"]]
     by_name = {tool["name"]: tool for tool in tools}
-    assert len(tools) == len(by_name) == 83 and set(by_name) == EXPECTED_ALL | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS
+    assert len(tools) == len(by_name) == 84 and set(by_name) == EXPECTED_ALL | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
     assert {name: by_name[name] for name in OBLIGATIONS} == OBLIGATIONS
     result, _ = cli(tmp_path, default=True)
     server, _ = final_server(tmp_path)
@@ -116,6 +117,7 @@ def test_source_archive_inventory_requires_every_original_and_new_member(tmp_pat
     checker = load_script("check_release_archives")
     assert set(REQUIRED_SOURCE) <= set(checker.REQUIRED_SOURCE)
     complete = [*REQUIRED_SOURCE, *[path for path in NEW_SOURCE if path in checker.REQUIRED_SOURCE]]
+    complete += [path for path in NETWORK_SOURCE if path in checker.REQUIRED_SOURCE]
     complete += [path for path in EXPERIMENT_SOURCE if path in checker.REQUIRED_SOURCE]
     checker.check_inventory(complete, source_archive=True)
     for missing in REQUIRED_SOURCE:
@@ -130,7 +132,7 @@ def test_installed_archive_checker_requires_exact_tool_names_not_just_counts(tmp
     final_server(tmp_path)
     module = load_script("check_installed")
     expected = set(module.EXPECTED_READS if read_only else module.EXPECTED_WRITE_MODE)
-    assert_expansion(expected, (EXPECTED_READS | TARGETING_READS) if read_only else (EXPECTED_ALL | TARGETING_ADDITIONS), EXPERIMENT_READS if read_only else EXPERIMENT_ADDITIONS)
+    assert_expansion(expected, (EXPECTED_READS | TARGETING_READS) if read_only else (EXPECTED_ALL | TARGETING_ADDITIONS), EXPERIMENT_READS if read_only else EXPERIMENT_ADDITIONS | {NETWORK_TOOL})
     class CatalogClient:
         def __init__(self, server):
             pass
@@ -192,8 +194,8 @@ def test_installed_console_drives_inspect_preview_apply_and_reread(tmp_path, mon
     with process_plumbing.InstalledServer(tmp_path / "installed", customer=customer,
             env={"ADS_MCP_REQUIRE_DRY_RUN": "true"}) as installed:
         listing = installed.receive(installed.send("tools/list", {}))["result"]["tools"]
-        assert 76 <= len(listing) == len({item["name"] for item in listing}) <= 83
-        assert_expansion({item["name"] for item in listing}, EXPECTED_ALL | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS)
+        assert 76 <= len(listing) == len({item["name"] for item in listing}) <= 84
+        assert_expansion({item["name"] for item in listing}, EXPECTED_ALL | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS | {NETWORK_TOOL})
         inspected = h.expect_ok(installed.call(spec["read"], args(kind)))
         assert inspected["customer_id"] == customer
         assert inspected[spec["entity"]]["final_urls"] == BEFORE_FINAL
@@ -275,9 +277,9 @@ def test_public_guide_and_generated_tool_docs_cover_the_complete_workflow(tmp_pa
     assert "example.invalid" in text
     assert "no retry" in lower or "not retry" in lower or "never retry" in lower
     readme = (ROOT / "README.md").read_text()
-    assert any(total in readme and reads in readme for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"))) and "docs/search-urls.md" in readme
+    assert any(total in readme and reads in readme for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"), ("84", "34"))) and "docs/search-urls.md" in readme
     migration = (ROOT / "docs/migration.md").read_text()
-    assert any(total in migration and reads in migration for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34")))
+    assert any(total in migration and reads in migration for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"), ("84", "34")))
     changelog = (ROOT / "CHANGELOG.md").read_text().lower()
     assert "unreleased" in changelog and "keyword" in changelog and "responsive search ad" in changelog
     generated = subprocess.run([sys.executable, str(ROOT / "scripts/gen_tools_md.py"), "--stdout"],

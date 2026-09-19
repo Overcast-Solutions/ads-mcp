@@ -42,17 +42,27 @@ def guarded(ctx, fn, name: str | None = None, *, plan_id=None):
         ctx.current_customer = None
         ctx.current_plan_id = plan_id
         ctx.clear_audit_loss()
+        ctx.receipts = None
         try:
             return fn(**kwargs)
         except BaseException as exc:  # noqa: BLE001 — classified & returned
             err = classify_exception(exc, scrub=ctx.scrub)
             ctx.audit_auth_failure(err)
-            return {"error": {"code": err.code, "message": ctx.scrub(err.message)}}
+            result = {"error": {"code": err.code, "message": ctx.scrub(err.message)}}
+            if ctx.receipts is not None:
+                result.update(ctx.receipts.payload())
+                if ctx.audit_loss:
+                    result["audit_warning"] = (
+                        "One or more audit records could not be written. "
+                        "Reconcile the plan against the account manually."
+                    )
+            return result
         finally:
             ctx.current_tool = ""
             ctx.current_customer = None
             ctx.current_plan_id = None
             ctx.clear_audit_loss()
+            ctx.receipts = None
 
     return _wrapped
 
@@ -253,6 +263,7 @@ def register_tools(server, ctx):
     # same closed shape. Inherit aliases, defaults and the SDK's dump behavior.
     for tool in server._tool_manager.list_tools():
         if tool.name in {
+            "draft_campaign", "set_campaign_networks",
             "list_pmax_url_experiments", "get_pmax_url_experiment", "get_pmax_url_experiment_results",
             "create_pmax_url_experiment",
             "end_pmax_url_experiment", "promote_pmax_url_experiment", "get_pmax_url_experiment_operation",

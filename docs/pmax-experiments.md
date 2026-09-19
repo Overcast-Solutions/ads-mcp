@@ -13,7 +13,7 @@ Use your **own credentials**, Cloud project, OAuth client and authorized Ads
 login; follow [authentication](authentication.md). The package supplies no
 shared credentials. Start read-only with `health_check` and `get_account_info`.
 The four experiment reads are available among all 34 reads. Opting into
-experimental writes exposes 83 total operations; review [write setup](writes.md)
+experimental writes exposes 84 total operations; review [write setup](writes.md)
 and configure private audit storage before using the three staging tools.
 Account authority and host approval remain the operator's responsibility.
 

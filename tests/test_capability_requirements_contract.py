@@ -10,6 +10,7 @@ import harness as h
 from shared_targeting_oracle import ADDITIONS as TARGETING_ADDITIONS
 from pmax_experiment_oracle import ADDITIONS as EXPERIMENT_ADDITIONS
 from pmax_oracle import PMAX_ADDITIONS, SEARCH_URL_ADDITIONS, expected_pending
+from campaign_networks_oracle import TOOL as NETWORK_TOOL
 
 from capability_oracle import (
     BUILTIN_FORBIDDEN, DEFAULT, DETAIL, ROOT, cli, compare, empty, failure,
@@ -34,7 +35,7 @@ def test_authored_default_covers_the_accepted_workflows_and_declared_obligations
         assert capability["tools"]
         tools.extend(capability["tools"])
     by_name = {tool["name"]: tool for tool in tools}
-    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS
+    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
     for tool in tools:
         assert set(tool) == {"name", "parameters", "required", "values"}
         assert len(tool["parameters"]) == len(set(tool["parameters"]))
