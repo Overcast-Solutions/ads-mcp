@@ -13,6 +13,7 @@ import re
 
 from google.ads.googleads.errors import GoogleAdsException
 
+from ads_mcp import gaql_hints
 from ads_mcp.errors import ToolError, cloud_project_access_error
 from ads_mcp.continuation import retained
 
@@ -151,7 +152,11 @@ def run(ctx, *, query: str, customer_id=None, format: str = "json",
         messages = "; ".join(
             e.message for e in exc.failure.errors if getattr(e, "message", "")
         ) or "the Google Ads API rejected the query"
-        raise ToolError("GAQL_ERROR", messages) from None
+        # The provider's code and message pass through untouched; named field
+        # errors gain schema guidance beside them. The query is never
+        # rewritten and never resubmitted.
+        raise ToolError("GAQL_ERROR", messages,
+                        gaql_hints.details(ctx, exc)) from None
     rows = result.pop("rows")
     if fmt == "json":
         return {**result, "format": fmt, "fields": fields, "rows": rows}

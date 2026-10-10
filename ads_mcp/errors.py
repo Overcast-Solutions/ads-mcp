@@ -24,15 +24,22 @@ REAUTH_MESSAGE = (
 
 
 class ToolError(Exception):
-    """Raise inside a tool to return a structured error payload."""
+    """Raise inside a tool to return a structured error payload.
 
-    def __init__(self, code: str, message: str):
+    ``details`` carries extra, already-bounded keys alongside the code and
+    message — guidance a caller can act on, such as run_gaql's field hints.
+    It never replaces or edits either of them.
+    """
+
+    def __init__(self, code: str, message: str, details: dict | None = None):
         super().__init__(message)
         self.code = code
         self.message = message
+        self.details = dict(details) if details else {}
 
     def payload(self) -> dict:
-        return {"error": {"code": self.code, "message": self.message}}
+        return {"error": {"code": self.code, "message": self.message,
+                          **self.details}}
 
 
 class AuthConfigError(ToolError):
@@ -42,6 +49,21 @@ class AuthConfigError(ToolError):
 
 def error_payload(code: str, message: str) -> dict:
     return {"error": {"code": code, "message": message}}
+
+
+def scrub_details(details: dict, scrub) -> dict:
+    """Apply the secret scrubber to every string inside error details."""
+
+    def walk(value):
+        if isinstance(value, str):
+            return scrub(value)
+        if isinstance(value, dict):
+            return {key: walk(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [walk(item) for item in value]
+        return value
+
+    return {key: walk(value) for key, value in details.items()}
 
 
 def cloud_project_access_error(exc: GoogleAdsException) -> ToolError | None:

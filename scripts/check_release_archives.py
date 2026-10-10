@@ -74,7 +74,8 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/test_resource_metadata_contract.py",
                    "tests/resource_metadata_oracle.py",
                    "tests/fixtures/resource_metadata_fields_v25.json",
-                   "tests/fixtures/resource_metadata/get_resource_metadata.json")
+                   "tests/fixtures/resource_metadata/get_resource_metadata.json",
+                   "tests/test_gaql_field_guidance_contract.py")
 
 REQUIRED_PACKAGE_SOURCE = ("ads_mcp/pmax_experiments.py",
                            "ads_mcp/pmax_experiment_create.py",

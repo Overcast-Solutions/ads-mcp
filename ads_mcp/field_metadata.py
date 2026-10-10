@@ -76,6 +76,12 @@ def sanitize(value) -> str:
     return "".join(ch for ch in text[:ECHO_LIMIT] if ch.isprintable())
 
 
+def is_field_name(value) -> bool:
+    """The same name rule, as a predicate for provider-supplied names."""
+    return (isinstance(value, str) and 1 <= len(value) <= MAX_NAME_LENGTH
+            and NAME_RULE.fullmatch(value) is not None)
+
+
 def validate_name(name) -> str:
     """The name rule, applied before any provider access."""
     if (not isinstance(name, str) or not 1 <= len(name) <= MAX_NAME_LENGTH
@@ -226,6 +232,21 @@ def _fetch_family(ctx, top: str, budget: _Budget) -> dict:
     return table
 
 
+def family_table(ctx, name: str) -> dict:
+    """The cached top-level family of ``name``: at most ``MAX_REQUESTS``
+    prefix-limited field-service requests inside one shared deadline."""
+    top = name.split(".")[0]
+    budget = _Budget()
+    return ctx.field_catalog.family(ctx, top, lambda: _fetch_family(ctx, top, budget))
+
+
+def close_names(name: str, table: dict) -> list[str]:
+    """Up to five catalogue names closest to ``name`` in its own family."""
+    return difflib.get_close_matches(
+        name, sorted(table), n=MAX_CLOSE_MATCHES, cutoff=CLOSE_MATCH_CUTOFF
+    )
+
+
 def _detail(record: dict) -> dict:
     values = record["enum_values"]
     return {
@@ -243,9 +264,7 @@ def _detail(record: dict) -> dict:
 
 def _not_found(resolved: str, table: dict) -> dict:
     """NOT_FOUND with the closest names from the same top-level family."""
-    matches = difflib.get_close_matches(
-        resolved, sorted(table), n=MAX_CLOSE_MATCHES, cutoff=CLOSE_MATCH_CUTOFF
-    )
+    matches = close_names(resolved, table)
     payload = error_payload(
         "NOT_FOUND",
         f"no Google Ads API resource or field is named {sanitize(resolved)!r}",
@@ -271,9 +290,7 @@ def run(ctx, *, name, page_size=None, page_token=None) -> dict:
     scope = json.dumps([TOOL, resolved, size], sort_keys=True)
     offset = 0 if page_token is None else catalog.offset(scope, page_token)
 
-    top = resolved.split(".")[0]
-    budget = _Budget()
-    table = catalog.family(ctx, top, lambda: _fetch_family(ctx, top, budget))
+    table = family_table(ctx, resolved)
 
     item = table.get(resolved)
     names: dict = {}

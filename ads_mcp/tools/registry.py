@@ -17,7 +17,7 @@ from mcp.server.mcpserver.utilities.func_metadata import FuncMetadata
 from pydantic import ConfigDict, PrivateAttr, ValidationError, create_model
 from pydantic_core import PydanticCustomError
 
-from ads_mcp.errors import classify_exception
+from ads_mcp.errors import classify_exception, scrub_details
 
 KIND_READ = "read"
 KIND_MUTATION = "mutation"
@@ -48,7 +48,11 @@ def guarded(ctx, fn, name: str | None = None, *, plan_id=None):
         except BaseException as exc:  # noqa: BLE001 — classified & returned
             err = classify_exception(exc, scrub=ctx.scrub)
             ctx.audit_auth_failure(err)
-            result = {"error": {"code": err.code, "message": ctx.scrub(err.message)}}
+            result = {"error": {
+                "code": err.code,
+                "message": ctx.scrub(err.message),
+                **scrub_details(err.details, ctx.scrub),
+            }}
             if ctx.receipts is not None:
                 result.update(ctx.receipts.payload())
                 if ctx.audit_loss:

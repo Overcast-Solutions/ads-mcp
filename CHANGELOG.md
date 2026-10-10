@@ -2,6 +2,14 @@
 
 ## Unreleased changes
 
+- Guide `run_gaql` query errors that name a field: twelve named
+  `QueryError` values gain `provider_error` and up to five `hints` read from
+  `GoogleAdsFieldService` — close names for a misspelling, the exact field to
+  add to `SELECT`, the resources a field is selectable with, and a field's
+  type, filterable, repeated and enum facts for a rejected operator. The
+  provider's code and message are unchanged, the query is never rewritten or
+  resubmitted, and a failed lookup returns the original error alone.
+
 - Add the `get_resource_metadata` read: describe a resource, field or field
   prefix from `GoogleAdsFieldService` so a query can be built before it is
   spent. Schema metadata only — no account is addressed and no account data
