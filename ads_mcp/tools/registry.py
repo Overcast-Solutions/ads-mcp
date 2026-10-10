@@ -317,7 +317,8 @@ def _prime_specs():
         max_bid_increase_pct=None, audit_log=None, customer_id="0000000000",
         login_customer_id=None, retry_base_seconds=1.0,
         plan_ttl_seconds=900.0, row_limit=1000, developer_token="",
-        credentials_path="", token_path="",
+        credentials_path="", token_path="", credential_source="files",
+        credential_paths=(), unused_settings=(),
     )
     ctx = SimpleNamespace(
         config=cfg, plan_store=None, audit=None, clock=lambda: 0.0,

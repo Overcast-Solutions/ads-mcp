@@ -75,12 +75,15 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/resource_metadata_oracle.py",
                    "tests/fixtures/resource_metadata_fields_v25.json",
                    "tests/fixtures/resource_metadata/get_resource_metadata.json",
-                   "tests/test_gaql_field_guidance_contract.py")
+                   "tests/test_gaql_field_guidance_contract.py",
+                   "tests/test_credential_sources_contract.py",
+                   "tests/credential_sources_oracle.py")
 
 REQUIRED_PACKAGE_SOURCE = ("ads_mcp/pmax_experiments.py",
                            "ads_mcp/pmax_experiment_create.py",
                            "ads_mcp/pmax_experiment_lifecycle.py",
-                           "ads_mcp/field_metadata.py")
+                           "ads_mcp/field_metadata.py",
+                           "ads_mcp/credentials.py")
 
 
 def check_package_inventory(paths):

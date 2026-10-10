@@ -1,8 +1,10 @@
 """Environment-driven configuration.
 
 Environment contract: required
-GOOGLE_ADS_CUSTOMER_ID,
-GOOGLE_ADS_CREDENTIALS_PATH, GOOGLE_ADS_TOKEN_PATH; optional
+GOOGLE_ADS_CUSTOMER_ID, plus GOOGLE_ADS_CREDENTIALS_PATH and
+GOOGLE_ADS_TOKEN_PATH for the default ``files`` credential source; optional
+GOOGLE_ADS_CREDENTIAL_SOURCE (files | adc | google_ads_yaml, validated before
+every other setting), GOOGLE_ADS_CONFIGURATION_FILE_PATH,
 GOOGLE_ADS_LOGIN_CUSTOMER_ID, ignored legacy GOOGLE_ADS_DEVELOPER_TOKEN,
 and every ADS_MCP_* guardrail variable
 (safe defaults: read-only on, dry-run required, caps refuse when unset).
@@ -20,6 +22,10 @@ class ConfigError(Exception):
 
 _REQUIRED = {
     "GOOGLE_ADS_CUSTOMER_ID": "123-456-7890",
+}
+#: Required by the two-file credential source only; the other sources carry
+#: their own credential material and ignore both variables.
+_REQUIRED_FILES = {
     "GOOGLE_ADS_CREDENTIALS_PATH": "/path/to/oauth_client.json",
     "GOOGLE_ADS_TOKEN_PATH": "/path/to/oauth_refresh.json",
 }
@@ -37,7 +43,9 @@ def normalize_customer_id(raw: str) -> str:
     return "".join(str(int(digit)) for digit in cleaned)
 
 
-def _expand(path: str) -> str:
+def expand_path(path: str) -> str:
+    """MCP ``env`` blocks are passed without shell expansion, and the README's
+    own snippet uses ~ — expand operator-supplied paths ourselves."""
     import os
 
     return os.path.expandvars(os.path.expanduser(str(path).strip()))
@@ -82,8 +90,8 @@ class Config:
     developer_token: str
     customer_id: str
     login_customer_id: Optional[str]
-    credentials_path: str
-    token_path: str
+    credentials_path: Optional[str]
+    token_path: Optional[str]
     read_only: bool
     require_dry_run: bool
     max_daily_budget: Optional[float]
@@ -93,10 +101,25 @@ class Config:
     retry_base_seconds: float
     plan_ttl_seconds: float
     row_limit: int
+    credential_source: str = "files"
+    # Candidate credential files for the selected source, in lookup order.
+    # Resolved here, from this mapping, so the lazy read cannot pick up a
+    # different ambient HOME or gcloud configuration later.
+    credential_paths: tuple = ()
+    # Settings the selected source ignores, for health to report.
+    unused_settings: tuple = ()
 
 
 def load_config(env: Mapping[str, str]) -> Config:
-    for var, example in _REQUIRED.items():
+    from ads_mcp import credentials
+
+    # The source decides which other variables are required, so it is
+    # validated before any of them.
+    source = credentials.select_source(env)
+    required = dict(_REQUIRED)
+    if source == "files":
+        required.update(_REQUIRED_FILES)
+    for var, example in required.items():
         value = env.get(var)
         if value is None or not str(value).strip():
             raise ConfigError(
@@ -139,14 +162,17 @@ def load_config(env: Mapping[str, str]) -> Config:
             "(e.g. ADS_MCP_AUDIT_LOG=/var/log/ads-mcp/audit.jsonl)"
         )
 
+    # Only the two-file source has these paths; the others report them as
+    # null and ignore the variables entirely.
+    files_source = source == "files"
     return Config(
         developer_token=str(env.get("GOOGLE_ADS_DEVELOPER_TOKEN") or "").strip(),
         customer_id=normalize_customer_id(str(env["GOOGLE_ADS_CUSTOMER_ID"])),
         login_customer_id=login_id,
-        # MCP `env` blocks are passed without shell expansion, and the
-        # README's own snippet uses ~ — expand it ourselves.
-        credentials_path=_expand(env["GOOGLE_ADS_CREDENTIALS_PATH"]),
-        token_path=_expand(env["GOOGLE_ADS_TOKEN_PATH"]),
+        credentials_path=(
+            expand_path(env["GOOGLE_ADS_CREDENTIALS_PATH"]) if files_source else None
+        ),
+        token_path=expand_path(env["GOOGLE_ADS_TOKEN_PATH"]) if files_source else None,
         read_only=read_only,
         require_dry_run=_parse_bool(env, "ADS_MCP_REQUIRE_DRY_RUN", True),
         max_daily_budget=_parse_float(env, "ADS_MCP_MAX_DAILY_BUDGET"),
@@ -156,4 +182,7 @@ def load_config(env: Mapping[str, str]) -> Config:
         retry_base_seconds=retry_base,
         plan_ttl_seconds=plan_ttl,
         row_limit=row_limit,
+        credential_source=source,
+        credential_paths=credentials.source_paths(source, env),
+        unused_settings=credentials.unused_settings(source, env),
     )

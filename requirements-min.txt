@@ -3,3 +3,5 @@ google-ads==31.4.0
 mcp==2.0.0
 httpx2==2.12.0
 httpcore2==2.12.0
+PyYAML==6.0.3
+google-auth==2.61.0

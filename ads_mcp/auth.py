@@ -1,6 +1,8 @@
 """OAuth credential loading and the authenticated GoogleAdsClient factory.
 
-Credential failures surface as structured, named errors (AUTH_TOKEN_REVOKED,
+The two-file source is read here; ``ads_mcp.credentials`` resolves the other
+GOOGLE_ADS_CREDENTIAL_SOURCE values onto the same OAuth material. Credential
+failures surface as structured, named errors (AUTH_TOKEN_REVOKED,
 AUTH_CONFIG_*) — never a generic failure, and never retried by transport.
 The Secrets registry lets every outgoing message be scrubbed of credential
 material regardless of which layer produced it.
@@ -21,6 +23,7 @@ class Secrets:
 
     def __init__(self, values=()):
         self._values = []
+        self._live = []
         for value in values:
             self.add(value)
 
@@ -36,7 +39,27 @@ class Secrets:
         ):
             self._values.append(value)
 
+    def watch(self, source):
+        """Register a callable yielding secret values minted while running.
+
+        An access token is issued after startup and replaced on every refresh,
+        so the registry cannot be a snapshot: each scrub harvests the live
+        values first, and keeps them, so an earlier token stays redacted once
+        the credentials have moved on.
+        """
+        self._live.append(source)
+
+    def _harvest(self):
+        for source in self._live:
+            try:
+                values = source()
+            except Exception:  # noqa: BLE001 — redaction is best-effort
+                continue
+            for value in values or ():
+                self.add(value)
+
     def scrub(self, text: str) -> str:
+        self._harvest()
         for value in self._values:
             if value:
                 text = text.replace(value, _REDACTED)
@@ -47,6 +70,10 @@ def collect_secrets(config) -> Secrets:
     """Best-effort registry of every credential value we can know about."""
     secrets = Secrets([config.developer_token])
     for path in (config.credentials_path, config.token_path):
+        # The other credential sources carry no path here; their material is
+        # registered when it is resolved.
+        if not path:
+            continue
         try:
             data = json.loads(Path(path).read_text())
         except Exception:
@@ -119,9 +146,17 @@ def load_oauth_material(config) -> dict:
     }
 
 
-def build_client(config):
-    """Construct an authenticated GoogleAdsClient from the resolved config."""
-    material = load_oauth_material(config)
+def build_client(config, *, resolution=None):
+    """Construct an authenticated GoogleAdsClient from the resolved config.
+
+    ``resolution`` reuses credential material the caller already resolved, so
+    a credential file is read once per server rather than once per consumer.
+    """
+    if resolution is None:
+        from ads_mcp import credentials
+
+        resolution = credentials.resolve(config)
+    material = resolution.material
     from google.ads.googleads.client import GoogleAdsClient
 
     conf = {
@@ -135,8 +170,8 @@ def build_client(config):
         "refresh_token": material["refresh_token"],
         "use_proto_plus": True,
     }
-    if config.login_customer_id:
-        conf["login_customer_id"] = config.login_customer_id
+    if resolution.login_customer_id:
+        conf["login_customer_id"] = resolution.login_customer_id
     return GoogleAdsClient.load_from_dict(conf)
 
 

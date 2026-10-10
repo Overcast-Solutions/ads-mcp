@@ -748,17 +748,27 @@ def _audit_writable(cfg) -> bool | None:
 
 def _health_impl(*, ctx) -> dict:
     cfg = ctx.config
+    config = {
+        "customer_id": cfg.customer_id,
+        "login_customer_id": ctx.login_header_customer_id(),
+        # Compatibility field reports legacy configuration presence only;
+        # access is determined by the OAuth Cloud project.
+        "developer_token": "present" if cfg.developer_token else "absent",
+        "credentials_path": cfg.credentials_path,
+        "token_path": cfg.token_path,
+    }
+    # The two-file source keeps today's exact payload. Another source reports
+    # which one it is and which file it resolved, with both path fields null.
+    if cfg.credential_source != "files":
+        config["credential_source"] = cfg.credential_source
+        detail = ctx.credential_detail()
+        if detail is not None:
+            config["credential_detail"] = detail
+    if cfg.unused_settings:
+        config["unused_settings"] = list(cfg.unused_settings)
     payload = {
         "status": "OK",
-        "config": {
-            "customer_id": cfg.customer_id,
-            "login_customer_id": cfg.login_customer_id,
-            # Compatibility field reports legacy configuration presence only;
-            # access is determined by the OAuth Cloud project.
-            "developer_token": "present" if cfg.developer_token else "absent",
-            "credentials_path": cfg.credentials_path,
-            "token_path": cfg.token_path,
-        },
+        "config": config,
         "credentials": {},
         "guardrails": {
             "read_only": cfg.read_only,

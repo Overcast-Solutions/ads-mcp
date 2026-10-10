@@ -21,6 +21,7 @@ class ServerContext:
     secrets: Optional[auth.Secrets] = None
     audit: Any = None
     _client: Any = field(default=None, repr=False)
+    _credential: Any = field(default=None, repr=False)
     # Tool calls run on a worker-thread pool, so per-call state must not be
     # shared: a retry record would otherwise be stamped with another call's
     # tool name.
@@ -49,14 +50,51 @@ class ServerContext:
     def current_plan_id(self, value) -> None:
         self._local.plan_id = value
 
+    def credential(self):
+        """Credential material for the configured source, resolved once.
+
+        Resolution is lazy and uncached on failure: a credential problem is
+        reported by health_check and by every tool that needs the API, and an
+        operator who repairs the file is not told to restart the server.
+        """
+        if self._credential is None:
+            from ads_mcp import credentials
+
+            self._credential = credentials.resolve(self.config)
+        return self._credential
+
+    def credential_detail(self):
+        """What health reports about a non-files source, when it resolves."""
+        from ads_mcp.errors import ToolError
+
+        if self.config.credential_source == "files":
+            return None
+        try:
+            return self.credential().detail
+        except ToolError:
+            # The credentials probe reports the failure itself.
+            return None
+
     def client(self):
         """The GoogleAdsClient: injected by the oracle, else built once from
         real credentials (structured AUTH_CONFIG_* on failure)."""
         if self.injected_client is not None:
             return self.injected_client
         if self._client is None:
-            self._client = auth.build_client(self.config)
+            resolution = self.credential()
+            self._client = auth.build_client(self.config, resolution=resolution)
+            self._register_live_secrets(resolution, self._client)
         return self._client
+
+    def _register_live_secrets(self, resolution, client) -> None:
+        """Redact this source's material and every token minted from it."""
+        if self.secrets is None:
+            return
+        for key in ("client_secret", "refresh_token"):
+            self.secrets.add(resolution.material.get(key))
+        live = getattr(client, "credentials", None)
+        if live is not None:
+            self.secrets.watch(lambda: (getattr(live, "token", None),))
 
     def scrub(self, text: str) -> str:
         return self.secrets.scrub(text) if self.secrets else text
@@ -191,7 +229,19 @@ class ServerContext:
         Swapping customer_id alone is not enough: without this header the API
         answers USER_PERMISSION_DENIED for any account other than the one the
         credentials belong to.
+
+        GOOGLE_ADS_LOGIN_CUSTOMER_ID wins wherever it is set; a google-ads.yaml
+        source may supply it instead, so that file decides when it does.
         """
+        from ads_mcp.errors import ToolError
+
+        if self.config.credential_source != "files":
+            try:
+                return self.credential().login_customer_id
+            except ToolError:
+                # Unresolvable credentials fail the call itself; this header
+                # falls back to the environment so the refusal still names it.
+                pass
         return self.config.login_customer_id
 
     def resolve_customer(self, customer_id=None) -> str:
