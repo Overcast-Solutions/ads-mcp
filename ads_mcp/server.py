@@ -159,14 +159,48 @@ def main(argv=None):
         description=(
             "ads-mcp: a Google Ads MCP server built for autonomous agents — "
             "full tool surface behind server-side spend guardrails. Serves "
-            "MCP over stdio; configure via GOOGLE_ADS_* and ADS_MCP_* "
-            "environment variables (see README)."
+            "MCP over stdio by default; configure via GOOGLE_ADS_* and "
+            "ADS_MCP_* environment variables (see README)."
         ),
     )
     parser.add_argument("--version", action="version",
                         version=f"ads-mcp {_package_version()}")
-    parser.parse_args(argv)
+    parser.add_argument(
+        "--transport", metavar="http",
+        help="serve read-only MCP over local streamable HTTP at /mcp instead "
+             "of stdio; 'http' is the only supported value",
+    )
+    parser.add_argument(
+        "--host", metavar="HOST",
+        help="loopback address to bind with --transport http: 127.x.y.z, ::1 "
+             "or localhost (default: 127.0.0.1)",
+    )
+    parser.add_argument(
+        "--port", metavar="PORT",
+        help="port to bind with --transport http, 0 for an ephemeral port "
+             "(default: 8000)",
+    )
+    args = parser.parse_args(argv)
 
+    if args.transport is None:
+        offered = [name for name, value in
+                   (("--host", args.host), ("--port", args.port))
+                   if value is not None]
+        if offered:
+            parser.error(
+                f"{' and '.join(offered)} apply to --transport http only; "
+                "stdio has no address to bind"
+            )
+        return _run_stdio()
+    if args.transport != "http":
+        parser.error(
+            f"--transport {args.transport!r} is not supported; 'http' is the "
+            "only transport that can be selected (omit --transport for stdio)"
+        )
+    return _run_http(parser, args)
+
+
+def _run_stdio():
     try:
         config = load_config(os.environ)
     except ConfigError as exc:
@@ -181,3 +215,58 @@ def main(argv=None):
         print(f"ads-mcp: configuration error: {exc}", file=sys.stderr)
         return 2
     return 0
+
+
+def _run_http(parser, args):
+    from ads_mcp import http_transport
+
+    # The option values are validated before any configuration is read and
+    # long before anything is bound, so a refused invocation binds nothing.
+    try:
+        spec = http_transport.resolve_host(
+            args.host if args.host is not None else "127.0.0.1"
+        )
+        port = http_transport.resolve_port(
+            args.port if args.port is not None else "8000"
+        )
+    except http_transport.OptionError as exc:
+        parser.error(str(exc))
+
+    try:
+        config = load_config(os.environ)
+    except ConfigError as exc:
+        print(f"ads-mcp: configuration error: {exc}", file=sys.stderr)
+        return 2
+    if not config.read_only:
+        # The endpoint is unauthenticated: any local process can reach it, so
+        # a write-enabled configuration is refused before anything is bound.
+        print(
+            "ads-mcp: --transport http serves read-only configurations only; "
+            "set ADS_MCP_READ_ONLY=true (or unset it) to serve over HTTP",
+            file=sys.stderr,
+        )
+        return 2
+
+    try:
+        server = create_server(config)
+    except ConfigError as exc:
+        print(f"ads-mcp: configuration error: {exc}", file=sys.stderr)
+        return 2
+    try:
+        listener = http_transport.bind(spec, port)
+    except OSError as exc:
+        print(
+            f"ads-mcp: cannot bind {spec.display}:{port}: "
+            f"{exc.strerror or exc.__class__.__name__}",
+            file=sys.stderr,
+        )
+        return 2
+    try:
+        for line in http_transport.serving_lines(
+                spec, listener.getsockname()[1]):
+            print(line, file=sys.stderr, flush=True)
+        return http_transport.serve(server, listener)
+    except KeyboardInterrupt:
+        return 0
+    finally:
+        listener.close()
