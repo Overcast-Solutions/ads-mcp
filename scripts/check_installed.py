@@ -23,7 +23,7 @@ EXPECTED_READS = frozenset({
     "get_policy_issues", "get_product_status", "get_responsive_search_ad_urls",
     "get_search_terms", "get_shopping_performance", "health_check",
     "list_accounts", "list_audiences", "list_extensions", "list_recommendations",
-    "run_gaql", "search_geo_targets",
+    "run_gaql", "search_geo_targets", "get_resource_metadata",
     "list_shared_negative_keyword_lists", "get_shared_negative_keyword_list",
     "get_demographic_targeting",
     "list_pmax_url_experiments", "get_pmax_url_experiment",

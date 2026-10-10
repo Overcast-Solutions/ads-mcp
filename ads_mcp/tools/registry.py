@@ -235,6 +235,10 @@ def register_tools(server, ctx):
     for tool in server._tool_manager.list_tools():
         fields = tool.fn_metadata.arg_model.model_fields
         field = fields.get("campaign_id")
+        if tool.name == "get_resource_metadata":
+            # Account-free schema metadata paginates from its own signed
+            # tokens, so it holds no snapshot and shares no admission.
+            continue
         if "page_token" in fields:
             tool.fn_metadata = _RetainedReadMetadata(**dict(tool.fn_metadata))
             tool.fn_metadata._queues = read_queues

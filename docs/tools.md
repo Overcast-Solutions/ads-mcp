@@ -230,6 +230,16 @@ Merchant Center feed health as visible from the Ads API: linked merchant id, pro
 | `campaign_id` | string | yes | — |
 | `customer_id` | string | no | — |
 
+### `get_resource_metadata`
+
+Describe the Google Ads API's own reporting schema from GoogleAdsFieldService: supply a resource name such as 'campaign', a full field name such as 'campaign.status', or a field prefix such as 'campaign.network_settings'. A resource answers with its attribute fields in full detail, plus the names of its attribute resources and of the segments and metrics it can be selected with. Each field reports category, data type, selectable, filterable, sortable, repeatedness and up to 100 enum values. Use it to build a valid run_gaql query before spending a read. Schema metadata only: no account is addressed and no account data is read, so there is no customer_id. Unknown names return NOT_FOUND with the closest names in the same resource. Results page at 100 fields by default (1-1000) through opaque tokens bound to this name and page size.
+
+| Parameter | Type | Required | Default |
+|---|---|---|---|
+| `name` | string | yes | — |
+| `page_size` | integer | no | — |
+| `page_token` | string | no | — |
+
 ### `get_responsive_search_ad_urls`
 
 Inspect an existing responsive search ad's exact final and mobile URLs, tracking settings and creative content. Requires a unique nonremoved ad association and enabled or paused Search parents. Reports direct settings; provider validation and policy review remain authoritative. Read-only account overrides are supported. This singular inspection has no pagination.

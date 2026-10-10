@@ -32,10 +32,11 @@ EXPERIMENT_READS = frozenset({
     "list_pmax_url_experiments", "get_pmax_url_experiment", "get_pmax_url_experiment_results",
     "get_pmax_url_experiment_operation",
 })
+METADATA_READS = frozenset({"get_resource_metadata"})
 
 
 def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
-    """Select an explicit inventory or all 34 authored read fixtures."""
+    """Select an explicit inventory or all 35 authored read fixtures."""
     directories = ([fixtures_dir] if fixtures_dir is not None else
                    [REPO / "tests/fixtures/contract", REPO / "tests/fixtures/pmax"])
     if any(not directory.is_dir() for directory in directories):
@@ -48,6 +49,8 @@ def fixture_paths(fixtures_dir: Path | None) -> list[Path]:
                      for name in sorted(SHARED_READS | DEMO_READS))
         paths.extend(REPO / "tests/fixtures/pmax_experiments" / (name + ".json")
                      for name in sorted(EXPERIMENT_READS))
+        paths.extend(REPO / "tests/fixtures/resource_metadata" / (name + ".json")
+                     for name in sorted(METADATA_READS))
     return sorted(paths)
 
 
@@ -66,7 +69,8 @@ def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
         except (OSError, ValueError):
             raise ValueError("fixture inventory contains unreadable or invalid JSON") from None
         tool = fixture.get("tool") if isinstance(fixture, dict) else None
-        allowed = READ_TOOLS | PMAX_READS | SEARCH_URL_READS | SHARED_READS | DEMO_READS | EXPERIMENT_READS
+        allowed = (READ_TOOLS | PMAX_READS | SEARCH_URL_READS | SHARED_READS | DEMO_READS
+                   | EXPERIMENT_READS | METADATA_READS)
         if not isinstance(tool, str) or tool not in allowed:
             raise ValueError("fixture inventory contains an unknown or missing tool identity")
         if tool in seen:
@@ -81,8 +85,10 @@ def validate_fixture_inventory(fixtures_dir: Path | None) -> None:
         required = required | SHARED_READS
     if fixtures_dir is None or seen & (SHARED_READS | DEMO_READS | EXPERIMENT_READS):
         required = required | DEMO_READS
-    if fixtures_dir is None or seen & EXPERIMENT_READS:
+    if fixtures_dir is None or seen & (EXPERIMENT_READS | METADATA_READS):
         required = required | EXPERIMENT_READS
+    if fixtures_dir is None or seen & METADATA_READS:
+        required = required | METADATA_READS
     missing = required - seen
     if missing:
         raise ValueError("fixture inventory is missing tools: " + ", ".join(sorted(missing)))
@@ -127,6 +133,8 @@ def offline_report(fixtures_dir: Path | None, out) -> int:
             client = _fixture_client(harness, fixture)
             for resource, rows in fixture["gaql"].items():
                 client.stub(resource, rows)
+            if fixture.get("fields"):
+                client.stub_fields(fixture["fields"])
             for method, response in fixture.get("planner", {}).items():
                 client.stub_planner(method, harness.planner_response(response))
             env = {"ADS_MCP_AUDIT_LOG": str(harness.audit_file(tmp))}
@@ -197,12 +205,13 @@ def main(argv=None) -> int:
     inventory.add_argument(
         "--fixtures",
         help="directory containing the complete 21-read baseline, 25-read PMax inventory "
-        "or the 27-read Search URL, 30-read targeting or 34-read experiment inventory; "
-        "default combines all project read fixtures",
+        "or the 27-read Search URL, 30-read targeting, 34-read experiment or 35-read "
+        "field-metadata inventory; default combines all project read fixtures",
     )
     inventory.add_argument(
         "--all-fixtures", action="store_true",
-        help="combine all 34 contract, PMax, Search URL, targeting and experiment fixtures (the default)",
+        help="combine all 35 contract, PMax, Search URL, targeting, experiment and "
+        "field-metadata fixtures (the default)",
     )
     parser.add_argument(
         "--report", default="-", help="report path, or - for stdout"

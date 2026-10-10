@@ -51,6 +51,36 @@ def register(server, ctx):
     cfg = ctx.config
 
     @server.tool(
+        name="get_resource_metadata",
+        description=_spec(
+            "get_resource_metadata",
+            "Describe the Google Ads API's own reporting schema from "
+            "GoogleAdsFieldService: supply a resource name such as 'campaign', "
+            "a full field name such as 'campaign.status', or a field prefix "
+            "such as 'campaign.network_settings'. A resource answers with its "
+            "attribute fields in full detail, plus the names of its attribute "
+            "resources and of the segments and metrics it can be selected "
+            "with. Each field reports category, data type, selectable, "
+            "filterable, sortable, repeatedness and up to 100 enum values. "
+            "Use it to build a valid run_gaql query before spending a read. "
+            "Schema metadata only: no account is addressed and no account "
+            "data is read, so there is no customer_id. Unknown names return "
+            "NOT_FOUND with the closest names in the same resource. Results "
+            "page at 100 fields by default (1-1000) through opaque tokens "
+            "bound to this name and page size.",
+        ),
+    )
+    def get_resource_metadata(
+        name: StrictStr, page_size: StrictInt | None = None,
+        page_token: StrictStr | None = None,
+    ) -> dict:
+        from ads_mcp import field_metadata
+
+        return guarded(ctx, field_metadata.run, name="get_resource_metadata")(
+            ctx=ctx, name=name, page_size=page_size, page_token=page_token,
+        )
+
+    @server.tool(
         name="get_pmax_url_experiment_operation",
         description=_spec(
             "get_pmax_url_experiment_operation",

@@ -2,6 +2,11 @@
 
 ## Unreleased changes
 
+- Add the `get_resource_metadata` read: describe a resource, field or field
+  prefix from `GoogleAdsFieldService` so a query can be built before it is
+  spent. Schema metadata only — no account is addressed and no account data
+  is read. The read surface is now 35 tools and 85 total operations.
+
 - Return validated `created` and `updated` resource receipts from applications
   and their audit records, including all completed steps. Uncertain responses
   retain earlier confirmed names and stop dependent writes without retrying.

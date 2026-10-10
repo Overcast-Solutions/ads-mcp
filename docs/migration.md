@@ -1,6 +1,6 @@
 # Integration and migration
 
-ads-mcp 0.1.0 registers 34 read tools by default and 84 operations when
+ads-mcp 0.1.0 registers 35 read tools by default and 85 operations when
 experimental writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
@@ -64,9 +64,9 @@ SDK may cancel in-flight responses when the input stream closes. The stdio
 boot regression holds the pipe open through initialization and `tools/list`.
 
 Start with read-only parallel operation: register this server alongside your
-current one without enabling mutations. All 34 read tools are available.
+current one without enabling mutations. All 35 read tools are available.
 Compare representative outputs and confirm that your API access permits the
-services you need. `scripts/parity.py --report -` replays all 34 read fixtures offline;
+services you need. `scripts/parity.py --report -` replays all 35 read fixtures offline;
 `--live` performs a read sweep using the supplied fixture arguments. For a live
 sweep, provide fixtures with your real resource IDs and suitable dates through
 `--fixtures`. A successful sweep is separate from comparing another server's
@@ -74,12 +74,14 @@ actual output.
 
 The default fixture sweep combines the original 21 fixtures with four PMax
 fixtures, both Search URL inspection fixtures, the two shared-list fixtures
-and demographic inspection, plus four PMax experiment reads for catalog,
-inspection, reporting and operation observation.
+and demographic inspection, four PMax experiment reads for catalog,
+inspection, reporting and operation observation, plus the field-metadata
+read.
 `--all-fixtures` selects the same complete set.
 An explicit `--fixtures` directory may contain the complete original
 21-read set, the complete 25-read PMax set, the 27-read Search URL set or all
-30 targeting reads or all 34 current reads; partial extensions are refused. Any targeting extension must
+30 targeting reads, the 34-read experiment set or all 35 current reads;
+partial extensions are refused. Any targeting extension must
 include both shared-list reads and demographic inspection.
 Original fixtures retain their output contracts.
 

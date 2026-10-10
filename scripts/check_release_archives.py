@@ -70,17 +70,22 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/mutation_receipts_oracle.py",
                    "tests/mutation_response_oracle.py",
                    "tests/test_mutation_response_oracle_controls.py",
-                   "docs/campaign-networks.md")
+                   "docs/campaign-networks.md",
+                   "tests/test_resource_metadata_contract.py",
+                   "tests/resource_metadata_oracle.py",
+                   "tests/fixtures/resource_metadata_fields_v25.json",
+                   "tests/fixtures/resource_metadata/get_resource_metadata.json")
 
 REQUIRED_PACKAGE_SOURCE = ("ads_mcp/pmax_experiments.py",
                            "ads_mcp/pmax_experiment_create.py",
-                           "ads_mcp/pmax_experiment_lifecycle.py")
+                           "ads_mcp/pmax_experiment_lifecycle.py",
+                           "ads_mcp/field_metadata.py")
 
 
 def check_package_inventory(paths):
-    """Require experiment implementation modules in both distribution formats."""
+    """Require the named implementation modules in both distribution formats."""
     if not set(REQUIRED_PACKAGE_SOURCE) <= set(paths):
-        raise ValueError("package inventory lacks required experiment modules")
+        raise ValueError("package inventory lacks required implementation modules")
 
 
 def check_inventory(paths, *, source_archive=False):

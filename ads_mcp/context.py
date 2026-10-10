@@ -8,6 +8,7 @@ from typing import Any, Callable, Optional
 
 from ads_mcp import auth
 from ads_mcp.continuation import SnapshotStore
+from ads_mcp.field_metadata import FieldCatalog
 from ads_mcp.transport import run_with_retry
 
 
@@ -28,6 +29,9 @@ class ServerContext:
     # together. Previews use only the plan store's short bookkeeping lock.
     application_lock: Any = field(default_factory=threading.Lock, repr=False)
     snapshots: SnapshotStore = field(default_factory=SnapshotStore, repr=False)
+    # The field catalogue is account-free schema metadata, cached per server
+    # and aged on this server's clock; it holds no provider rows.
+    field_catalog: FieldCatalog = field(default_factory=FieldCatalog, repr=False)
 
     @property
     def current_tool(self) -> str:
