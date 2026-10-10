@@ -97,7 +97,7 @@ server's read-only default during evaluation.
 [Google Ads access model](https://developers.google.com/google-ads/api/docs/oauth/access-model).
 
 Project recommendation: document advertiser authority, the intended account,
-allowed operations and who may approve them. Experimental writes stage plans,
+allowed operations and who may approve them. Writes stage plans,
 but an agent can also call the confirmation tool; confirmation alone does not
 authenticate a human. Keep a trusted approval boundary in the MCP host and
 review the [per-operation cap limits](migration.md). Never automate policy

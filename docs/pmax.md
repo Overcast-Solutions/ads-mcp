@@ -1,7 +1,7 @@
 # Performance Max management
 
 Inspect existing Performance Max (PMax) campaigns in the default read-only
-installation. Experimental writes can manage asset-group status, optimization
+installation. Guarded writes can manage asset-group status, optimization
 signals, URL controls and product selection. Use your own authorized credentials
 and review [authentication](authentication.md), [configuration](configuration.md)
 and the [write flow and limits](writes.md#plan-preview-apply) before enabling

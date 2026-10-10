@@ -78,7 +78,10 @@ REQUIRED_SOURCE = ("LICENSE", "SECURITY.md", "CONTRIBUTING.md",
                    "tests/test_gaql_field_guidance_contract.py",
                    "tests/test_credential_sources_contract.py",
                    "tests/credential_sources_oracle.py",
-                   "tests/test_http_transport_contract.py")
+                   "tests/test_http_transport_contract.py",
+                   "tests/test_google_parity_docs_contract.py",
+                   "docs/credential-sources.md",
+                   "docs/http-transport.md")
 
 REQUIRED_PACKAGE_SOURCE = ("ads_mcp/pmax_experiments.py",
                            "ads_mcp/pmax_experiment_create.py",

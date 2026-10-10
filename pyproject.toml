@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ads-mcp"
 version = "0.1.0"
-description = "Self-hosted Google Ads MCP server with read-only defaults and guarded experimental writes."
+description = "Self-hosted Google Ads MCP server with guarded writes: plans, dry-run previews, spend caps and an audit log; read-only by default."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"

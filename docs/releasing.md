@@ -165,4 +165,4 @@ publication plan; do not use a force push as routine release preparation.
 The supported distribution provides code, not Google access. Release archives,
 examples and CI must contain no working OAuth client or tokens. Each operator
 must follow the [own-credential onboarding](../README.md#oauth-setup-one-time).
-Publishing source does not approve an account cutover or experimental writes.
+Publishing source does not approve an account cutover or enabling writes.

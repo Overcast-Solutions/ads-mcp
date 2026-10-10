@@ -1,7 +1,7 @@
 # Integration and migration
 
 ads-mcp 0.1.0 registers 35 read tools by default and 85 operations when
-experimental writes are enabled. Integrate against the actual
+writes are enabled. Integrate against the actual
 [tool catalog](tools.md) and this project's expected-output fixtures. Review
 representative workflows and adapt consumers before changing a deployment.
 
@@ -51,7 +51,7 @@ account spend, sum separate budgets, constrain CPA/ROAS targets or guarantee
 that enabling an existing entity cannot increase spend. A verified reduction
 may exceed a configured daily-budget ceiling; an unset budget ceiling refuses
 budget changes. Bid increases use freshly verified account baselines. First
-bids require an absolute configured ceiling. Experimental writes always target
+bids require an absolute configured ceiling. Writes always target
 the configured account, use expiring single-use plans, and never retry an
 uncertain provider write automatically. A client calling confirmation is not
 proof of human authorization. See [operator responsibilities](operator-guide.md).

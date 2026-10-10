@@ -25,7 +25,7 @@
 
 - Add an [installation and validation guide](docs/installation-validation.md)
   for the public source, covering commit-pinned installation,
-  operator-owned live validation and separately approved experimental writes.
+  operator-owned live validation and separately approved write enablement.
 - Refuse explicitly invalid MCP request IDs before dispatch with one generic
   invalid-request error. Preserve exact string/integer correlation, response-free
   notifications, SDK response handling and recovery on the same stdio connection.

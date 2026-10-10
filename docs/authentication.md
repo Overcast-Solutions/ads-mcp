@@ -10,7 +10,11 @@ organization's credential files or refresh tokens.
 An organization may use its own credentials for its authorized internal
 installation. This does not grant independent users access through that
 organization's project. Run separate installations for independent operators;
-do not expose this stdio server as a shared credential-backed proxy.
+do not expose this stdio server as a shared credential-backed proxy. The same
+limit governs the local [HTTP transport](http-transport.md): it is read-only,
+bound to loopback and unauthenticated, which makes it a single-user
+convenience and never a shared gateway. Do not publish it through a reverse
+proxy, port forward or tunnel.
 
 Google sunset developer tokens on **September 9, 2026**. API access now belongs
 to the Cloud project that owns your OAuth client. This downloaded server uses
@@ -27,7 +31,9 @@ omit the header from unary and streaming requests. See Google's
    Download its JSON — this is your `GOOGLE_ADS_CREDENTIALS_PATH` file.
 2. Configure the OAuth consent screen for the intended users. External apps
    left in Testing normally receive refresh tokens that expire after seven
-   days. See Google's [OAuth error guidance](https://developers.google.com/google-ads/api/docs/get-started/common-errors)
+   days; [Testing-mode expiry and the fix](#testing-mode-expiry-and-the-fix)
+   below covers how that failure looks and how to stop it. See Google's
+   [OAuth error guidance](https://developers.google.com/google-ads/api/docs/get-started/common-errors)
    before choosing the app's publishing status.
 3. Set `GOOGLE_ADS_CREDENTIALS_PATH` to the downloaded client JSON and
    `GOOGLE_ADS_TOKEN_PATH` to the token output path, then generate the refresh
@@ -58,6 +64,26 @@ who legally owns a supplied credential. Ownership and permission remain the
 operator's responsibility.
 
 `AUTH_TOKEN_REVOKED` identifies credentials that need to be renewed.
+
+## Testing-mode expiry and the fix
+
+An OAuth app left in **Testing** publishing status issues refresh tokens that
+stop working after about seven days, and the failure has a recognizable shape:
+calls that worked yesterday now refuse with `AUTH_TOKEN_REVOKED`, Google's
+underlying response is `invalid_grant`, and nothing on disk changed — the
+client JSON and token file are the same ones you generated. A token minted
+while the app is in Testing expires this way roughly seven days after it was
+issued, every time, no matter how carefully it is stored.
+
+Re-minting the token on its own buys another seven days, so the fix is to take
+the app out of Testing. In the Cloud Console's OAuth consent screen, complete
+the **Branding** section — including a privacy-policy URL served from a domain
+listed among the app's authorized domains — and then publish the app by setting
+its publishing status to In production. Publish first, then re-mint the refresh
+token once with `ads-mcp-generate-token`: the replacement is not subject to the
+seven-day limit, and no further periodic re-minting is needed. Publishing
+changes the consent screen's status only; it neither performs brand
+verification nor grants Ads account access.
 
 ## Token storage
 

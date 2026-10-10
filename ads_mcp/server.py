@@ -123,8 +123,11 @@ def create_server(config: Config, *, client=None, plan_store=None, clock=None):
         name="ads-mcp",
         version=_package_version(),
         description=(
-            "Google Ads MCP server built for autonomous agents: full tool "
-            "surface behind server-side spend guardrails."
+            "Google Ads MCP server built for autonomous agents: guarded "
+            "writes — every change staged as a plan, a required dry-run "
+            "preview, server-side budget and CPC caps, and an append-only "
+            "audit log — plus the full read surface. Read-only until "
+            "ADS_MCP_READ_ONLY=false."
         ),
     )
     resolved_clock = clock if clock is not None else time.time
@@ -158,7 +161,8 @@ def main(argv=None):
         prog="ads-mcp",
         description=(
             "ads-mcp: a Google Ads MCP server built for autonomous agents — "
-            "full tool surface behind server-side spend guardrails. Serves "
+            "guarded writes (plans, dry-run previews, spend caps, audit log) "
+            "and the full read surface. Serves "
             "MCP over stdio by default; configure via GOOGLE_ADS_* and "
             "ADS_MCP_* environment variables (see README)."
         ),

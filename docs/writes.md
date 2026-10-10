@@ -1,10 +1,10 @@
-# Experimental writes
+# Guarded writes
 
 Review [operator responsibilities](operator-guide.md) and [configuration](configuration.md) before enabling writes.
 
 ## Plan, preview, apply
 
-Write support is an explicit opt-in and remains experimental. Before enabling
+Write support is an explicit opt-in, and every change is guarded. Before enabling
 it, review the [spend limits](#spend-limits) and the plans your client produces. Configure
 `ADS_MCP_AUDIT_LOG`, the needed daily-budget and bid caps (including
 `ADS_MCP_MAX_FIRST_BID` for first bids), and then `ADS_MCP_READ_ONLY=false`.

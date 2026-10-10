@@ -3,7 +3,8 @@
 The public source supports CPython 3.12, 3.13 and 3.14 on Linux and macOS.
 Native Windows server operation, including read-only mode, mutation audit
 storage and the token helper, is unsupported. No Windows ACL implementation
-or successful native Windows validation is claimed. Writes remain experimental.
+or successful native Windows validation is claimed. Writes are an explicit
+opt-in, guarded by plans, previews, spend caps and an audit log.
 
 The source repository is [Overcast-Solutions/ads-mcp](https://github.com/Overcast-Solutions/ads-mcp).
 The designated reporting route is

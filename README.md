@@ -1,18 +1,22 @@
 # ads-mcp
 
-A Google Ads MCP server for agents. Query accounts and reports, or stage
-changes for review before applying them. **Read-only by default.**
+A Google Ads MCP server for agents. **Guarded writes are the core capability:**
+every change is staged as a plan, previewed as a dry run, checked against the
+configured budget and CPC caps, and recorded in an append-only audit log before
+it reaches an account. The server starts read-only when `ADS_MCP_READ_ONLY` is
+unset, and `ADS_MCP_READ_ONLY=false` enables writes.
 
 The source is publicly available under Apache License 2.0. Install from source;
-the package is not published to PyPI. Write support is
-experimental. Supports CPython 3.12–3.14 on Linux and macOS; native Windows
-is unsupported. Requires Google Ads SDK 31.4.0 or later within major 31.
+the package is not published to PyPI. Supports CPython 3.12–3.14 on Linux and
+macOS; native Windows is unsupported. Requires Google Ads SDK 31.4.0 or later
+within major 31.
 
+- **Guarded changes:** 85 operations once writes are enabled. Write tools stage
+  plans; application rechecks account binding, expiry, preview requirements and
+  the configured budget/CPC limits.
 - **35 read tools:** authenticated health checks, account and PMax inspection,
   performance reports, Keyword Planner, API field metadata and raw GAQL with
   bounded responses.
-- **Reviewed changes:** write tools create plans; application checks account
-  binding, expiry, preview requirements and configured budget/CPC limits.
 - **Traceable execution:** write mode requires an audit log. Uncertain writes
   are surfaced and never retried automatically; transient reads use bounded retries.
 
@@ -57,6 +61,10 @@ Internal teams may use their own authorized installation; independent users
 must configure their own credentials. Review the [operator guide](docs/operator-guide.md)
 before connecting account data to an MCP host or model provider.
 
+If you already have `gcloud` Application Default Credentials or a
+`google-ads.yaml`, the [credential sources guide](docs/credential-sources.md)
+covers using them instead.
+
 ## Claude Code / MCP registration
 
 For clients using `mcpServers` configuration, replace the executable path,
@@ -86,9 +94,11 @@ to confirm the account. Metric reports require an explicit date window or
 `last_n_days`; see the [reporting guide](docs/reporting.md).
 
 For a read-only rollout alongside an existing server, follow the
-[integration and migration guide](docs/migration.md).
+[integration and migration guide](docs/migration.md). A client that cannot
+launch a subprocess can use the local read-only
+[HTTP transport](docs/http-transport.md).
 
-## Experimental writes
+## Guarded writes
 
 Enabling writes exposes 85 operations. Read the [write guide](docs/writes.md)
 before opting in. Writes require audit
@@ -99,12 +109,32 @@ storage and the appropriate caps; the default flow is plan → dry-run preview �
 spend or CPA/ROAS targets. Enabling existing entities can also affect spend.
 Use independent account controls and review the guide's full limit scope.
 
+## Coming from Google's server
+
+Google's own [google-ads-mcp](https://github.com/googleads/google-ads-mcp)
+exposes only read tools (as of 2026-10-09), while ads-mcp adds guarded writes
+alongside its 35 reads. Their three tools map across like this:
+
+| Google's server | ads-mcp | Argument differences |
+| --- | --- | --- |
+| `list_accessible_customers` | `list_accounts` | takes no arguments; the accounts come from the configured `GOOGLE_ADS_LOGIN_CUSTOMER_ID`, which cannot be supplied per call |
+| `search` | `run_gaql` | `query` is required; `customer_id` is optional and defaults to the configured account; adds `format` (`json`, `table`, `csv`), `page_size` and `page_token` for bounded responses |
+| `get_resource_metadata` | `get_resource_metadata` | `name` is required and accepts a resource (`campaign`), a field (`campaign.status`) or a field prefix; adds `page_size` and `page_token`; takes no account argument, because schema metadata addresses no account |
+
+ads-mcp does not offer several things their deployment path provides: MCP
+resources, a per-call login customer id, a hosted OAuth proxy, and a Cloud Run
+container. Its own HTTP transport is local and read-only; see the
+[HTTP transport guide](docs/http-transport.md). ads-mcp is an independent
+project, not affiliated with or endorsed by Google.
+
 ## Documentation
 
 | Guide | What it covers |
 | --- | --- |
 | [Authentication](docs/authentication.md) | Your OAuth client, token storage and Google API access |
+| [Credential sources](docs/credential-sources.md) | Token files, `gcloud` ADC and `google-ads.yaml` |
 | [Configuration](docs/configuration.md) | Environment variables, defaults and audit storage |
+| [HTTP transport](docs/http-transport.md) | Local read-only streamable HTTP, its limits and its risk |
 | [Reporting](docs/reporting.md) | GAQL, pagination, date windows, history and forecasts |
 | [Writes](docs/writes.md) | Plans, spend limits, creation requirements and validation |
 | [Campaign networks](docs/campaign-networks.md) | Search defaults, precise updates and network reporting |

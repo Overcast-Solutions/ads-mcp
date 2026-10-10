@@ -6,7 +6,7 @@ CPython 3.12, 3.13 and 3.14 on Linux and macOS; native Windows is unsupported.
 The source and package metadata use [Apache License 2.0](../LICENSE).
 
 The server provides 85 operations, including 35 reads. Read-only mode is the
-default; write support remains experimental. The [changelog](../CHANGELOG.md)
+default; writes are an explicit opt-in. The [changelog](../CHANGELOG.md)
 describes the workflows and protocol repair. Invalid request IDs now receive a
 generic refusal before dispatch, and the same connection accepts valid requests
 afterward. This does not add advertising operations or change credential setup.
@@ -78,7 +78,7 @@ Google Ads feature. Choose checks supported by the account, project access and
 provider rules; a refusal is not permission to bypass them. Review the
 [operator guide](operator-guide.md) before exposing account data to a host/model.
 
-## Optional experimental write validation
+## Optional write validation
 
 Enable writes only after deliberate, separate approval for the exact account
 and change. Follow the [write guide](writes.md), configure protected audit storage

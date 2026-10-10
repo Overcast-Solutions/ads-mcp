@@ -1,7 +1,7 @@
 # Configuration
 
 Configure account access with the `GOOGLE_ADS_*` variables below. The server
-starts read-only unless you explicitly enable experimental writes.
+starts read-only unless you explicitly enable writes.
 
 | Variable | Required | Default | Meaning |
 |---|---|---|---|
@@ -77,4 +77,7 @@ There is no automatic rotation or deletion. Failed pre-write setup preserves
 existing bytes; a disk failure during append can leave a partial final record
 that needs operator reconciliation before resuming writes.
 
-See [experimental writes](writes.md) for cap scope and the plan, preview and apply flow.
+See [guarded writes](writes.md) for cap scope and the plan, preview and apply flow.
+The [credential sources guide](credential-sources.md) covers the three OAuth
+sources in full, and the [HTTP transport guide](http-transport.md) the local
+read-only HTTP endpoint.

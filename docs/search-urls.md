@@ -7,7 +7,7 @@ Destination changes can still affect delivery and policy review.
 
 The two inspection tools are available in read-only mode. To stage updates,
 configure your own credentials and audit storage, then explicitly enable
-experimental writes as described in the [write guide](writes.md). Reads may
+writes as described in the [write guide](writes.md). Reads may
 select another accessible `customer_id`; writes always target the configured
 account. Omitted or actual JSON `null` selects that configured account. The
 string `"null"` is invalid and does not select an account.
