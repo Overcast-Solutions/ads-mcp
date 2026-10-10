@@ -1090,6 +1090,13 @@
         {"name":"promote_pmax_url_experiment","parameters":["experiment_id","customer_id"],"required":["experiment_id"],"values":{}},
         {"name":"get_pmax_url_experiment_operation","parameters":["experiment_id","operation_name","customer_id"],"required":["experiment_id","operation_name"],"values":{}}
       ]
+    },
+    {
+      "id": "field_metadata",
+      "purpose": "Look up Google Ads field metadata for a resource, field or prefix before writing GAQL, without account access.",
+      "tools": [
+        {"name":"get_resource_metadata","parameters":["name","page_size","page_token"],"required":["name"],"values":{}}
+      ]
     }
   ],
   "forbidden_parameters": [

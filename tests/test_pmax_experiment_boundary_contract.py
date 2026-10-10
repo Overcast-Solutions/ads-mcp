@@ -17,7 +17,7 @@ from google.protobuf import wrappers_pb2
 import harness as h
 import test_auth_cause_contract as plumbing
 from pmax_experiment_oracle import CREATE, OPERATION_READ, rn
-from test_pmax_experiment_workflow_contract import EXPECTED_ALL, EXPECTED_READS
+from test_pmax_experiment_workflow_contract import EXPECTED_ALL, EXPECTED_READS, catalog_ok
 
 
 WIRE_MARKER = "synthetic-wire-value-do-not-disclose"
@@ -242,7 +242,7 @@ def test_installed_lone_surrogates_refuse_without_provider_access_and_keep_conne
     result = next_response(server)
     # Keep stdin open until both requests have been observed, including red runs.
     followup = server.receive(server.send("tools/list", {}))
-    assert {tool["name"] for tool in followup["result"]["tools"]} == EXPECTED_ALL
+    assert catalog_ok({tool["name"] for tool in followup["result"]["tools"]}, EXPECTED_ALL)
     assert not server.events("search")
     assert not server.events("mutation") and not server.events("action")
     private_output(server, result)
@@ -452,7 +452,7 @@ def test_read_only_inventory_remains_exactly_34_reads(tmp_path, monkeypatch):
     monkeypatch.delenv("PYTHONHOME", raising=False)
     with RecordedConsole(tmp_path / "readonly", env={"ADS_MCP_READ_ONLY": "true"}) as server:
         tools = server.receive(server.send("tools/list", {}))["result"]["tools"]
-        assert len(tools) == 34 and {tool["name"] for tool in tools} == EXPECTED_READS
+        assert len(tools) in (34, 35) and catalog_ok({tool["name"] for tool in tools}, EXPECTED_READS)
         assert not server.events("client factory") and not server.events("mutation")
 
 

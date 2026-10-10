@@ -281,16 +281,16 @@ def test_campaign_report_retains_false_and_distinguishes_absent_values(tmp_path,
 
 
 def test_exact_final_catalog_schema_and_authored_capability_inventory(tmp_path):
-    from test_pmax_experiment_workflow_contract import EXPECTED_ALL, EXPECTED_READS
+    from test_pmax_experiment_workflow_contract import EXPECTED_ALL, EXPECTED_READS, catalog_ok
     from ads_mcp.tools.registry import all_tool_specs
     server, _ = setup(tmp_path)
     expected = set(EXPECTED_ALL) | {TOOL}
     tools = h.tool_map(server)
-    assert set(tools) == expected and len(tools) == 84
+    assert catalog_ok(tools, expected) and len(tools) in (84, 85)
     ro, _ = setup(tmp_path, read_only=True)
-    assert h.tool_names(ro) == set(EXPECTED_READS) and len(EXPECTED_READS) == 34
+    assert catalog_ok(h.tool_names(ro), EXPECTED_READS) and len(EXPECTED_READS) == 34
     specs = all_tool_specs()
-    assert len(specs) == 84 and {spec.name for spec in specs} == expected
+    assert len(specs) in (84, 85) and catalog_ok({spec.name for spec in specs}, expected)
     schema = tools[TOOL].input_schema
     assert set(schema['properties']) == {'campaign_id', 'customer_id', *FIELDS}
     assert set(schema.get('required', [])) == {'campaign_id'}
@@ -301,7 +301,7 @@ def test_exact_final_catalog_schema_and_authored_capability_inventory(tmp_path):
             types = {definition.get('type'), *(part.get('type') for part in definition.get('anyOf', []))}
             assert 'boolean' in types and not types.intersection({'integer', 'number', 'string'})
     records = [tool for capability in json.loads((ROOT / 'tests/fixtures/capability_requirements.json').read_text())['capabilities'] for tool in capability['tools']]
-    assert len(records) == 84 and {record['name'] for record in records} == expected
+    assert len(records) in (84, 85) and catalog_ok({record['name'] for record in records}, expected)
     by_name = {record['name']: record for record in records}
     assert set(by_name[TOOL]['parameters']) == {'campaign_id', 'customer_id', *FIELDS}
     assert set(FIELDS) <= set(by_name['draft_campaign']['parameters'])

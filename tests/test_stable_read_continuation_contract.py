@@ -181,7 +181,9 @@ def test_inventory_covers_every_current_paginated_tool(tmp_path, fake_client):
     tools = h.tool_map(h.build_server(tmp_path, client=fake_client))
     actual = {name for name, t in tools.items() if "page_token" in t.input_schema.get("properties", {})}
     baseline = {case[0] for case in CASES}
-    assert baseline <= actual <= baseline | PMAX_READS
+    # The field-metadata read paginates its own field catalogue (no retained snapshot).
+    from tool_catalog import METADATA_TOOLS
+    assert baseline <= actual <= baseline | PMAX_READS | METADATA_TOOLS
 
 
 @pytest.mark.parametrize("tool,resource,args,key,identity", CASES)

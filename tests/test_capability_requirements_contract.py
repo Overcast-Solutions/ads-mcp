@@ -17,7 +17,7 @@ from capability_oracle import (
     record, requirement, success, tool_requirement,
 )
 from offline_contract import load_script
-from tool_catalog import ALL_WRITE_MODE_TOOLS, OPTIONAL_ARGS
+from tool_catalog import ALL_WRITE_MODE_TOOLS, METADATA_TOOLS, OPTIONAL_ARGS
 
 
 def test_authored_default_covers_the_accepted_workflows_and_declared_obligations():
@@ -35,7 +35,9 @@ def test_authored_default_covers_the_accepted_workflows_and_declared_obligations
         assert capability["tools"]
         tools.extend(capability["tools"])
     by_name = {tool["name"]: tool for tool in tools}
-    assert len(by_name) == len(tools) and set(by_name) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    prior = ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    # The field-metadata requirement is authored for its pending tool (read via expected_pending).
+    assert len(by_name) == len(tools) and set(by_name) in (prior, prior | METADATA_TOOLS)
     for tool in tools:
         assert set(tool) == {"name", "parameters", "required", "values"}
         assert len(tool["parameters"]) == len(set(tool["parameters"]))

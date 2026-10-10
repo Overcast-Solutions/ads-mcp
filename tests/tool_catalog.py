@@ -69,6 +69,11 @@ MUTATION_TOOLS = frozenset(
 APPLY_TOOL = "confirm_and_apply"
 ALL_WRITE_MODE_TOOLS = READ_TOOLS | MUTATION_TOOLS | {APPLY_TOOL}
 
+# The field-metadata read is its own catalog set, deliberately not part of
+# READ_TOOLS. Shared prior inventories accept it as an optional addition;
+# its exact final inventory is asserted by test_resource_metadata_contract.py.
+METADATA_TOOLS = frozenset({"get_resource_metadata"})
+
 # Plans for these tools must be flagged irreversible in their summary.
 IRREVERSIBLE_TOOLS = frozenset(
     {

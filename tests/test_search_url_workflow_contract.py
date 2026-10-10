@@ -20,7 +20,7 @@ from offline_contract import load_script
 from pmax_oracle import PMAX_ADDITIONS, PMAX_READS, PMAX_MUTATIONS
 from search_url_oracle import (ADDITIONS, AFTER_FINAL, BEFORE_FINAL, FACTS_PATH, FIXTURES, KINDS, READS, ROOT,
     WRITES, args, assert_provider_queries, require, setup)
-from tool_catalog import ALL_WRITE_MODE_TOOLS, MUTATION_TOOLS, READ_TOOLS
+from tool_catalog import ALL_WRITE_MODE_TOOLS, METADATA_TOOLS, MUTATION_TOOLS, READ_TOOLS
 
 EXPECTED_ALL = ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | ADDITIONS
 EXPECTED_READS = READ_TOOLS | PMAX_READS | READS
@@ -60,7 +60,7 @@ def test_final_catalog_requires_all_67_operations_and_27_reads(tmp_path):
     readonly, _ = setup(tmp_path, "ad", read_only=True)
     assert_expansion(h.tool_names(readonly), EXPECTED_READS | TARGETING_READS, EXPERIMENT_READS)
     specs = all_tool_specs()
-    assert 76 <= len(specs) == len({spec.name for spec in specs}) <= 84
+    assert 76 <= len(specs) == len({spec.name for spec in specs}) <= 85
     assert_expansion({spec.name for spec in specs if spec.kind == "read"}, EXPECTED_READS | TARGETING_READS, EXPERIMENT_READS)
     assert_expansion({spec.name for spec in specs if spec.kind == "mutation"}, EXPECTED_WRITES | TARGETING_WRITES, EXPERIMENT_WRITES | {NETWORK_TOOL})
     assert {spec.name for spec in specs if spec.kind == "apply"} == {"confirm_and_apply"}
@@ -76,7 +76,8 @@ def test_independent_requirements_are_complete_and_cli_has_no_pending_additions(
     final_server(tmp_path)
     tools = [tool for cap in json.loads(DEFAULT.read_text())["capabilities"] for tool in cap["tools"]]
     by_name = {tool["name"]: tool for tool in tools}
-    assert len(tools) == len(by_name) == 84 and set(by_name) == EXPECTED_ALL | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    prior = EXPECTED_ALL | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    assert len(tools) == len(by_name) in (84, 85) and set(by_name) in (prior, prior | METADATA_TOOLS)
     assert {name: by_name[name] for name in OBLIGATIONS} == OBLIGATIONS
     result, _ = cli(tmp_path, default=True)
     server, _ = final_server(tmp_path)
@@ -89,12 +90,12 @@ def test_default_parity_report_requires_and_exercises_every_authored_read(tmp_pa
                             cwd=tmp_path, env=h.scrubbed_env(), capture_output=True, text=True, timeout=90)
     assert result.returncode == 0, result.stdout + result.stderr
     matches = re.findall(r"(?m)^(\w+)\s+MATCH\s*$", result.stdout)
-    assert 30 <= len(matches) == len(set(matches)) <= 34
+    assert 30 <= len(matches) == len(set(matches)) <= 35
     assert_expansion(set(matches), EXPECTED_READS | TARGETING_READS, EXPERIMENT_READS)
     module = load_script("parity")
     paths = module.fixture_paths(None)
     assert_expansion({h.load_contract_fixture(path)["tool"] for path in paths}, EXPECTED_READS | TARGETING_READS, EXPERIMENT_READS)
-    assert 30 <= len(paths) <= 34
+    assert 30 <= len(paths) <= 35
 
 
 @pytest.mark.parametrize("missing", sorted(READS))
@@ -119,6 +120,8 @@ def test_source_archive_inventory_requires_every_original_and_new_member(tmp_pat
     complete = [*REQUIRED_SOURCE, *[path for path in NEW_SOURCE if path in checker.REQUIRED_SOURCE]]
     complete += [path for path in NETWORK_SOURCE if path in checker.REQUIRED_SOURCE]
     complete += [path for path in EXPERIMENT_SOURCE if path in checker.REQUIRED_SOURCE]
+    from test_pmax_experiment_workflow_contract import CYCLE_SOURCE
+    complete += [path for path in sorted(CYCLE_SOURCE) if path in checker.REQUIRED_SOURCE]
     checker.check_inventory(complete, source_archive=True)
     for missing in REQUIRED_SOURCE:
         with pytest.raises(ValueError):
@@ -194,7 +197,7 @@ def test_installed_console_drives_inspect_preview_apply_and_reread(tmp_path, mon
     with process_plumbing.InstalledServer(tmp_path / "installed", customer=customer,
             env={"ADS_MCP_REQUIRE_DRY_RUN": "true"}) as installed:
         listing = installed.receive(installed.send("tools/list", {}))["result"]["tools"]
-        assert 76 <= len(listing) == len({item["name"] for item in listing}) <= 84
+        assert 76 <= len(listing) == len({item["name"] for item in listing}) <= 85
         assert_expansion({item["name"] for item in listing}, EXPECTED_ALL | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS | {NETWORK_TOOL})
         inspected = h.expect_ok(installed.call(spec["read"], args(kind)))
         assert inspected["customer_id"] == customer
@@ -277,9 +280,9 @@ def test_public_guide_and_generated_tool_docs_cover_the_complete_workflow(tmp_pa
     assert "example.invalid" in text
     assert "no retry" in lower or "not retry" in lower or "never retry" in lower
     readme = (ROOT / "README.md").read_text()
-    assert any(total in readme and reads in readme for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"), ("84", "34"))) and "docs/search-urls.md" in readme
+    assert any(total in readme and reads in readme for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"), ("84", "34"), ("85", "35"))) and "docs/search-urls.md" in readme
     migration = (ROOT / "docs/migration.md").read_text()
-    assert any(total in migration and reads in migration for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"), ("84", "34")))
+    assert any(total in migration and reads in migration for total, reads in (("67", "27"), ("74", "29"), ("76", "30"), ("79", "33"), ("80", "33"), ("83", "34"), ("84", "34"), ("85", "35")))
     changelog = (ROOT / "CHANGELOG.md").read_text().lower()
     assert "unreleased" in changelog and "keyword" in changelog and "responsive search ad" in changelog
     generated = subprocess.run([sys.executable, str(ROOT / "scripts/gen_tools_md.py"), "--stdout"],

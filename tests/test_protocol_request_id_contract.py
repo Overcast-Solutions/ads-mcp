@@ -16,7 +16,7 @@ import time
 import pytest
 
 import harness as h
-from test_pmax_experiment_workflow_contract import EXPECTED_ALL, EXPECTED_READS
+from test_pmax_experiment_workflow_contract import EXPECTED_ALL, EXPECTED_READS, catalog_ok
 
 
 PRIVATE = "synthetic-request-id-private-value"
@@ -310,7 +310,7 @@ def refusal(replies):
 
 def catalog(server):
     names = {tool["name"] for tool in server.request("tools/list")["tools"]}
-    assert names == (EXPECTED_ALL if server.writes else EXPECTED_READS)
+    assert catalog_ok(names, EXPECTED_ALL if server.writes else EXPECTED_READS)
 
 
 @pytest.mark.parametrize("identity", INVALID_IDS)
@@ -380,7 +380,7 @@ def test_valid_ids_notifications_and_catalogs_remain_compatible(tmp_path, writes
         for identity in VALID_IDS:
             assert server.request("ping", identity=identity) == {}
             names = {tool["name"] for tool in server.request("tools/list", identity=identity)["tools"]}
-            assert names == (EXPECTED_ALL if writes else EXPECTED_READS)
+            assert catalog_ok(names, EXPECTED_ALL if writes else EXPECTED_READS)
         server.message({"jsonrpc": "2.0", "method": "notifications/progress",
                         "params": {"progressToken": "synthetic", "progress": 1, "total": 2}})
         server.message({"jsonrpc": "2.0", "method": "notifications/initialized"})

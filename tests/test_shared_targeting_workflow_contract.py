@@ -18,7 +18,7 @@ from capability_oracle import DEFAULT,cli,empty,success
 from offline_contract import load_script
 from pmax_oracle import PMAX_ADDITIONS,PMAX_READS
 from search_url_oracle import ADDITIONS as SEARCH_ADDITIONS,READS as SEARCH_READS
-from tool_catalog import ALL_WRITE_MODE_TOOLS,READ_TOOLS
+from tool_catalog import ALL_WRITE_MODE_TOOLS,METADATA_TOOLS,READ_TOOLS
 from shared_targeting_oracle import (ROOT,FIXTURES,ADDITIONS,READS,NEW_SOURCE,SIGNATURES,SHARED_ARGS,CATEGORIES,
     setup,rn,INSTALLED_INJECTION,assert_queries,break_audit)
 from shared_targeting_oracle import assert_expansion
@@ -44,7 +44,7 @@ def test_final_exact_76_operations_and_30_reads_preserve_all_previous_names(tmp_
     readonly,_=setup(tmp_path,READS,read_only=True)
     assert_expansion(h.tool_names(readonly),EXPECTED_READS,EXPERIMENT_READS)
     specs=all_tool_specs()
-    assert 76<=len(specs)==len({s.name for s in specs})<=84
+    assert 76<=len(specs)==len({s.name for s in specs})<=85
     assert_expansion({s.name for s in specs if s.kind=='read'},EXPECTED_READS,EXPERIMENT_READS)
     assert {s.name for s in specs if s.kind=='apply'}=={'confirm_and_apply'}
     for name,(parameters,required) in SIGNATURES.items():
@@ -56,7 +56,8 @@ def test_default_capability_requirements_keep_exact_required_parameters(tmp_path
     final_server(tmp_path)
     records=[t for capability in json.loads(DEFAULT.read_text())['capabilities'] for t in capability['tools']]
     by_name={r['name']:r for r in records}
-    assert len(records)==len(by_name)==84 and set(by_name)==EXPECTED_ALL|EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    prior=EXPECTED_ALL|EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    assert len(records)==len(by_name) in (84,85) and set(by_name) in (prior,prior|METADATA_TOOLS)
     for name,(parameters,required) in SIGNATURES.items():
         assert by_name[name]=={'name':name,'parameters':parameters,'required':required,'values':{}}
     result,_=cli(tmp_path,default=True);server,_=final_server(tmp_path);success(result,expected_pending(server))
@@ -71,7 +72,7 @@ def all_fixtures():
 def test_final_default_parity_executes_all_30_authored_reads(tmp_path):
     server,_=final_server(tmp_path)
     paths=load_script('parity').fixture_paths(None)
-    expected=EXPECTED_READS|(h.tool_names(server)&EXPERIMENT_READS)
+    expected=EXPECTED_READS|(h.tool_names(server)&EXPERIMENT_READS)|(h.tool_names(server)&METADATA_TOOLS)
     assert len(paths)==len(expected) and {h.load_contract_fixture(p)['tool'] for p in paths}==expected
     result=subprocess.run([sys.executable,str(ROOT/'scripts/parity.py'),'--report','-'],cwd=tmp_path,
         env=h.scrubbed_env(),capture_output=True,text=True,timeout=90)
@@ -95,6 +96,8 @@ def test_each_new_oracle_golden_helper_and_guide_is_mandatory_in_sdist(tmp_path,
     expected=set(REQUIRED_SOURCE)|set(NEW_SOURCE)
     expected|={path for path in NETWORK_SOURCE if path in checker.REQUIRED_SOURCE}
     expected|={path for path in EXPERIMENT_SOURCE if path in checker.REQUIRED_SOURCE}
+    from test_pmax_experiment_workflow_contract import CYCLE_SOURCE
+    expected|={path for path in CYCLE_SOURCE if path in checker.REQUIRED_SOURCE}
     assert set(NEW_SOURCE)<=set(checker.REQUIRED_SOURCE)
     checker.check_inventory(sorted(expected),source_archive=True)
     with pytest.raises(ValueError):checker.check_inventory(sorted(expected-{missing}),source_archive=True)
@@ -151,7 +154,7 @@ def installed_plan(installed,tool,args):
 def test_installed_shared_list_create_inspect_members_link_unlink_and_reread(tmp_path,monkeypatch,customer):
     with install(tmp_path,monkeypatch,customer=customer) as installed:
         listing=installed.receive(installed.send('tools/list',{}))['result']['tools']
-        assert 76<=len(listing)==len({t['name'] for t in listing})<=84
+        assert 76<=len(listing)==len({t['name'] for t in listing})<=85
         assert_expansion({t['name'] for t in listing},EXPECTED_ALL,EXPERIMENT_ADDITIONS|{NETWORK_TOOL})
         created=installed_plan(installed,'create_shared_negative_keyword_list',{'name':'Autumn test list'})
         assert created['proto']=='MutateSharedSetsRequest' and created['service']=='SharedSetService'
@@ -279,7 +282,7 @@ def test_public_guide_and_generated_reference_explain_local_scope_and_provider_l
     assert 'live' in lower and 'acceptance' in lower
     assert not re.search(r'google (?:always|universally) (?:forbids|prohibits).*undetermined',lower)
     for path in (ROOT/'README.md',ROOT/'docs/migration.md'):
-        content=path.read_text();assert any(total in content and reads in content for total,reads in (('76','30'),('79','33'),('80','33'),('83','34'),('84','34')))
+        content=path.read_text();assert any(total in content and reads in content for total,reads in (('76','30'),('79','33'),('80','33'),('83','34'),('84','34'),('85','35')))
     assert 'docs/shared-targeting.md' in (ROOT/'README.md').read_text()
     changelog=(ROOT/'CHANGELOG.md').read_text().lower()
     assert all(word in changelog for word in ('unreleased','shared','demographic'))

@@ -14,7 +14,7 @@ import pytest
 import harness
 from pmax_oracle import PMAX_FIXTURES, PMAX_READS, assert_catalog
 from ads_mcp.tools.registry import all_tool_specs
-from tool_catalog import READ_TOOLS
+from tool_catalog import METADATA_TOOLS, READ_TOOLS
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -80,7 +80,11 @@ def test_every_registry_read_tool_has_a_contract_fixture():
     from pmax_experiment_oracle import FIXTURES as EXPERIMENT_FIXTURES, READS as EXPERIMENT_READS
     experiment_fixtures = {path.name: harness.load_contract_fixture(path)["tool"] for path in EXPERIMENT_FIXTURES.glob("*.json")}
     assert experiment_fixtures == {name + ".json": name for name in EXPERIMENT_READS}
-    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values()) | set(targeting_fixtures.values()) | set(experiment_fixtures.values())
+    # One optional field-metadata golden; its exact use is owned by its own contract.
+    metadata_fixtures = {path.name: harness.load_contract_fixture(path)["tool"]
+                         for path in (REPO / "tests" / "fixtures" / "resource_metadata").glob("*.json")}
+    assert metadata_fixtures in ({}, {name + ".json": name for name in METADATA_TOOLS})
+    assert registry_reads <= fixture_tools | approved_fixtures | set(search_url_fixtures.values()) | set(targeting_fixtures.values()) | set(experiment_fixtures.values()) | set(metadata_fixtures.values())
     assert fixture_tools == READ_TOOLS, (
         f"registry reads: {sorted(registry_reads)}\n"
         f"fixtures:       {sorted(fixture_tools)}"

@@ -66,7 +66,10 @@ NEW_SOURCE = [
 
 
 def assert_expansion(actual, baseline, additions):
-    actual=set(actual)
+    # The field-metadata read may be present; its exact inventory is owned by
+    # test_resource_metadata_contract.py.
+    from tool_catalog import METADATA_TOOLS
+    actual=set(actual); additions=set(additions)|METADATA_TOOLS
     assert set(baseline) <= actual <= set(baseline) | set(additions), {
         'missing_prior':sorted(set(baseline)-actual), 'unapproved':sorted(actual-set(baseline)-set(additions))}
 

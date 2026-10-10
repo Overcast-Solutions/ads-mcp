@@ -1,0 +1,244 @@
+{
+  "tool": "get_resource_metadata",
+  "args": {
+    "name": "campaign.network_settings"
+  },
+  "gaql": {},
+  "fields": [
+    {
+      "name": "campaign",
+      "category": "RESOURCE",
+      "data_type": "MESSAGE",
+      "selectable": true,
+      "filterable": false,
+      "sortable": false,
+      "is_repeated": false,
+      "selectable_with": [
+        "accessible_bidding_strategy",
+        "bidding_strategy",
+        "campaign_budget",
+        "customer",
+        "segments.ad_network_type",
+        "segments.date",
+        "segments.device",
+        "segments.hour",
+        "segments.week",
+        "metrics.clicks",
+        "metrics.conversions",
+        "metrics.cost_micros",
+        "metrics.ctr",
+        "metrics.impressions"
+      ],
+      "attribute_resources": [
+        "accessible_bidding_strategy",
+        "bidding_strategy",
+        "campaign_budget",
+        "customer"
+      ],
+      "metrics": [
+        "metrics.clicks",
+        "metrics.conversions",
+        "metrics.cost_micros",
+        "metrics.ctr",
+        "metrics.impressions"
+      ],
+      "segments": [
+        "segments.ad_network_type",
+        "segments.date",
+        "segments.device",
+        "segments.hour",
+        "segments.week"
+      ],
+      "type_url": "google.ads.googleads.v25.resources.Campaign"
+    },
+    {
+      "name": "campaign.status",
+      "category": "ATTRIBUTE",
+      "data_type": "ENUM",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "enum_values": [
+        "UNSPECIFIED",
+        "UNKNOWN",
+        "ENABLED",
+        "PAUSED",
+        "REMOVED"
+      ],
+      "selectable_with": [
+        "accessible_bidding_strategy",
+        "ad_group",
+        "bidding_strategy",
+        "campaign_budget",
+        "customer",
+        "metrics.clicks",
+        "segments.date"
+      ]
+    },
+    {
+      "name": "campaign.network_settings.target_google_search",
+      "category": "ATTRIBUTE",
+      "data_type": "BOOLEAN",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "selectable_with": [
+        "campaign_budget",
+        "customer",
+        "segments.date",
+        "segments.device",
+        "metrics.clicks",
+        "metrics.impressions"
+      ]
+    },
+    {
+      "name": "campaign.network_settings.target_search_network",
+      "category": "ATTRIBUTE",
+      "data_type": "BOOLEAN",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "selectable_with": [
+        "campaign_budget",
+        "customer",
+        "segments.date",
+        "segments.device",
+        "metrics.clicks",
+        "metrics.impressions"
+      ]
+    },
+    {
+      "name": "campaign.network_settings.target_partner_search_network",
+      "category": "ATTRIBUTE",
+      "data_type": "BOOLEAN",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "selectable_with": [
+        "campaign_budget",
+        "customer",
+        "segments.date",
+        "segments.device",
+        "metrics.clicks",
+        "metrics.impressions"
+      ]
+    },
+    {
+      "name": "campaign.network_settings.target_content_network",
+      "category": "ATTRIBUTE",
+      "data_type": "BOOLEAN",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "selectable_with": [
+        "campaign_budget",
+        "customer",
+        "segments.date",
+        "segments.device",
+        "metrics.clicks",
+        "metrics.impressions"
+      ]
+    },
+    {
+      "name": "campaign.network_settings_extra",
+      "category": "ATTRIBUTE",
+      "data_type": "BOOLEAN",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "selectable_with": [
+        "campaign_budget",
+        "customer",
+        "segments.date",
+        "segments.device",
+        "metrics.clicks",
+        "metrics.impressions"
+      ]
+    },
+    {
+      "name": "campaign_budget",
+      "category": "RESOURCE",
+      "data_type": "MESSAGE",
+      "selectable": true,
+      "filterable": false,
+      "sortable": false,
+      "is_repeated": false,
+      "selectable_with": [
+        "customer"
+      ],
+      "attribute_resources": [
+        "customer"
+      ],
+      "type_url": "google.ads.googleads.v25.resources.CampaignBudget"
+    },
+    {
+      "name": "campaign_budget.amount_micros",
+      "category": "ATTRIBUTE",
+      "data_type": "INT64",
+      "selectable": true,
+      "filterable": true,
+      "sortable": true,
+      "is_repeated": false,
+      "selectable_with": [
+        "customer"
+      ]
+    }
+  ],
+  "golden": {
+    "name": "campaign.network_settings",
+    "fields": [
+      {
+        "name": "campaign.network_settings.target_content_network",
+        "category": "ATTRIBUTE",
+        "data_type": "BOOLEAN",
+        "selectable": true,
+        "filterable": true,
+        "sortable": true,
+        "is_repeated": false,
+        "enum_values": [],
+        "enum_values_truncated": false
+      },
+      {
+        "name": "campaign.network_settings.target_google_search",
+        "category": "ATTRIBUTE",
+        "data_type": "BOOLEAN",
+        "selectable": true,
+        "filterable": true,
+        "sortable": true,
+        "is_repeated": false,
+        "enum_values": [],
+        "enum_values_truncated": false
+      },
+      {
+        "name": "campaign.network_settings.target_partner_search_network",
+        "category": "ATTRIBUTE",
+        "data_type": "BOOLEAN",
+        "selectable": true,
+        "filterable": true,
+        "sortable": true,
+        "is_repeated": false,
+        "enum_values": [],
+        "enum_values_truncated": false
+      },
+      {
+        "name": "campaign.network_settings.target_search_network",
+        "category": "ATTRIBUTE",
+        "data_type": "BOOLEAN",
+        "selectable": true,
+        "filterable": true,
+        "sortable": true,
+        "is_repeated": false,
+        "enum_values": [],
+        "enum_values_truncated": false
+      }
+    ],
+    "next_page_token": null
+  },
+  "provenance": "Synthetic GoogleAdsFieldService catalogue subset; the golden payload is authored from the field metadata contract, not captured from product output."
+}

@@ -45,10 +45,14 @@ BAD_TEXT = [None, True, 3, {}, [], "", "   ", "a\x00b", "a\nb", "a\rb", "a\tb"]
 
 
 def assert_catalog(actual, *, read_only=False, kind=None, final=False):
-    """All original names remain required; only this fixed addition list may appear."""
-    from tool_catalog import READ_TOOLS, MUTATION_TOOLS, ALL_WRITE_MODE_TOOLS
-    base, allowed = (READ_TOOLS | PMAX_READS | SEARCH_URL_READS | TARGETING_READS, EXPERIMENT_READS) if read_only or kind == "read" else (
-        (MUTATION_TOOLS | PMAX_MUTATIONS | SEARCH_URL_MUTATIONS | TARGETING_WRITES, EXPERIMENT_WRITES | {NETWORK_TOOL}) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS | {NETWORK_TOOL}))
+    """All original names remain required; only this fixed addition list may appear.
+
+    The field-metadata read (tool_catalog.METADATA_TOOLS) is an approved
+    optional read addition; its exact presence is owned by its own contract.
+    """
+    from tool_catalog import READ_TOOLS, MUTATION_TOOLS, ALL_WRITE_MODE_TOOLS, METADATA_TOOLS
+    base, allowed = (READ_TOOLS | PMAX_READS | SEARCH_URL_READS | TARGETING_READS, EXPERIMENT_READS | METADATA_TOOLS) if read_only or kind == "read" else (
+        (MUTATION_TOOLS | PMAX_MUTATIONS | SEARCH_URL_MUTATIONS | TARGETING_WRITES, EXPERIMENT_WRITES | {NETWORK_TOOL}) if kind == "mutation" else (ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS, EXPERIMENT_ADDITIONS | {NETWORK_TOOL} | METADATA_TOOLS))
     actual = set(actual)
     assert base <= actual <= base | allowed, {"missing_baseline": sorted(base - actual), "unapproved": sorted(actual - base - allowed)}
     if final:
@@ -60,10 +64,13 @@ def expected_pending(server):
 
     Existing lifecycle kinds remain mandatory; asset_group is a newly declared
     domain value whose absence is a real pending requirement, never success.
+    The field-metadata read is an authored requirement whose absence is
+    likewise reported as pending.
     """
     from capability_oracle import empty
+    from tool_catalog import METADATA_TOOLS
     tools = h.tool_map(server)
-    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}) - set(tools))
+    missing = sorted((PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL} | METADATA_TOOLS) - set(tools))
     missing_values = []
     def admits(node):
         if isinstance(node, dict):

@@ -12,7 +12,7 @@ from campaign_networks_oracle import TOOL as NETWORK_TOOL
 from tool_catalog import MUTATION_ARGS, OPTIONAL_ARGS
 
 from capability_oracle import DEFAULT, cli, compare, empty, record, requirement, success
-from tool_catalog import ALL_WRITE_MODE_TOOLS
+from tool_catalog import ALL_WRITE_MODE_TOOLS, METADATA_TOOLS
 
 
 def _plan(server, tool, extra):
@@ -142,7 +142,8 @@ def test_authored_requirements_cover_the_public_tool_set():
     data = json.loads(DEFAULT.read_text())
     names = [tool["name"] for capability in data["capabilities"] for tool in capability["tools"]]
     assert len(names) == len(set(names))
-    assert set(names) == ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    prior = ALL_WRITE_MODE_TOOLS | PMAX_ADDITIONS | SEARCH_URL_ADDITIONS | TARGETING_ADDITIONS | EXPERIMENT_ADDITIONS | {NETWORK_TOOL}
+    assert set(names) in (prior, prior | METADATA_TOOLS)
 
 
 def test_preview_bypass_names_are_forbidden_even_in_custom_contracts():

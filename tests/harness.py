@@ -143,6 +143,184 @@ _MUTATION_METHOD_RE = re.compile(
 )
 
 
+@dataclass
+class FieldSearchCall:
+    """One GoogleAdsFieldService request as the provider would receive it."""
+
+    method: str
+    query: str
+    page_size: int
+    page_token: str
+    timeout: object
+    retry: object
+
+
+_FIELD_SERVICE = "GoogleAdsFieldService"
+_FIELD_METHODS = ("search_google_ads_fields", "get_google_ads_field")
+_FIELD_ATTRIBUTES = (
+    "resource_name", "name", "category", "selectable", "filterable", "sortable",
+    "selectable_with", "attribute_resources", "metrics", "segments",
+    "enum_values", "data_type", "type_url", "is_repeated",
+)
+_FIELD_ENUM_ATTRIBUTES = {"category", "data_type"}
+_FIELD_BOOL_ATTRIBUTES = {"selectable", "filterable", "sortable", "is_repeated"}
+_FIELD_QUERY_RE = re.compile(
+    r"^\s*SELECT\s+(?P<select>.+?)"
+    r"(?:\s+WHERE\s+(?P<where>.+?))?"
+    r"(?:\s+ORDER\s+BY\s+(?P<order>[a-z_]+(?:\s+(?:ASC|DESC))?))?"
+    r"(?:\s+LIMIT\s+(?P<limit>\d+))?\s*$",
+    re.IGNORECASE | re.DOTALL,
+)
+_FIELD_CONDITION_RE = re.compile(
+    r"^\s*(?P<attr>[a-z_]+)\s+(?P<op>=|!=|NOT\s+LIKE|LIKE|NOT\s+IN|IN)\s+"
+    r"(?P<value>.+?)\s*$",
+    re.IGNORECASE | re.DOTALL,
+)
+_FIELD_LITERAL_RE = re.compile(r"""'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z0-9_.]+)""")
+
+
+class UnsupportedFieldQuery(ValueError):
+    """The synthetic field service cannot evaluate this query text."""
+
+
+def make_field(field_dict: dict):
+    """Parse a fixture dict into a REAL v25 GoogleAdsField message."""
+    data = dict(field_dict)
+    data.setdefault("resource_name", f"googleAdsFields/{data.get('name', '')}")
+    field_message = get_ads_type("GoogleAdsField")
+    try:
+        json_format.ParseDict(data, field_message._pb)
+    except Exception as exc:
+        raise AssertionError(f"fixture field does not parse as GoogleAdsField: {exc}\n{data}")
+    return field_message
+
+
+def _field_literals(text: str) -> list:
+    text = text.strip()
+    if text.startswith("(") and text.endswith(")"):
+        text = text[1:-1]
+    values, position = [], 0
+    while position < len(text):
+        if text[position] in " ,\t\n":
+            position += 1
+            continue
+        match = _FIELD_LITERAL_RE.match(text, position)
+        if match is None:
+            raise UnsupportedFieldQuery("unsupported literal")
+        quoted = match.group(1) if match.group(1) is not None else match.group(2)
+        values.append(quoted.replace("\\'", "'").replace('\\"', '"') if quoted is not None else match.group(3))
+        position = match.end()
+    if not values:
+        raise UnsupportedFieldQuery("empty literal list")
+    return values
+
+
+def like_pattern(pattern: str, *, honor_escapes: bool = True) -> re.Pattern:
+    """GAQL LIKE: % any run, _ one character, [x] the literal x."""
+    out, position = [], 0
+    while position < len(pattern):
+        char = pattern[position]
+        if char == "[" and honor_escapes:
+            end = pattern.find("]", position + 1)
+            if end == -1:
+                raise UnsupportedFieldQuery("unterminated LIKE escape")
+            out.append(re.escape(pattern[position + 1:end]))
+            position = end + 1
+            continue
+        if char == "[" or char == "]":
+            position += 1
+            continue
+        out.append(".*" if char == "%" else "." if char == "_" else re.escape(char))
+        position += 1
+    return re.compile("".join(out) + r"\Z", re.DOTALL)
+
+
+def _field_attribute(field_message, attr):
+    value = getattr(field_message, attr)
+    if attr in _FIELD_ENUM_ATTRIBUTES:
+        return value.name
+    return value
+
+
+def _field_condition(condition: str):
+    match = _FIELD_CONDITION_RE.match(condition)
+    if match is None:
+        raise UnsupportedFieldQuery("unsupported condition")
+    attr = match.group("attr").lower()
+    if attr not in _FIELD_ATTRIBUTES:
+        raise UnsupportedFieldQuery("unknown attribute")
+    op = re.sub(r"\s+", " ", match.group("op").upper())
+    values = _field_literals(match.group("value"))
+    if op in ("=", "!=", "LIKE", "NOT LIKE") and len(values) != 1:
+        raise UnsupportedFieldQuery("single value expected")
+
+    def normalize(raw):
+        if attr in _FIELD_BOOL_ATTRIBUTES:
+            lowered = str(raw).lower()
+            if lowered not in ("true", "false"):
+                raise UnsupportedFieldQuery("boolean expected")
+            return lowered == "true"
+        return str(raw)
+
+    wanted = [normalize(value) for value in values]
+    return attr, op, wanted
+
+
+def field_query_matches(query: str, fields, *, honor_escapes: bool = True) -> list:
+    """Evaluate a GoogleAdsFieldService query over genuine field messages."""
+    match = _FIELD_QUERY_RE.match(query or "")
+    if match is None:
+        raise UnsupportedFieldQuery("unsupported query shape")
+    selected = [part.strip().lower() for part in match.group("select").split(",")]
+    if not selected or any(part not in _FIELD_ATTRIBUTES for part in selected):
+        raise UnsupportedFieldQuery("unsupported SELECT list")
+    conditions = []
+    if match.group("where"):
+        for condition in re.split(r"\s+AND\s+", match.group("where"), flags=re.IGNORECASE):
+            conditions.append(_field_condition(condition))
+
+    def accepted(field_message):
+        for attr, op, wanted in conditions:
+            actual = _field_attribute(field_message, attr)
+            items = list(actual) if attr in (
+                "selectable_with", "attribute_resources", "metrics", "segments", "enum_values") else [actual]
+            if op in ("LIKE", "NOT LIKE"):
+                pattern = like_pattern(wanted[0], honor_escapes=honor_escapes)
+                hit = any(isinstance(item, str) and pattern.match(item) for item in items)
+                if hit != (op == "LIKE"):
+                    return False
+            elif op in ("=", "IN"):
+                if not any(item in wanted for item in items):
+                    return False
+            elif any(item in wanted for item in items):
+                return False
+        return True
+
+    matched = [field_message for field_message in fields if accepted(field_message)]
+    if match.group("order"):
+        attr, *direction = match.group("order").split()
+        if attr.lower() not in _FIELD_ATTRIBUTES:
+            raise UnsupportedFieldQuery("unsupported ORDER BY")
+        matched.sort(key=lambda item: str(_field_attribute(item, attr.lower())),
+                     reverse=bool(direction) and direction[0].upper() == "DESC")
+    if match.group("limit"):
+        matched = matched[:int(match.group("limit"))]
+    projected = []
+    for field_message in matched:
+        copy = get_ads_type("GoogleAdsField")
+        copy.resource_name = field_message.resource_name
+        for attr in selected:
+            if attr == "resource_name":
+                continue
+            value = getattr(field_message, attr)
+            if attr in ("selectable_with", "attribute_resources", "metrics", "segments", "enum_values"):
+                getattr(copy, attr).extend(list(value))
+            else:
+                setattr(copy, attr, value)
+        projected.append(copy)
+    return projected
+
+
 def _req_field(args, kwargs, name, default=""):
     if name in kwargs and kwargs[name] not in (None, ""):
         return kwargs[name]
@@ -165,6 +343,8 @@ class _FakeService:
         owner, service = self._owner, self._name
 
         def _call(*args, **kwargs):
+            if service == _FIELD_SERVICE and method in _FIELD_METHODS:
+                return owner._do_field_call(method, args, kwargs)
             if method in ("search", "search_stream"):
                 rows = owner._do_search(service, method, args, kwargs)
                 if method == "search_stream":
@@ -210,6 +390,15 @@ class FakeGoogleAdsClient:
         self._planner: dict = {}
         self._planner_calls: list = []
         self._services: dict[str, _FakeService] = {}
+        # GoogleAdsFieldService substitute: genuine GoogleAdsField messages
+        # served by query, with every request (including pages) recorded.
+        self._fields: list = []
+        self._field_error: Exception | None = None
+        self._field_error_budget: int | None = None
+        self.field_hook = None
+        self.field_like_honors_escapes = True
+        self.field_searches: list[FieldSearchCall] = []
+        self.unsupported_field_queries: list[str] = []
 
     # -- construction-compatible surface
     def get_service(self, name, version=None):
@@ -243,6 +432,17 @@ class FakeGoogleAdsClient:
         """Every search raises ``exc`` (or only the first ``times`` calls)."""
         self._search_error = exc
         self._search_error_budget = times
+        return self
+
+    def stub_fields(self, field_dicts: list[dict]):
+        """Serve these GoogleAdsField fixtures from GoogleAdsFieldService."""
+        self._fields = [make_field(d) for d in field_dicts]
+        return self
+
+    def stub_field_error(self, exc: Exception, times: int | None = None):
+        """Every field-service request raises ``exc`` (or the first ``times``)."""
+        self._field_error = exc
+        self._field_error_budget = times
         return self
 
     # -- recording accessors
@@ -305,6 +505,86 @@ class FakeGoogleAdsClient:
         )
         from mutation_response_oracle import success_response
         return success_response(self, service, method, req)
+
+    def _do_field_call(self, method, args, kwargs):
+        services = importlib.import_module(f"google.ads.googleads.{API_VERSION}.services.types")
+        request = kwargs.get("request")
+        if request is None and args:
+            request = args[0]
+        if method == "get_google_ads_field":
+            if not isinstance(request, services.GetGoogleAdsFieldRequest):
+                request = services.GetGoogleAdsFieldRequest(request)
+            if kwargs.get("resource_name") is not None:
+                request.resource_name = kwargs["resource_name"]
+        else:
+            if request is not None and kwargs.get("query") is not None:
+                raise ValueError("If the `request` argument is set, then none of "
+                                 "the individual field arguments should be set.")
+            if not isinstance(request, services.SearchGoogleAdsFieldsRequest):
+                request = services.SearchGoogleAdsFieldsRequest(request)
+            if kwargs.get("query") is not None:
+                request.query = kwargs["query"]
+        retry, timeout = kwargs.get("retry"), kwargs.get("timeout")
+
+        def rpc(page_request, retry=None, timeout=None, metadata=()):
+            call = FieldSearchCall(
+                method=method,
+                query=str(getattr(page_request, "query", "")),
+                page_size=int(getattr(page_request, "page_size", 0) or 0),
+                page_token=str(getattr(page_request, "page_token", "")),
+                timeout=timeout,
+                retry=retry,
+            )
+            self.field_searches.append(call)
+            if self.field_hook is not None:
+                self.field_hook(call)
+            if self._field_error is not None:
+                if self._field_error_budget is None:
+                    raise self._field_error
+                if self._field_error_budget > 0:
+                    self._field_error_budget -= 1
+                    raise self._field_error
+            if method == "get_google_ads_field":
+                for field_message in self._fields:
+                    if field_message.resource_name == page_request.resource_name:
+                        return field_message
+                from google.api_core.exceptions import NotFound
+
+                raise NotFound("synthetic field service has no such field")
+            try:
+                matched = field_query_matches(call.query, self._fields,
+                                              honor_escapes=self.field_like_honors_escapes)
+            except UnsupportedFieldQuery:
+                self.unsupported_field_queries.append(call.query)
+                failure = get_ads_type("GoogleAdsFailure")
+                json_format.ParseDict({"errors": [{
+                    "error_code": {"query_error": "UNEXPECTED_INPUT"},
+                    "message": "The synthetic field service could not evaluate this query.",
+                }]}, failure._pb)
+                raise GoogleAdsException(None, None, failure, "synthetic-field-request") from None
+            offset = 0
+            if call.page_token:
+                if not call.page_token.startswith("synthetic-field-page-"):
+                    raise ValueError("unknown synthetic field page token")
+                offset = int(call.page_token.rsplit("-", 1)[1])
+            size = call.page_size if call.page_size > 0 else len(matched) or 1
+            response = services.SearchGoogleAdsFieldsResponse(
+                results=matched[offset:offset + size],
+                total_results_count=len(matched),
+            )
+            if offset + size < len(matched):
+                response.next_page_token = f"synthetic-field-page-{offset + size}"
+            return response
+
+        first = rpc(request, retry=retry, timeout=timeout)
+        if method == "get_google_ads_field":
+            return first
+        from google.ads.googleads.v25.services.services.google_ads_field_service.pagers import (
+            SearchGoogleAdsFieldsPager,
+        )
+
+        return SearchGoogleAdsFieldsPager(method=rpc, request=request, response=first,
+                                          retry=retry, timeout=timeout, metadata=())
 
 
 
@@ -786,12 +1066,38 @@ def console_script(name: str = "ads-mcp") -> Path:
     return path
 
 
+ISOLATED_CREDENTIAL_VARIABLES = ("GOOGLE_APPLICATION_CREDENTIALS", "CLOUDSDK_CONFIG")
+_AMBIENT_HOME = os.environ.get("HOME")
+_ISOLATED_HOME: list[str] = []
+
+
+def isolated_home() -> str:
+    """An empty per-session HOME: no ambient gcloud ADC or google-ads.yaml."""
+    if not _ISOLATED_HOME:
+        import tempfile
+
+        _ISOLATED_HOME.append(tempfile.mkdtemp(prefix="ads-mcp-oracle-home-"))
+    return _ISOLATED_HOME[0]
+
+
+def isolate_credential_environment(monkeypatch, home=None):
+    """In-process counterpart of scrubbed_env's ambient-credential isolation."""
+    for name in ISOLATED_CREDENTIAL_VARIABLES:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("HOME", str(home if home is not None else isolated_home()))
+
+
 def scrubbed_env(overlay: dict | None = None) -> dict:
     env = {
         k: v
         for k, v in os.environ.items()
         if not k.startswith(("GOOGLE_ADS_", "ADS_MCP_"))
+        and k not in ISOLATED_CREDENTIAL_VARIABLES
     }
+    # The operator's own home may hold gcloud ADC or google-ads.yaml. A HOME a
+    # test deliberately contained (monkeypatched) is kept as it is.
+    if env.get("HOME") is None or env.get("HOME") == _AMBIENT_HOME:
+        env["HOME"] = isolated_home()
     env.update(overlay or {})
     return env
 
