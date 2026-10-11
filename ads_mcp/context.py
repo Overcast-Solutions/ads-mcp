@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional
 
 from ads_mcp import auth
 from ads_mcp.continuation import SnapshotStore
-from ads_mcp.field_metadata import FieldCatalog
+from ads_mcp.field_metadata import LOOKUP as FIELD_METADATA_LOOKUP, FieldCatalog
 from ads_mcp.transport import run_with_retry
 
 
@@ -125,6 +125,34 @@ class ServerContext:
         return run_with_retry(
             call,
             base_seconds=self.config.retry_base_seconds,
+            on_retry=_on_retry,
+        )
+
+    def retry_field_lookup(self, call, *, sleep=None):
+        """Retry one field-service request, audited as a schema lookup.
+
+        The field service describes the API's own schema, so a retry here
+        addresses no account and is not the caller's read being retried: the
+        record names the lookup and carries no customer id. run_gaql's hint
+        lookup runs through here too, so a retried hint lookup can never be
+        read as a retried (or re-sent) query.
+        """
+
+        def _on_retry(attempt, exc):
+            self.observe_audit(
+                {
+                    "event": "retry",
+                    "tool": self.current_tool or "unknown",
+                    "lookup": FIELD_METADATA_LOOKUP,
+                    "outcome": f"transient fault, attempt {attempt}",
+                    "fault": type(exc).__name__,
+                },
+            )
+
+        return run_with_retry(
+            call,
+            base_seconds=self.config.retry_base_seconds,
+            sleep=sleep,
             on_retry=_on_retry,
         )
 

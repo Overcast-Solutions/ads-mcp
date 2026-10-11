@@ -29,6 +29,9 @@ from ads_mcp.errors import ToolError, error_payload
 from ads_mcp.transport import TransportError
 
 TOOL = "get_resource_metadata"
+# What a retry of this lookup is called in the audit log: schema
+# metadata, never the account read whose error it may be explaining.
+LOOKUP = "field_metadata"
 
 MAX_REQUESTS = 3
 DEADLINE_SECONDS = 10.0
@@ -63,6 +66,15 @@ TOO_BROAD = {"metrics": "metrics.clicks", "segments": "segments.date"}
 TOKEN_REFUSAL = (
     "page_token is malformed, or belongs to another tool, name or page_size. "
     "Restart from the first page without a page token."
+)
+DEADLINE_REFUSAL = (
+    f"the field-metadata deadline of {DEADLINE_SECONDS:g}s for this lookup, "
+    "which covers retry backoff and every follow-on page, left no time for "
+    "another request"
+)
+BUDGET_REFUSAL = (
+    f"the field-metadata budget of {MAX_REQUESTS} requests for this lookup, "
+    "which counts every retried attempt and every follow-on page, is exhausted"
 )
 
 
@@ -167,21 +179,44 @@ class FieldCatalog:
 
 
 class _Budget:
-    """At most MAX_REQUESTS field-service requests under one wall deadline."""
+    """At most MAX_REQUESTS field-service requests under one wall deadline.
+
+    The clock starts when the lookup starts, and every request — a retried
+    attempt and a follow-on page included — is served out of the same two
+    allowances. A caller therefore waits at most ``DEADLINE_SECONDS`` for a
+    lookup however the time is spent: a request receives only the time still
+    left, and a retry backoff that would outlast the deadline fails the
+    lookup instead of sleeping past it.
+    """
 
     def __init__(self):
         self.remaining = MAX_REQUESTS
         self.deadline = time.monotonic() + DEADLINE_SECONDS
 
+    def left(self) -> float:
+        """Seconds still inside the deadline; zero or less once it passes."""
+        return self.deadline - time.monotonic()
+
     def take(self) -> float:
-        left = self.deadline - time.monotonic()
-        if self.remaining <= 0 or left <= 0:
-            raise TransportError(
-                "the field-metadata budget of "
-                f"{MAX_REQUESTS} requests within {DEADLINE_SECONDS:g}s is exhausted"
-            )
+        """The timeout for one more request, or why there can be none."""
+        left = self.left()
+        if left <= 0:
+            raise TransportError(DEADLINE_REFUSAL)
+        if self.remaining <= 0:
+            raise TransportError(BUDGET_REFUSAL)
         self.remaining -= 1
         return left
+
+    def backoff(self, seconds: float) -> None:
+        """Wait before a retry, never past the deadline.
+
+        A backoff that does not fit leaves no room for the attempt it would
+        precede, so the lookup fails on the deadline now rather than sleeping
+        towards the same answer.
+        """
+        if seconds >= self.left():
+            raise TransportError(DEADLINE_REFUSAL)
+        time.sleep(seconds)
 
 
 def _like(value: str) -> str:
@@ -208,7 +243,14 @@ def _record(message) -> dict:
     }
 
 
-def _search(ctx, budget: _Budget, query: str) -> list:
+def _page(ctx, budget: _Budget, query: str, page_token: str) -> tuple[list, str]:
+    """One field-service page: its own request slot, its own timeout.
+
+    Only the page that was asked for is read. The SDK pager would otherwise
+    fetch the rest itself, inside the attribute access that consumes it, on
+    this request's timeout and outside the request budget; the next page is
+    asked for here instead, as the request it is.
+    """
     def once():
         timeout = budget.take()
         client = ctx.client()
@@ -216,9 +258,21 @@ def _search(ctx, budget: _Budget, query: str) -> list:
         request = client.get_type("SearchGoogleAdsFieldsRequest")
         request.query = query
         request.page_size = PROVIDER_PAGE_SIZE
-        return list(service.search_google_ads_fields(request=request, timeout=timeout))
+        if page_token:
+            request.page_token = page_token
+        page = service.search_google_ads_fields(request=request, timeout=timeout)
+        return list(page.results), page.next_page_token
 
-    return ctx.retry(once)
+    return ctx.retry_field_lookup(once, sleep=budget.backoff)
+
+
+def _search(ctx, budget: _Budget, query: str) -> list:
+    """Every page of one field-service query, inside the shared budget."""
+    messages, token = _page(ctx, budget, query, "")
+    while token:
+        following, token = _page(ctx, budget, query, token)
+        messages.extend(following)
+    return messages
 
 
 def _fetch_family(ctx, top: str, budget: _Budget) -> dict:
@@ -306,7 +360,11 @@ def run(ctx, *, name, page_size=None, page_token=None) -> dict:
     else:
         chosen = [record for key, record in table.items()
                   if key.startswith(resolved + ".")]
-    if not chosen:
+    # A resource the catalogue knows is described even when it carries no
+    # attribute fields of its own: an empty fields list beside its attribute
+    # resources, segments and metrics is the answer, and listing the resource
+    # as a close match for itself would not be.
+    if item is None and not chosen:
         return _not_found(resolved, table)
 
     entries = [_detail(record) for record in sorted(chosen, key=lambda r: r["name"])]

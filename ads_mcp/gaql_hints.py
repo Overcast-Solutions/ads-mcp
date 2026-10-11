@@ -155,11 +155,14 @@ def _operator_hints(field: str, record, table) -> list[dict]:
               if value not in PLACEHOLDER_VALUES]
     if record["data_type"] == "ENUM" and values:
         listed = values[:MAX_LISTED_VALUES]
-        suffix = "" if len(listed) == len(values) else ", ..."
+        # Prose, not an ellipsis: a trailing ", ..." ran into the sentence's
+        # own full stop and read as doubled punctuation.
+        more = ("" if len(listed) == len(values)
+                else f", and {len(values) - len(listed)} more")
         hints.append(_hint(
             "enum_values",
             f"Compare against this field's own enum values: "
-            f"{', '.join(listed)}{suffix}.",
+            f"{', '.join(listed)}{more}.",
             [name],
         ))
     return hints
