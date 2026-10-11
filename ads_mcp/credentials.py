@@ -18,6 +18,7 @@ from __future__ import annotations
 import errno
 import json
 import os
+import re
 import stat
 from dataclasses import dataclass
 from pathlib import Path
@@ -280,6 +281,16 @@ def _resolve_adc(config) -> Resolution:
             "AUTH_CONFIG_UNREADABLE_FILE",
             f"{ADC_LABEL} {path} is not valid JSON: {type(exc).__name__}",
         ) from None
+    except Exception as exc:
+        # A decoder can fail outside its own error type: thirty thousand
+        # nested lists exhaust the C scanner's stack and raise RecursionError
+        # on the minimum runtime. That is still an unreadable credential
+        # file, not an internal fault, and the name of the failure is all
+        # that may be said about the contents.
+        raise AuthConfigError(
+            "AUTH_CONFIG_UNREADABLE_FILE",
+            f"{ADC_LABEL} {path} could not be parsed: {type(exc).__name__}",
+        ) from None
     if not isinstance(data, dict):
         raise AuthConfigError(
             "AUTH_CONFIG_UNREADABLE_FILE",
@@ -317,6 +328,40 @@ class _YamlRefused(Exception):
     """A document shape this server will not accept; carries its own wording."""
 
 
+#: Ten decimal digits with no leading zero: the only unquoted login id text
+#: that is the account it reads as. Every other YAML number form resolves to
+#: some other integer.
+TEN_PLAIN_DIGITS = re.compile(r"[1-9][0-9]{9}\Z", re.ASCII)
+
+
+class _YamlNumber:
+    """A scalar YAML resolved to a number, keeping the text it was written as.
+
+    YAML 1.1 has far more number forms than decimal, and several of them read
+    like a customer id while meaning another one: 010000000000 is octal,
+    0x499602D2 hex, 1_234_567_890 underscored and 342935:31:30 sexagesimal.
+    The resolved integer cannot tell them apart from ten plain digits, so the
+    source text is carried alongside it and decides.
+
+    Equality follows the resolved value so duplicate numeric keys are still
+    duplicates however each one was spelled.
+    """
+
+    __slots__ = ("value", "text")
+
+    def __init__(self, value, text: str):
+        self.value = value
+        self.text = text
+
+    def __eq__(self, other):
+        if isinstance(other, _YamlNumber):
+            return self.value == other.value
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(self.value)
+
+
 def _strict_loader():
     """``yaml.SafeLoader`` with anchors, aliases and duplicate keys refused.
 
@@ -347,6 +392,16 @@ def _strict_loader():
                 seen.append(key)
             return super().construct_mapping(node, deep=deep)
 
+        def construct_number(self, node):
+            tag = node.tag.rsplit(":", 1)[-1]
+            build = (self.construct_yaml_int if tag == "int"
+                     else self.construct_yaml_float)
+            return _YamlNumber(build(node), node.value)
+
+    for tag in ("int", "float"):
+        StrictLoader.add_constructor(
+            f"tag:yaml.org,2002:{tag}", StrictLoader.construct_number
+        )
     return StrictLoader
 
 
@@ -376,6 +431,15 @@ def _resolve_yaml(config) -> Resolution:
             "AUTH_CONFIG_UNREADABLE_FILE",
             f"{YAML_LABEL} {path} is not valid YAML: {type(exc).__name__}",
         ) from None
+    except Exception as exc:
+        # The composer recurses once per nesting level, so a document twenty
+        # thousand sequences deep raises RecursionError rather than a
+        # YAMLError. Either way the file cannot be read, and only the name of
+        # the failure may be reported.
+        raise AuthConfigError(
+            "AUTH_CONFIG_UNREADABLE_FILE",
+            f"{YAML_LABEL} {path} could not be parsed: {type(exc).__name__}",
+        ) from None
     if not isinstance(data, dict):
         raise AuthConfigError(
             "AUTH_CONFIG_UNREADABLE_FILE",
@@ -397,19 +461,20 @@ def _resolve_yaml(config) -> Resolution:
 
 
 def _yaml_login(value, path: Path) -> str:
-    """The yaml login_customer_id: a quoted id, or an int of exactly 10 digits.
+    """The yaml login_customer_id: a quoted id, or ten unquoted plain digits.
 
     An unquoted id is a number to YAML, and a leading zero makes it an octal
-    one: 0123456789 is not the account it looks like. Only an int that already
-    reads as ten decimal digits is accepted; everything else asks for quotes.
+    one: 0123456789 is not the account it looks like. A number is therefore
+    accepted only when it was written as exactly ten decimal digits with no
+    leading zero; a string keeps the ordinary customer-id rule, which allows
+    the dashed form and a leading zero. Everything else asks for quotes rather
+    than becoming a different account.
     """
     text = None
     if isinstance(value, str):
         text = value
-    elif isinstance(value, int) and not isinstance(value, bool):
-        digits = str(value)
-        if len(digits) == 10:
-            text = digits
+    elif isinstance(value, _YamlNumber) and TEN_PLAIN_DIGITS.match(value.text):
+        text = value.text
     if text is not None:
         try:
             return normalize_customer_id(text)
