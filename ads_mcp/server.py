@@ -192,8 +192,9 @@ def main(argv=None):
                    if value is not None]
         if offered:
             parser.error(
-                f"{' and '.join(offered)} apply to --transport http only; "
-                "stdio has no address to bind"
+                f"{' and '.join(offered)} "
+                f"{'apply' if len(offered) > 1 else 'applies'} to "
+                "--transport http only; stdio has no address to bind"
             )
         return _run_stdio()
     if args.transport != "http":
@@ -269,7 +270,7 @@ def _run_http(parser, args):
         for line in http_transport.serving_lines(
                 spec, listener.getsockname()[1]):
             print(line, file=sys.stderr, flush=True)
-        return http_transport.serve(server, listener)
+        return http_transport.serve(server, listener, spec.display)
     except KeyboardInterrupt:
         return 0
     finally:
