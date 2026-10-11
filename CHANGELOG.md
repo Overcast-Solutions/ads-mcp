@@ -30,6 +30,47 @@
   invalid-request error. Preserve exact string/integer correlation, response-free
   notifications, SDK response handling and recovery on the same stdio connection.
 
+- Read OAuth material from a chosen credential source:
+  `GOOGLE_ADS_CREDENTIAL_SOURCE` selects `files` (the default), `adc` for an
+  authorized-user Application Default Credentials file, or `google_ads_yaml`
+  for an existing `google-ads.yaml`. The endpoint, transport, headers and
+  spend limits still come from this server's own configuration; keys the
+  source does not read are ignored and listed by `health_check`. See the
+  [credential sources guide](docs/credential-sources.md).
+
+- Serve read-only MCP over local streamable HTTP, with
+  `ads-mcp --transport http`, for clients that cannot launch a subprocess.
+  This is a new listening
+  surface: it binds literal loopback only, refuses to start unless the
+  configuration is read-only, checks `Host` and `Origin` before the SDK parses
+  anything, and is unauthenticated, so any local process can read the
+  configured accounts through it. stdio stays the default and is unchanged.
+  See the [HTTP transport guide](docs/http-transport.md) for the residual risk
+  before enabling it.
+
+- Four new direct runtime dependencies, with floors matched by
+  `requirements-min.txt`: `PyYAML` 6.0.3 and `google-auth` 2.61.0 for the new
+  credential sources, `starlette` 1.7.0 and `uvicorn` 0.54.0 for the HTTP
+  transport.
+
+- Position guarded writes as the core capability rather than a side feature:
+  the README, the server description and the tool catalog lead with
+  staged plans, the dry-run preview required by default
+  (`ADS_MCP_REQUIRE_DRY_RUN`), the budget and CPC caps and the audit log, and
+  the README maps Google's own read-only server tool by tool.
+
+- Repairs within this cycle: `get_resource_metadata` keeps its field-service
+  requests, retry backoff included, inside one 10-second deadline measured
+  from its first request, counts every page of them against the same budget,
+  audits a metadata lookup as itself rather than as the query that prompted
+  it, and carries its `page_size` default in the tool schema; a `google-ads.yaml`
+  `login_customer_id` written as an unquoted octal, hex, underscored,
+  sexagesimal, signed or fractional number is refused instead of becoming a
+  different account; and the HTTP endpoint answers `GET` and `DELETE` with
+  `405`, times out idle and trickling request bodies, drains an oversize body
+  before its `413`, and keeps caller input out of every refusal and out of
+  stderr.
+
 ## Public source history — 0.1.0
 
 The project is available as public source. These changes are already on the

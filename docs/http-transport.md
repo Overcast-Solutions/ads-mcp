@@ -33,6 +33,13 @@ resolver cannot move the endpoint off loopback. Anything else, including a
 hostname or `0.0.0.0`, is refused before anything is bound. The default is
 `127.0.0.1`.
 
+`localhost` in any case is also *printed* as `http://127.0.0.1:PORT/mcp`, the
+authority the endpoint answers for however the caller's resolver maps the name,
+so the startup URL works as printed. Every other accepted address is printed as
+the literal that was bound — `--host 127.0.0.2` prints
+`http://127.0.0.2:PORT/mcp` — and that validated literal is accepted in `Host`
+and `Origin` alongside the three canonical authorities.
+
 `--port` takes plain decimal digits from 0 to 65535; the default is `8000`.
 Use `--port 0` to take any free ephemeral port and read the one you got from
 the startup line. Both options apply to `--transport http`; passing them
@@ -45,13 +52,16 @@ echoes the request back to the caller or into the log:
 
 | Check | Refusal |
 | --- | --- |
-| `Host` must be `127.0.0.1:PORT`, `localhost:PORT` or `[::1]:PORT` for the bound port | `421` |
-| `Origin`, when present, must be the `http` form of one of those authorities; an absent `Origin` is allowed | `403` |
-| request bodies over 1 MiB, including chunked bodies that only exceed it while streaming | `413` |
+| `Host` must be `127.0.0.1:PORT`, `localhost:PORT`, `[::1]:PORT` or the `--host` literal that was bound, each carrying the bound port; the host part is compared case-insensitively, so `LOCALHOST:PORT` is accepted while `localhost.:PORT` and any other authority are not | `421` |
+| `Origin`, when present, must be the `http` form of one of those same authorities, compared the same way; an absent `Origin` is allowed | `403` |
+| only `POST` is served at `/mcp`: a stateless server has no event stream to open and no session to delete, so `GET`, `DELETE` and every other method are refused at once | `405` with `Allow: POST` |
+| a request body that goes 10 seconds without a byte, or is still incomplete 30 seconds after its headers, ends the request — idle and total body timeouts, so a stalled or trickling client cannot hold a connection open | `408`, connection closed |
+| request bodies over 1 MiB, including chunked bodies that only exceed it while streaming. The rest of the body is drained first, up to 8 MiB and within those same timeouts, so an ordinary client finishes sending and reads the refusal instead of a connection reset | `413` with `Connection: close` |
 | a POST body that is not a single JSON-RPC object with an absent or string/integer id | `400`, one fixed body |
 
-Together these stop a browser page, and a request arriving for some other
-authority, from reaching the server.
+Together these stop a browser page, a request arriving for some other
+authority, and a client that holds a connection without finishing a request,
+from reaching or occupying the server.
 
 ## Residual risk
 

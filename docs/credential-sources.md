@@ -82,10 +82,21 @@ refused, because each of them lets the file mean something other than it reads.
 
 **Read:** `client_id`, `client_secret` and `refresh_token` (each a non-blank
 string), plus `login_customer_id`. An explicit `GOOGLE_ADS_LOGIN_CUSTOMER_ID`
-overrides the file's value. Quote the id — `login_customer_id: '123-456-7890'`
-— because YAML reads an unquoted id as a number and a leading zero as octal;
-an unquoted integer is accepted only when it already reads as exactly ten
-digits.
+overrides the file's value.
+
+Quote the login id. An unquoted one is a YAML 1.1 number, and only a plain
+decimal literal of exactly ten digits with no leading zero is the account it
+reads as; every other numeric form resolves to some other integer and gets
+the `AUTH_CONFIG_INCOMPLETE` refusal that asks for quotes, before any
+credential is used. The forms that read like an id and are not one: a leading
+zero is octal (`010000000000`), a `0x` prefix is hexadecimal (`0x499602D2`),
+digit groups may carry underscores (`1_234_567_890`), a colon makes it
+sexagesimal (`342935:31:30`), and a sign (`+1234567890`) or a decimal point
+(`1234567890.0`) makes it yet another literal.
+
+Quoted string forms keep working exactly as before: write
+`login_customer_id: '123-456-7890'` and the value keeps the ordinary
+customer-id rule, dashes and a leading zero included.
 
 **Ignored, never applied:** every other key, including `developer_token`,
 `endpoint`, `http_proxy`, `logging`, `json_key_file_path`,

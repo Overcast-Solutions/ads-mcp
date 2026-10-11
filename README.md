@@ -1,10 +1,11 @@
 # ads-mcp
 
 A Google Ads MCP server for agents. **Guarded writes are the core capability:**
-every change is staged as a plan, previewed as a dry run, checked against the
-configured budget and CPC caps, and recorded in an append-only audit log before
-it reaches an account. The server starts read-only when `ADS_MCP_READ_ONLY` is
-unset, and `ADS_MCP_READ_ONLY=false` enables writes.
+every change is staged as a plan, checked against the configured budget and CPC
+caps, and recorded in an append-only audit log before it reaches an account. A
+dry-run preview is required by default, and only an operator who sets
+`ADS_MCP_REQUIRE_DRY_RUN=false` can waive it. The server starts read-only when
+`ADS_MCP_READ_ONLY` is unset, and `ADS_MCP_READ_ONLY=false` enables writes.
 
 The source is publicly available under Apache License 2.0. Install from source;
 the package is not published to PyPI. Supports CPython 3.12–3.14 on Linux and
@@ -117,9 +118,9 @@ alongside its 35 reads. Their three tools map across like this:
 
 | Google's server | ads-mcp | Argument differences |
 | --- | --- | --- |
-| `list_accessible_customers` | `list_accounts` | takes no arguments; the accounts come from the configured `GOOGLE_ADS_LOGIN_CUSTOMER_ID`, which cannot be supplied per call |
-| `search` | `run_gaql` | `query` is required; `customer_id` is optional and defaults to the configured account; adds `format` (`json`, `table`, `csv`), `page_size` and `page_token` for bounded responses |
-| `get_resource_metadata` | `get_resource_metadata` | `name` is required and accepts a resource (`campaign`), a field (`campaign.status`) or a field prefix; adds `page_size` and `page_token`; takes no account argument, because schema metadata addresses no account |
+| `list_accessible_customers` | `list_accounts` | neither takes arguments, and they answer about different sets: theirs lists the accounts the credentials can access directly, while `list_accounts` walks the account hierarchy under the login customer id if one is configured and otherwise under the configured customer id (`GOOGLE_ADS_LOGIN_CUSTOMER_ID` overrides a `google-ads.yaml` login id); no id can be supplied per call |
+| `search` | `run_gaql` | theirs takes the query apart into structured arguments — `customer_id` is required, with `fields`, `resource`, `conditions`, `orderings`, `limit` and an optional `login_customer_id` — while `run_gaql` takes one GAQL query string in `query`, makes `customer_id` optional (it defaults to the configured account), and adds `format` (`json`, `table`, `csv`), `page_size` and `page_token` for bounded responses |
+| `get_resource_metadata` | `get_resource_metadata` | same tool name, renamed argument: theirs takes `resource_name`, ads-mcp takes `name`, which accepts a resource (`campaign`), a field (`campaign.status`) or a field prefix; adds `page_size` (default 100) and `page_token`; takes no account argument, because schema metadata addresses no account |
 
 ads-mcp does not offer several things their deployment path provides: MCP
 resources, a per-call login customer id, a hosted OAuth proxy, and a Cloud Run

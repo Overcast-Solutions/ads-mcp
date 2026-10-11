@@ -9,6 +9,7 @@ from pydantic import StrictInt, StrictStr
 
 from ads_mcp.audit import audit_writable
 from ads_mcp.errors import ToolError, classify_exception
+from ads_mcp.field_metadata import DEFAULT_PAGE_SIZE
 from ads_mcp.tools.registry import KIND_READ, ToolSpec, guarded
 from ads_mcp.transport import TransportError
 
@@ -71,7 +72,9 @@ def register(server, ctx):
         ),
     )
     def get_resource_metadata(
-        name: StrictStr, page_size: StrictInt | None = None,
+        # The schema carries the default, so a client reads it from
+        # tools/list instead of the prose: 100 is what the tool applies.
+        name: StrictStr, page_size: StrictInt | None = DEFAULT_PAGE_SIZE,
         page_token: StrictStr | None = None,
     ) -> dict:
         from ads_mcp import field_metadata

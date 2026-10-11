@@ -237,7 +237,7 @@ Describe the Google Ads API's own reporting schema from GoogleAdsFieldService: s
 | Parameter | Type | Required | Default |
 |---|---|---|---|
 | `name` | string | yes | — |
-| `page_size` | integer | no | — |
+| `page_size` | integer | no | `100` |
 | `page_token` | string | no | — |
 
 ### `get_responsive_search_ad_urls`

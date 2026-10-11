@@ -124,9 +124,10 @@ def create_server(config: Config, *, client=None, plan_store=None, clock=None):
         version=_package_version(),
         description=(
             "Google Ads MCP server built for autonomous agents: guarded "
-            "writes — every change staged as a plan, a required dry-run "
-            "preview, server-side budget and CPC caps, and an append-only "
-            "audit log — plus the full read surface. Read-only until "
+            "writes — every change staged as a plan, a dry-run preview "
+            "required by default (waivable with ADS_MCP_REQUIRE_DRY_RUN), "
+            "server-side budget and CPC caps, and an append-only audit log "
+            "— plus the full read surface. Read-only until "
             "ADS_MCP_READ_ONLY=false."
         ),
     )
